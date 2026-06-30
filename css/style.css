@@ -1494,8 +1494,28 @@ nav{
     transform:translateY(0);
 }
 
-/* hover avatar => hiện menu */
-.profile:hover + .profile-menu{
+.profile-wrapper{
+    position:relative;
+}
+
+/* menu */
+.profile-menu{
+    position:absolute;
+    top:60px;
+    right:0;
+    width:280px;
+    background:#fff;
+    border-radius:15px;
+    box-shadow:var(--shadow);
+
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:.25s ease;
+}
+
+/* khi mở bằng JS */
+.profile-menu.active{
     opacity:1;
     visibility:visible;
     transform:translateY(0);
