@@ -1558,3 +1558,25 @@ nav{
     visibility:visible;
     transform:translateY(0) scale(1);
 }
+.notification-box{
+    position:absolute;
+    top:70px;
+    right:120px;
+    width:320px;
+
+    background:#fff;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:0.25s ease;
+
+    z-index:1000;
+}
+.notification-box.active{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+}
