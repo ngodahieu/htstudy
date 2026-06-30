@@ -1468,7 +1468,38 @@ nav{
 }
 
 }
+/* =======================
+   PROFILE MENU HOVER FIX
+======================= */
 
+.profile{
+    position:relative;
+}
+
+/* giữ menu bám vào avatar */
+.profile-menu{
+    position:absolute;
+    top:60px;
+    right:0;
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:.25s ease;
+}
+
+/* khi active (click JS) */
+.profile-menu.active{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+}
+
+/* hover avatar => hiện menu */
+.profile:hover + .profile-menu{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0);
+}
 /*=========================================================
                     END
 =========================================================*/
