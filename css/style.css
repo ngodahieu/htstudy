@@ -1,0 +1,578 @@
+/* ===========================
+   RESET
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+    background:#f5f7fb;
+    color:#222;
+    overflow-x:hidden;
+
+}
+
+img{
+
+    width:100%;
+    display:block;
+
+}
+
+a{
+
+    text-decoration:none;
+
+}
+
+ul{
+
+    list-style:none;
+
+}
+
+.container{
+
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+
+}
+
+
+/* ===========================
+HEADER
+=========================== */
+
+header{
+
+    width:100%;
+    position:fixed;
+    top:0;
+    left:0;
+
+    background:white;
+
+    z-index:999;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
+
+}
+
+header .container{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    height:80px;
+
+}
+
+.logo{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#2563eb;
+
+}
+
+.logo span{
+
+    color:#ff9800;
+
+}
+
+nav ul{
+
+    display:flex;
+
+    gap:35px;
+
+}
+
+nav a{
+
+    color:#333;
+
+    font-weight:500;
+
+    transition:.3s;
+
+}
+
+nav a:hover{
+
+    color:#2563eb;
+
+}
+
+.login-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px 28px;
+
+    border-radius:30px;
+
+    transition:.3s;
+
+}
+
+.login-btn:hover{
+
+    background:#1747b7;
+
+}
+
+
+/* ===========================
+HERO
+=========================== */
+
+.hero{
+
+    padding-top:120px;
+
+    min-height:100vh;
+
+    display:flex;
+
+    align-items:center;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #5b8cff
+    );
+
+    color:white;
+
+}
+
+.hero-content{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    align-items:center;
+
+    gap:60px;
+
+}
+
+.hero-left h1{
+
+    font-size:60px;
+
+    line-height:1.2;
+
+    margin-bottom:30px;
+
+}
+
+.hero-left span{
+
+    color:#ffd54f;
+
+}
+
+.hero-left p{
+
+    font-size:18px;
+
+    line-height:1.8;
+
+    margin-bottom:40px;
+
+}
+
+.hero-button{
+
+    display:flex;
+
+    gap:20px;
+
+}
+
+.btn-primary{
+
+    background:#ff9800;
+
+    color:white;
+
+    padding:15px 35px;
+
+    border-radius:40px;
+
+    transition:.3s;
+
+    font-weight:600;
+
+}
+
+.btn-primary:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.25);
+
+}
+
+.btn-secondary{
+
+    border:2px solid white;
+
+    color:white;
+
+    padding:15px 35px;
+
+    border-radius:40px;
+
+    transition:.3s;
+
+}
+
+.btn-secondary:hover{
+
+    background:white;
+
+    color:#2563eb;
+
+}
+
+.hero-right{
+
+    animation:float 4s ease-in-out infinite;
+
+}
+
+
+/* ===========================
+ANIMATION
+=========================== */
+
+@keyframes float{
+
+    0%{
+
+        transform:translateY(0px);
+
+    }
+
+    50%{
+
+        transform:translateY(-20px);
+
+    }
+
+    100%{
+
+        transform:translateY(0);
+
+    }
+
+}
+/*====================================================
+    SECTION TITLE
+====================================================*/
+
+section{
+
+    padding:100px 0;
+
+}
+
+section h2{
+
+    text-align:center;
+
+    font-size:42px;
+
+    font-weight:700;
+
+    color:#222;
+
+    margin-bottom:60px;
+
+    position:relative;
+
+}
+
+section h2::after{
+
+    content:"";
+
+    width:90px;
+
+    height:5px;
+
+    background:#2563eb;
+
+    display:block;
+
+    margin:18px auto 0;
+
+    border-radius:30px;
+
+}
+
+
+/*====================================================
+    STATS
+====================================================*/
+
+.stats{
+
+    background:#ffffff;
+
+}
+
+.stats .container{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:30px;
+
+}
+
+.stats .card{
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:20px;
+
+    text-align:center;
+
+    transition:.35s;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    cursor:pointer;
+
+}
+
+.stats .card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 18px 40px rgba(37,99,235,.18);
+
+}
+
+.stats .card h2{
+
+    color:#2563eb;
+
+    font-size:48px;
+
+    margin-bottom:10px;
+
+}
+
+.stats .card p{
+
+    color:#666;
+
+    font-size:18px;
+
+    font-weight:500;
+
+}
+
+
+/*====================================================
+    COURSES
+====================================================*/
+
+.courses{
+
+    background:#f7f9fd;
+
+}
+
+.course-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:35px;
+
+}
+
+.course-card{
+
+    background:white;
+
+    padding:40px 30px;
+
+    border-radius:25px;
+
+    text-align:center;
+
+    transition:.35s;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.course-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-100%;
+
+    width:100%;
+
+    height:6px;
+
+    background:#2563eb;
+
+    transition:.4s;
+
+}
+
+.course-card:hover::before{
+
+    left:0;
+
+}
+
+.course-card:hover{
+
+    transform:translateY(-12px);
+
+    box-shadow:0 20px 45px rgba(0,0,0,.15);
+
+}
+
+.course-card i{
+
+    font-size:55px;
+
+    color:#2563eb;
+
+    margin-bottom:25px;
+
+}
+
+.course-card h3{
+
+    font-size:26px;
+
+    margin-bottom:15px;
+
+    color:#222;
+
+}
+
+.course-card p{
+
+    color:#666;
+
+    line-height:1.8;
+
+    font-size:16px;
+
+}
+
+.course-card:hover i{
+
+    transform:scale(1.12);
+
+    transition:.3s;
+
+    color:#ff9800;
+
+}
+
+
+/*====================================================
+    BUTTON EFFECT
+====================================================*/
+
+.course-card a{
+
+    display:inline-block;
+
+    margin-top:25px;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px 28px;
+
+    border-radius:30px;
+
+    transition:.3s;
+
+    font-weight:600;
+
+}
+
+.course-card a:hover{
+
+    background:#1747b7;
+
+}
+
+
+/*====================================================
+    CARD ANIMATION
+====================================================*/
+
+.course-card{
+
+    animation:fadeUp .8s ease;
+
+}
+
+@keyframes fadeUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
