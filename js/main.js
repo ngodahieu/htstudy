@@ -31,6 +31,9 @@ notificationBtn.addEventListener("click", (e) => {
 document.addEventListener("click", () => {
     profileMenu.classList.remove("active");
     notificationBox.classList.remove("active");
+
+    // reset xoay avatar
+    avatarBtn.classList.remove("active");
 });
 
 // ===============================
