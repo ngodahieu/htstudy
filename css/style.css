@@ -1520,6 +1520,41 @@ nav{
     visibility:visible;
     transform:translateY(0);
 }
-/*=========================================================
-                    END
-=========================================================*/
+
+/* =========================
+   AVATAR ROTATE EFFECT
+========================= */
+.profile img{
+    transition:0.35s ease;
+}
+
+/* khi active xoay nhẹ */
+.profile.active img{
+    transform:rotate(10deg) scale(1.05);
+}
+
+/* =========================
+   PROFILE MENU ANIMATION
+========================= */
+.profile-menu{
+    position:absolute;
+    top:60px;
+    right:0;
+    width:280px;
+    background:#fff;
+    border-radius:15px;
+    box-shadow:var(--shadow);
+
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(15px) scale(0.95);
+    transition:0.25s ease;
+    transform-origin:top right;
+}
+
+/* khi mở */
+.profile-menu.active{
+    opacity:1;
+    visibility:visible;
+    transform:translateY(0) scale(1);
+}
