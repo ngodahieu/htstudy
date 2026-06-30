@@ -21,8 +21,12 @@ avatarBtn.addEventListener("click", (e) => {
 // ===============================
 notificationBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+
     notificationBox.classList.toggle("active");
+
+    // đóng profile nếu đang mở
     profileMenu.classList.remove("active");
+    avatarBtn.classList.remove("active");
 });
 
 // ===============================
