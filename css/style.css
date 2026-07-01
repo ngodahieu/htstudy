@@ -1559,7 +1559,7 @@ nav{
     transform:translateY(0) scale(1);
 }
 .notification-box{
-    position:absolute;
+    position:fixed;
     top:70px;
     right:120px;
     width:320px;
