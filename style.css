@@ -3103,3 +3103,49 @@ transparent
 animation:footerLaser 8s linear infinite;
 
 }
+
+/*==========================================
+        COUNTDOWN NUMBER EFFECT
+==========================================*/
+
+.number-change{
+
+    animation:numberPop .45s ease;
+
+}
+
+@keyframes numberPop{
+
+    0%{
+
+        transform:scale(.85);
+
+        opacity:.6;
+
+        text-shadow:
+
+        0 0 40px #38c8ff;
+
+    }
+
+    50%{
+
+        transform:scale(1.15);
+
+        text-shadow:
+
+        0 0 45px white,
+
+        0 0 70px #4fd8ff;
+
+    }
+
+    100%{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
