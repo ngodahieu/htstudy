@@ -948,6 +948,388 @@ FLOAT EFFECT
 
 }
 
+/*==================================================
+                COURSES
+==================================================*/
+
+.courses{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+/* Background Glow */
+
+.courses::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:700px;
+
+    height:700px;
+
+    left:-250px;
+
+    top:-200px;
+
+    background:
+
+    radial-gradient(circle,
+
+    rgba(0,170,255,.15),
+
+    transparent 70%);
+
+    pointer-events:none;
+
+}
+
+.courses::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:600px;
+
+    height:600px;
+
+    right:-200px;
+
+    bottom:-200px;
+
+    background:
+
+    radial-gradient(circle,
+
+    rgba(40,120,255,.12),
+
+    transparent 70%);
+
+    pointer-events:none;
+
+}
+
+/*==============================
+GRID
+==============================*/
+
+.course-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:35px;
+
+}
+
+/*==============================
+CARD
+==============================*/
+
+.course-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    border-radius:26px;
+
+    background:
+
+    linear-gradient(
+
+    145deg,
+
+    rgba(17,32,64,.92),
+
+    rgba(7,14,30,.92)
+
+    );
+
+    border:1px solid rgba(130,190,255,.15);
+
+    backdrop-filter:blur(22px);
+
+    transition:.45s;
+
+    box-shadow:
+
+    0 20px 45px rgba(0,0,0,.35);
+
+}
+
+/* đường sáng */
+
+.course-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-150%;
+
+    left:-150%;
+
+    width:250%;
+
+    height:250%;
+
+    background:
+
+    linear-gradient(
+
+    135deg,
+
+    transparent,
+
+    rgba(255,255,255,.08),
+
+    transparent
+
+    );
+
+    transform:rotate(25deg);
+
+    transition:1s;
+
+}
+
+.course-card:hover::before{
+
+    top:-20%;
+
+    left:-20%;
+
+}
+
+/* Hover */
+
+.course-card:hover{
+
+    transform:
+
+    translateY(-12px)
+
+    scale(1.02);
+
+    border-color:#47c5ff;
+
+    box-shadow:
+
+    0 0 35px rgba(0,180,255,.28),
+
+    0 25px 55px rgba(0,0,0,.45);
+
+}
+
+/*==============================
+IMAGE
+==============================*/
+
+.course-card img{
+
+    width:100%;
+
+    height:240px;
+
+    object-fit:cover;
+
+    transition:.6s;
+
+}
+
+.course-card:hover img{
+
+    transform:scale(1.08);
+
+}
+
+/*==============================
+CONTENT
+==============================*/
+
+.course-content{
+
+    padding:28px;
+
+}
+
+.course-content h3{
+
+    color:white;
+
+    font-size:1.5rem;
+
+    margin-bottom:12px;
+
+    font-weight:700;
+
+}
+
+.course-content p{
+
+    color:#a8c0e5;
+
+    line-height:1.8;
+
+    margin-bottom:24px;
+
+}
+
+/*==============================
+INFO
+==============================*/
+
+.course-info{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    margin-bottom:28px;
+
+}
+
+.course-info span{
+
+    background:
+
+    rgba(0,160,255,.08);
+
+    border:1px solid rgba(120,190,255,.15);
+
+    padding:10px 15px;
+
+    border-radius:999px;
+
+    font-size:.82rem;
+
+    color:#d7ecff;
+
+}
+
+/*==============================
+BUTTON
+==============================*/
+
+.btn-course{
+
+    display:inline-flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:100%;
+
+    height:52px;
+
+    border-radius:999px;
+
+    background:
+
+    linear-gradient(
+
+    135deg,
+
+    #0f66df,
+
+    #37c8ff
+
+    );
+
+    color:white;
+
+    font-weight:600;
+
+    letter-spacing:.5px;
+
+    transition:.4s;
+
+    box-shadow:
+
+    0 10px 25px rgba(0,140,255,.25);
+
+}
+
+.btn-course:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+
+    0 0 30px rgba(0,190,255,.45);
+
+}
+
+/*==============================
+COURSE TITLE EFFECT
+==============================*/
+
+.course-content h3{
+
+    transition:.4s;
+
+}
+
+.course-card:hover h3{
+
+    color:#68d7ff;
+
+}
+
+/*==============================
+SMALL GLOW
+==============================*/
+
+.course-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    border-radius:26px;
+
+    pointer-events:none;
+
+    box-shadow:
+
+    inset 0 0 0 1px rgba(255,255,255,.04);
+
+}
+
+/*==============================
+ANIMATION
+==============================*/
+
+.course-card:nth-child(1){
+
+    animation:floating 7s infinite;
+
+}
+
+.course-card:nth-child(2){
+
+    animation:floating 8s infinite;
+
+}
+
+.course-card:nth-child(3){
+
+    animation:floating 9s infinite;
+
+}
+
 .time-box:nth-child(4){
 
     animation:floating 8s infinite;
