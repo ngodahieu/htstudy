@@ -2750,3 +2750,279 @@ body::after{
     z-index:-5;
 
 }
+
+/*==================================================
+            FOOTER ANIMATION
+==================================================*/
+
+/* Hiệu ứng xuất hiện */
+
+.footer{
+
+    opacity:0;
+
+    transform:translateY(80px);
+
+    animation:footerFade 1s ease forwards;
+
+    animation-delay:.3s;
+
+}
+
+@keyframes footerFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(80px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* Ánh sáng chạy trên đầu Footer */
+
+.footer::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-120%;
+
+    width:45%;
+
+    height:2px;
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    rgba(80,220,255,.9),
+
+    transparent
+
+    );
+
+    animation:footerLight 7s linear infinite;
+
+}
+
+@keyframes footerLight{
+
+    from{
+
+        left:-120%;
+
+    }
+
+    to{
+
+        left:220%;
+
+    }
+
+}
+
+/* Glow nền Footer */
+
+.footer{
+
+    overflow:hidden;
+
+}
+
+.footer::before{
+
+    animation:footerGlow 8s ease-in-out infinite alternate;
+
+}
+
+@keyframes footerGlow{
+
+    from{
+
+        filter:blur(0px);
+
+        opacity:.6;
+
+    }
+
+    to{
+
+        filter:blur(3px);
+
+        opacity:1;
+
+    }
+
+}
+
+/* Tiêu đề Footer */
+
+.footer h2,
+
+.footer h3{
+
+    transition:.35s;
+
+}
+
+.footer h2:hover,
+
+.footer h3:hover{
+
+    color:#63d7ff;
+
+    text-shadow:
+
+    0 0 18px rgba(0,200,255,.5);
+
+}
+
+/* Đoạn văn */
+
+.footer p{
+
+    transition:.35s;
+
+}
+
+.footer p:hover{
+
+    color:#dceeff;
+
+}
+
+/* Link */
+
+.footer li{
+
+    position:relative;
+
+    transition:.35s;
+
+}
+
+.footer li::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-3px;
+
+    width:0;
+
+    height:2px;
+
+    background:#4fd3ff;
+
+    transition:.35s;
+
+}
+
+.footer li:hover::after{
+
+    width:65%;
+
+}
+
+.footer li:hover{
+
+    color:#67dcff;
+
+    transform:translateX(10px);
+
+}
+
+/* Icon */
+
+.footer li i{
+
+    transition:.35s;
+
+}
+
+.footer li:hover i{
+
+    transform:rotate(-15deg) scale(1.2);
+
+    color:#7fe4ff;
+
+}
+
+/* Copyright */
+
+.copyright{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.copyright::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-100%;
+
+    top:0;
+
+    width:50%;
+
+    height:100%;
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    rgba(255,255,255,.08),
+
+    transparent
+
+    );
+
+    animation:copyrightLight 6s linear infinite;
+
+}
+
+@keyframes copyrightLight{
+
+    from{
+
+        left:-100%;
+
+    }
+
+    to{
+
+        left:180%;
+
+    }
+
+}
