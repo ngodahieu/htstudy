@@ -3026,3 +3026,47 @@ body::after{
     }
 
 }
+
+/*==============================
+    Footer Icon Animation
+==============================*/
+
+.footer li{
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+}
+
+.footer li i{
+
+    width:28px;
+    text-align:center;
+
+    color:#4ecfff;
+
+    transition:
+        transform .6s ease,
+        color .35s ease,
+        text-shadow .35s ease,
+        filter .35s ease;
+
+}
+
+/* Hover */
+
+.footer li:hover i{
+
+    color:#ffffff;
+
+    transform:rotate(360deg) scale(1.25);
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.9),
+        0 0 18px rgba(255,255,255,.8),
+        0 0 30px rgba(70,210,255,.8);
+
+    filter:drop-shadow(0 0 10px rgba(255,255,255,.8));
+
+}
