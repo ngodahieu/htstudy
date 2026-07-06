@@ -3069,3 +3069,37 @@ body::after{
     filter:drop-shadow(0 0 10px rgba(255,255,255,.8));
 
 }
+
+.footer::after{
+
+content:"";
+
+position:absolute;
+
+bottom:0;
+
+left:-50%;
+
+width:40%;
+
+height:1px;
+
+background:
+
+linear-gradient(
+
+90deg,
+
+transparent,
+
+white,
+
+#46d2ff,
+
+transparent
+
+);
+
+animation:footerLaser 8s linear infinite;
+
+}
