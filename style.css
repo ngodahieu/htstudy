@@ -2282,3 +2282,471 @@ height:52px;
 }
 
 }
+
+/*==================================================
+        GLOBAL ANIMATION
+==================================================*/
+
+/* Fade Up */
+
+.fade-up{
+
+    opacity:0;
+
+    transform:translateY(60px);
+
+    transition:
+
+    opacity .8s ease,
+
+    transform .8s ease;
+
+}
+
+.fade-up.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
+
+/* Fade Left */
+
+.fade-left{
+
+    opacity:0;
+
+    transform:translateX(-80px);
+
+    transition:.8s;
+
+}
+
+.fade-left.show{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+/* Fade Right */
+
+.fade-right{
+
+    opacity:0;
+
+    transform:translateX(80px);
+
+    transition:.8s;
+
+}
+
+.fade-right.show{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+/* Scale */
+
+.scale-in{
+
+    opacity:0;
+
+    transform:scale(.9);
+
+    transition:.8s;
+
+}
+
+.scale-in.show{
+
+    opacity:1;
+
+    transform:scale(1);
+
+}
+
+/*==================================================
+            BUTTON RIPPLE
+==================================================*/
+
+.btn-course,
+
+.login-btn{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.btn-course::after,
+
+.login-btn::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:0;
+
+    height:0;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.3);
+
+    transform:translate(-50%,-50%);
+
+    transition:.6s;
+
+}
+
+.btn-course:active::after,
+
+.login-btn:active::after{
+
+    width:350px;
+
+    height:350px;
+
+}
+
+/*==================================================
+            GLOW BORDER
+==================================================*/
+
+.course-card,
+
+.feature-card,
+
+.stat-box,
+
+.time-box{
+
+    isolation:isolate;
+
+}
+
+.course-card::after,
+
+.feature-card::after,
+
+.stat-box::after,
+
+.time-box::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-1px;
+
+    border-radius:inherit;
+
+    background:
+
+    linear-gradient(
+
+    135deg,
+
+    transparent,
+
+    rgba(72,199,255,.18),
+
+    transparent
+
+    );
+
+    opacity:0;
+
+    z-index:-1;
+
+    transition:.4s;
+
+}
+
+.course-card:hover::after,
+
+.feature-card:hover::after,
+
+.stat-box:hover::after,
+
+.time-box:hover::after{
+
+    opacity:1;
+
+}
+
+/*==================================================
+            IMAGE OVERLAY
+==================================================*/
+
+.course-card{
+
+    position:relative;
+
+}
+
+.course-card img{
+
+    position:relative;
+
+}
+
+.course-card img::selection{
+
+    background:none;
+
+}
+
+.course-card::before{
+
+    pointer-events:none;
+
+}
+
+.course-card:hover img{
+
+    filter:
+
+    brightness(1.05)
+
+    contrast(1.08)
+
+    saturate(1.15);
+
+}
+
+/*==================================================
+            NAV UNDERLINE
+==================================================*/
+
+.nav-menu a{
+
+    overflow:hidden;
+
+}
+
+.nav-menu a::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:8px;
+
+    width:0;
+
+    height:2px;
+
+    background:#59d8ff;
+
+    transform:translateX(-50%);
+
+    transition:.35s;
+
+}
+
+.nav-menu a:hover::before{
+
+    width:55%;
+
+}
+
+.nav-menu a.active::before{
+
+    width:55%;
+
+}
+
+/*==================================================
+            SCROLLBAR
+==================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#03101d;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:
+
+    linear-gradient(
+
+    180deg,
+
+    #1180ff,
+
+    #38c8ff
+
+    );
+
+    border-radius:999px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#55d8ff;
+
+}
+
+/*==================================================
+            TEXT SELECTION
+==================================================*/
+
+::selection{
+
+    background:#38c8ff;
+
+    color:#00111f;
+
+}
+
+/*==================================================
+            HERO GLOW
+==================================================*/
+
+.section-title h2{
+
+    position:relative;
+
+}
+
+.section-title h2::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:-14px;
+
+    transform:translateX(-50%);
+
+    width:120px;
+
+    height:2px;
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    #46d0ff,
+
+    transparent
+
+    );
+
+}
+
+/*==================================================
+            CARD TRANSITION
+==================================================*/
+
+.course-card,
+
+.feature-card,
+
+.stat-box,
+
+.time-box,
+
+.notification-btn,
+
+.avatar,
+
+.btn-course{
+
+    will-change:
+
+    transform,
+
+    box-shadow;
+
+}
+
+/*==================================================
+            BACKGROUND GLOW
+==================================================*/
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    top:-300px;
+
+    right:-300px;
+
+    width:700px;
+
+    height:700px;
+
+    border-radius:50%;
+
+    background:
+
+    radial-gradient(circle,
+
+    rgba(0,180,255,.10),
+
+    transparent);
+
+    pointer-events:none;
+
+    z-index:-5;
+
+}
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+
+    bottom:-300px;
+
+    left:-300px;
+
+    width:700px;
+
+    height:700px;
+
+    border-radius:50%;
+
+    background:
+
+    radial-gradient(circle,
+
+    rgba(40,120,255,.08),
+
+    transparent);
+
+    pointer-events:none;
+
+    z-index:-5;
+
+}
