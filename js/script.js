@@ -279,12 +279,14 @@ async function loadUser(uid){
     document.getElementById("guestMenu").style.display = "none";
     document.getElementById("userMenuList").style.display = "block";
 
-    document.querySelector(".avatar img").src =
-        user.avatar || "assets/avatars/default.jpg";
+    const avatarUrl =
+    user.avatar && user.avatar.trim() !== ""
+        ? user.avatar
+        : "assets/avatars/default.jpg";
 
-    userAvatar.src =
-        user.avatar || "assets/avatars/default.jpg";
+document.querySelector(".avatar img").src = avatarUrl;
 
+userAvatar.src = avatarUrl;
     userName.textContent = user.name;
 
     userStudentId.textContent = user.studentId;
