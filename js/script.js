@@ -273,8 +273,8 @@ async function loadUser(uid){
     document.getElementById("userName").textContent =
         user.name;
 
-    document.getElementById("studentId").textContent =
-        user.studentId;
+    document.getElementById("userStudentId").textContent =
+    user.studentId;
 
     document.getElementById("userRole").textContent =
         user.role;
