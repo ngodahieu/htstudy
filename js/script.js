@@ -181,6 +181,10 @@ const userAvatar = document.getElementById("userAvatar");
 
 const logoutBtn = document.getElementById("logoutBtn");
 
+const myCoursesBtn = document.getElementById("myCoursesBtn");
+
+const manageBtn = document.getElementById("manageBtn");
+
 logoutBtn.addEventListener("click", async () => {
 
     await signOut(auth);
@@ -290,9 +294,32 @@ userAvatar.src = avatarUrl;
     userName.textContent = user.name;
 
     userStudentId.textContent = user.studentId;
-
+    
     userRole.textContent = user.role;
 
+    if (user.role === "Học sinh") {
+
+    myCoursesBtn.style.display = "flex";
+
+    manageBtn.style.display = "none";
+
+}
+
+else if (user.role === "Giáo viên") {
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "flex";
+
+}
+
+else if (user.role === "Admin") {
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "flex";
+
+}
 }
 const loginForm = document.getElementById("loginForm");
 
@@ -376,7 +403,9 @@ onAuthStateChanged(auth, async (user) => {
 
         document.querySelector(".avatar img").src =
             "assets/avatars/default.jpg";
+        myCoursesBtn.style.display = "none";
 
+manageBtn.style.display = "none";
     }
 
 });
