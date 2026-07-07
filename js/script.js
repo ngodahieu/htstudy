@@ -165,6 +165,18 @@ const loginBtn = document.getElementById("openLogin");
 
 const guideBtn = document.getElementById("openGuide");
 
+const guestBox = document.getElementById("guestBox");
+
+const userBox = document.getElementById("userBox");
+
+const userName = document.getElementById("userName");
+
+const userStudentId = document.getElementById("userStudentId");
+
+const userRole = document.getElementById("userRole");
+
+const userAvatar = document.getElementById("userAvatar");
+
 /* Mở / Đóng User Menu */
 
 avatar.addEventListener("click", (e) => {
@@ -274,6 +286,16 @@ const docSnap = await getDoc(docRef);
 if (docSnap.exists()) {
 
     const userData = docSnap.data();
+
+    guestBox.style.display = "none";
+
+userBox.style.display = "block";
+
+userName.textContent = userData.name;
+
+userStudentId.textContent = userData.studentId;
+
+userRole.textContent = userData.role;
 
     console.log(userData);
 
