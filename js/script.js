@@ -194,7 +194,7 @@ let currentUser = null;
 const myCoursesBtn = document.getElementById("myCoursesBtn");
 
 const manageBtn = document.getElementById("manageBtn");
-
+let currentRole = "";
 logoutBtn.addEventListener("click", async () => {
 
     await signOut(auth);
@@ -306,6 +306,7 @@ userAvatar.src = avatarUrl;
     userStudentId.textContent = user.studentId;
     
     userRole.textContent = user.role;
+    currentRole = user.role;
 
     if (user.role === "Học sinh") {
 
@@ -420,6 +421,30 @@ resultLink.addEventListener("click", requireLogin);
 myCoursesBtn.addEventListener("click", requireLogin);
 
 manageBtn.addEventListener("click", requireLogin);
+manageBtn.addEventListener("click", () => {
+
+    if (!currentUser) return;
+
+    if (currentRole === "Giáo viên") {
+
+        window.location.href = "teacher.html";
+
+    }
+
+    else if (currentRole === "Admin") {
+
+        window.location.href = "admin.html";
+
+    }
+
+});
+myCoursesBtn.addEventListener("click", () => {
+
+    if (!currentUser) return;
+
+    window.location.href = "my-courses.html";
+
+});
 
 onAuthStateChanged(auth, async (user) => {
 
