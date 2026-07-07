@@ -156,3 +156,36 @@ document.addEventListener("keydown",(e)=>{
     }
 
 });
+
+const loginForm = document.getElementById("loginForm");
+
+loginForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const email = document
+        .getElementById("studentEmail")
+        .value
+        .trim();
+
+    const password = document
+        .getElementById("studentPassword")
+        .value;
+
+    try{
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        alert("Đăng nhập thành công!");
+
+    }catch(error){
+
+        alert(error.message);
+
+    }
+
+});
