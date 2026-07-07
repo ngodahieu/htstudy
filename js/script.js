@@ -154,17 +154,11 @@ document.addEventListener("click",(e)=>{
         USER MENU
 ==========================================*/
 
-const avatar = document.querySelector(".avatar");
-
 const userMenu = document.getElementById("userMenu");
-
-const loginOverlay = document.getElementById("loginOverlay");
 
 const loginBtn = document.getElementById("openLogin");
 
 const guideBtn = document.getElementById("openGuide");
-
-const closeLogin = document.getElementById("closeLogin");
 
 /* Mở / Đóng User Menu */
 
@@ -216,26 +210,6 @@ loginBtn.addEventListener("click", () => {
 
 });
 
-/* Đóng Login */
-
-closeLogin.addEventListener("click", () => {
-
-    loginOverlay.style.display = "none";
-
-});
-
-/* Click nền tối */
-
-loginOverlay.addEventListener("click", (e) => {
-
-    if (e.target === loginOverlay) {
-
-        loginOverlay.style.display = "none";
-
-    }
-
-});
-
 /* Hướng dẫn */
 
 guideBtn.addEventListener("click", () => {
@@ -246,12 +220,6 @@ guideBtn.addEventListener("click", () => {
 /*==========================================
         LOGIN MODAL
 ==========================================*/
-
-avatar.addEventListener("click",()=>{
-
-    loginOverlay.style.display="flex";
-
-});
 
 closeLogin.addEventListener("click",()=>{
 
