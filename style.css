@@ -473,11 +473,13 @@ NOTIFICATION
 
 .header-right{
 
-display:flex;
+    display:flex;
 
-align-items:center;
+    align-items:center;
 
-gap:20px;
+    gap:20px;
+
+    position:relative;
 
 }
 
