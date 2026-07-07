@@ -257,7 +257,7 @@ loginOverlay.addEventListener("click",(e)=>{
 });
 async function loadUser(uid){
 
-    const docRef = doc(db,"users",uid);
+    const docRef = doc(db, "users", uid);
 
     const docSnap = await getDoc(docRef);
 
@@ -265,19 +265,23 @@ async function loadUser(uid){
 
     const user = docSnap.data();
 
-    // Avatar
+    guestBox.style.display = "none";
+    userBox.style.display = "block";
+
+    document.getElementById("guestMenu").style.display = "none";
+    document.getElementById("userMenuList").style.display = "block";
+
     document.querySelector(".avatar img").src =
         user.avatar || "assets/avatars/default.jpg";
 
-    // Menu
-    document.getElementById("userName").textContent =
-        user.name;
+    userAvatar.src =
+        user.avatar || "assets/avatars/default.jpg";
 
-    document.getElementById("userStudentId").textContent =
-    user.studentId;
+    userName.textContent = user.name;
 
-    document.getElementById("userRole").textContent =
-        user.role;
+    userStudentId.textContent = user.studentId;
+
+    userRole.textContent = user.role;
 
 }
 const loginForm = document.getElementById("loginForm");
@@ -313,19 +317,6 @@ if (docSnap.exists()) {
 
     const userData = docSnap.data();
     await loadUser(uid);
-
-    guestBox.style.display = "none";
-
-userBox.style.display = "block";
-
-    document.getElementById("guestMenu").style.display = "none";
-
-document.getElementById("userMenuList").style.display = "block";
-userName.textContent = userData.name;
-
-userStudentId.textContent = userData.studentId;
-
-userRole.textContent = userData.role;
 
     console.log(userData);
 
