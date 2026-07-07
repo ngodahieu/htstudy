@@ -98,6 +98,12 @@ const closeNotification = document.getElementById("closeNotification");
 
 const notificationBadge = document.querySelector(".badge");
 
+const avatar = document.querySelector(".avatar");
+
+const loginOverlay = document.getElementById("loginOverlay");
+
+const closeLogin = document.getElementById("closeLogin");
+
 /* Mở / Đóng */
 
 notificationBtn.addEventListener("click",(e)=>{
@@ -153,6 +159,34 @@ document.addEventListener("keydown",(e)=>{
 
         notificationPanel.classList.remove("active");
 
+        loginOverlay.style.display="none";
+
+    }
+
+});
+
+/*==========================================
+        LOGIN MODAL
+==========================================*/
+
+avatar.addEventListener("click",()=>{
+
+    loginOverlay.style.display="flex";
+
+});
+
+closeLogin.addEventListener("click",()=>{
+
+    loginOverlay.style.display="none";
+
+});
+
+loginOverlay.addEventListener("click",(e)=>{
+
+    if(e.target===loginOverlay){
+
+        loginOverlay.style.display="none";
+
     }
 
 });
@@ -175,12 +209,16 @@ loginForm.addEventListener("submit", async (e) => {
     try{
 
         await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
+    auth,
+    email,
+    password
+);
 
-        alert("Đăng nhập thành công!");
+loginOverlay.style.display="none";
+
+loginForm.reset();
+
+alert("Đăng nhập thành công!");
 
     }catch(error){
 
