@@ -3864,3 +3864,75 @@ position:relative;
     font-size:18px;
 
 }
+
+.user-box{
+
+    padding:18px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.user-profile{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.user-profile img{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:2px solid #4da3ff;
+
+}
+
+.user-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.user-info h3{
+
+    margin:0 0 6px;
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:600;
+
+}
+
+.user-info p{
+
+    margin:2px 0;
+
+    color:#cfd8dc;
+
+    font-size:13px;
+
+    line-height:1.5;
+
+}
+
+.user-info span{
+
+    color:#4da3ff;
+
+    font-weight:600;
+
+}
