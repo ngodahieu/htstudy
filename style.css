@@ -3688,3 +3688,179 @@ position:absolute;
 position:relative;
 
 }
+/*==================================================
+                USER MENU
+==================================================*/
+
+.user-menu{
+
+    position:absolute;
+
+    top:72px;
+
+    right:0;
+
+    width:320px;
+
+    border-radius:22px;
+
+    background:
+    linear-gradient(
+        145deg,
+        rgba(18,35,70,.96),
+        rgba(6,14,30,.96)
+    );
+
+    backdrop-filter:blur(22px);
+
+    border:1px solid rgba(110,190,255,.16);
+
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.45),
+    0 0 40px rgba(0,170,255,.12);
+
+    overflow:hidden;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transform:
+    translateY(-20px)
+    scale(.95);
+
+    transition:.35s cubic-bezier(.22,1,.36,1);
+
+    z-index:9999;
+
+}
+
+/* Khi mở */
+
+.user-menu.active{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:
+    translateY(0)
+    scale(1);
+
+}
+
+/*==================================================
+            PHẦN TRÊN
+==================================================*/
+
+.guest-box{
+
+    padding:28px;
+
+    text-align:center;
+
+}
+
+.guest-avatar{
+
+    width:74px;
+
+    height:74px;
+
+    margin:auto;
+
+    margin-bottom:18px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    color:#69d8ff;
+
+    background:rgba(0,170,255,.08);
+
+    border:1px solid rgba(110,190,255,.18);
+
+}
+
+.guest-box h3{
+
+    color:white;
+
+    margin-bottom:12px;
+
+    font-size:1.15rem;
+
+}
+
+.guest-box p{
+
+    color:#9fb6d8;
+
+    font-size:.92rem;
+
+    line-height:1.7;
+
+}
+
+/*==================================================
+            DANH SÁCH
+==================================================*/
+
+.user-menu-list{
+
+    border-top:1px solid rgba(255,255,255,.06);
+
+}
+
+.user-menu-list button{
+
+    width:100%;
+
+    height:58px;
+
+    border:none;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:0 24px;
+
+    font-size:.96rem;
+
+    color:#dcecff;
+
+    background:transparent;
+
+    transition:.35s;
+
+}
+
+.user-menu-list button:hover{
+
+    background:rgba(70,180,255,.08);
+
+    color:white;
+
+}
+
+.user-menu-list button i{
+
+    width:22px;
+
+    color:#67d6ff;
+
+    font-size:18px;
+
+}
