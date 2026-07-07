@@ -3823,51 +3823,51 @@ position:relative;
 
     width:100%;
 
-    height:58px;
-
     border:none;
 
-    cursor:pointer;
+    background:transparent;
 
     display:flex;
 
     align-items:center;
 
-    gap:16px;
+    gap:14px;
 
-    padding:0 24px;
+    padding:16px 22px;
 
-    font-size:.96rem;
+    cursor:pointer;
 
     color:#dcecff;
 
-    background:transparent;
+    font-size:15px;
 
-    transition:.35s;
+    transition:.3s;
 
 }
 
 .user-menu-list button:hover{
 
-    background:rgba(70,180,255,.08);
-
-    color:white;
+    background:rgba(77,163,255,.12);
 
 }
-
 .user-menu-list button i{
 
     width:22px;
 
-    color:#67d6ff;
+    text-align:center;
 
-    font-size:18px;
+    color:#4da3ff;
+
+    font-size:17px;
 
 }
+/*==========================================
+        USER INFO (ĐÃ ĐĂNG NHẬP)
+==========================================*/
 
 .user-box{
 
-    padding:18px;
+    padding:20px 22px;
 
     border-bottom:1px solid rgba(255,255,255,.08);
 
@@ -3877,7 +3877,7 @@ position:relative;
 
     display:flex;
 
-    align-items:center;
+    align-items:flex-start;
 
     gap:14px;
 
@@ -3885,15 +3885,17 @@ position:relative;
 
 .user-profile img{
 
-    width:55px;
+    width:52px;
 
-    height:55px;
+    height:52px;
 
     border-radius:50%;
 
     object-fit:cover;
 
     border:2px solid #4da3ff;
+
+    flex-shrink:0;
 
 }
 
@@ -3907,11 +3909,11 @@ position:relative;
 
 .user-info h3{
 
-    margin:0 0 6px;
-
     color:#fff;
 
     font-size:17px;
+
+    margin:0 0 8px;
 
     font-weight:600;
 
@@ -3921,17 +3923,17 @@ position:relative;
 
     margin:2px 0;
 
-    color:#cfd8dc;
+    color:#c7d4e5;
 
-    font-size:13px;
+    font-size:14px;
 
     line-height:1.5;
 
 }
 
-.user-info span{
+.user-info strong{
 
-    color:#4da3ff;
+    color:#67d6ff;
 
     font-weight:600;
 
