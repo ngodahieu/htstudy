@@ -81,3 +81,74 @@ function updateCountdown(){
 updateCountdown();
 
 const timer = setInterval(updateCountdown,1000);
+
+/*==========================================
+        NOTIFICATION PANEL
+==========================================*/
+
+const notificationBtn = document.querySelector(".notification-btn");
+
+const notificationPanel = document.getElementById("notificationPanel");
+
+const closeNotification = document.getElementById("closeNotification");
+
+const notificationBadge = document.querySelector(".badge");
+
+/* Mở / Đóng */
+
+notificationBtn.addEventListener("click",(e)=>{
+
+    e.stopPropagation();
+
+    notificationPanel.classList.toggle("active");
+
+    // Khi mở thì ẩn badge
+    if(notificationPanel.classList.contains("active")){
+
+        notificationBadge.style.opacity="0";
+
+        notificationBadge.style.transform="scale(0)";
+
+    }
+
+});
+
+/* Nút X */
+
+closeNotification.addEventListener("click",()=>{
+
+    notificationPanel.classList.remove("active");
+
+});
+
+/* Click ra ngoài */
+
+document.addEventListener("click",(e)=>{
+
+    if(
+
+        !notificationPanel.contains(e.target)
+
+        &&
+
+        !notificationBtn.contains(e.target)
+
+    ){
+
+        notificationPanel.classList.remove("active");
+
+    }
+
+});
+
+/* ESC */
+
+document.addEventListener("keydown",(e)=>{
+
+    if(e.key==="Escape"){
+
+        notificationPanel.classList.remove("active");
+
+    }
+
+});
