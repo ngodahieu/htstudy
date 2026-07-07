@@ -3149,3 +3149,341 @@ animation:footerLaser 8s linear infinite;
     }
 
 }
+
+/*==================================================
+                NOTIFICATION PANEL
+==================================================*/
+
+.notification-panel{
+
+    position:absolute;
+
+    top:75px;
+
+    right:0;
+
+    width:380px;
+
+    max-height:520px;
+
+    overflow:hidden;
+
+    border-radius:22px;
+
+    background:
+    linear-gradient(
+        145deg,
+        rgba(18,35,70,.96),
+        rgba(6,14,30,.96)
+    );
+
+    backdrop-filter:blur(22px);
+
+    border:1px solid rgba(110,190,255,.16);
+
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.45),
+    0 0 40px rgba(0,170,255,.12);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transform:
+    translateY(-20px)
+    scale(.96);
+
+    transition:
+    .35s cubic-bezier(.22,1,.36,1);
+
+    z-index:9999;
+
+}
+
+/* Khi mở */
+
+.notification-panel.active{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:
+    translateY(0)
+    scale(1);
+
+}
+
+/*==================================================
+HEADER
+==================================================*/
+
+.notification-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 22px;
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.notification-header h3{
+
+    font-size:1.15rem;
+
+    color:white;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+.notification-header button{
+
+    width:38px;
+
+    height:38px;
+
+    border:none;
+
+    border-radius:50%;
+
+    cursor:pointer;
+
+    background:rgba(255,255,255,.05);
+
+    color:#dcecff;
+
+    transition:.35s;
+
+}
+
+.notification-header button:hover{
+
+    background:#1480ff;
+
+    color:white;
+
+    transform:rotate(90deg);
+
+}
+
+/*==================================================
+LIST
+==================================================*/
+
+.notification-list{
+
+    max-height:430px;
+
+    overflow-y:auto;
+
+}
+
+/* Scrollbar */
+
+.notification-list::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.notification-list::-webkit-scrollbar-thumb{
+
+    background:#38c8ff;
+
+    border-radius:999px;
+
+}
+
+/*==================================================
+ITEM
+==================================================*/
+
+.notification-item{
+
+    display:flex;
+
+    gap:16px;
+
+    padding:18px 22px;
+
+    cursor:pointer;
+
+    transition:.35s;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+}
+
+.notification-item:hover{
+
+    background:
+
+    rgba(60,170,255,.08);
+
+}
+
+/*==================================================
+UNREAD
+==================================================*/
+
+.notification-item.unread{
+
+    background:
+
+    rgba(0,170,255,.06);
+
+}
+
+/*==================================================
+ICON
+==================================================*/
+
+.notification-icon{
+
+    width:52px;
+
+    height:52px;
+
+    min-width:52px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+
+    rgba(0,160,255,.08);
+
+    border:1px solid rgba(110,190,255,.15);
+
+    color:#5fd8ff;
+
+    font-size:20px;
+
+    transition:.35s;
+
+}
+
+.notification-item:hover .notification-icon{
+
+    transform:
+
+    rotate(360deg)
+
+    scale(1.08);
+
+    color:white;
+
+    box-shadow:
+
+    0 0 25px rgba(0,180,255,.35);
+
+}
+
+/*==================================================
+TEXT
+==================================================*/
+
+.notification-content{
+
+    flex:1;
+
+}
+
+.notification-content h4{
+
+    color:white;
+
+    font-size:1rem;
+
+    margin-bottom:6px;
+
+}
+
+.notification-content p{
+
+    color:#a7bddb;
+
+    font-size:.92rem;
+
+    line-height:1.6;
+
+}
+
+.notification-content span{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#69d8ff;
+
+    font-size:.78rem;
+
+}
+
+/*==================================================
+TOP LIGHT
+==================================================*/
+
+.notification-panel::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-120%;
+
+    width:45%;
+
+    height:2px;
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    white,
+
+    #45d1ff,
+
+    transparent
+
+    );
+
+    animation:notificationLight 6s linear infinite;
+
+}
+
+@keyframes notificationLight{
+
+    from{
+
+        left:-120%;
+
+    }
+
+    to{
+
+        left:180%;
+
+    }
+
+}
