@@ -150,6 +150,47 @@ document.addEventListener("click",(e)=>{
     }
 
 });
+/*==========================================
+        USER MENU
+==========================================*/
+
+const avatar = document.querySelector(".avatar");
+
+const userMenu = document.getElementById("userMenu");
+
+const loginOverlay = document.getElementById("loginOverlay");
+
+const loginBtn = document.getElementById("openLogin");
+
+const guideBtn = document.getElementById("openGuide");
+
+const closeLogin = document.getElementById("closeLogin");
+
+/* Mở / Đóng User Menu */
+
+avatar.addEventListener("click", (e) => {
+
+    e.stopPropagation();
+
+    userMenu.classList.toggle("active");
+
+});
+
+/* Click ra ngoài */
+
+document.addEventListener("click", (e) => {
+
+    if (
+        !userMenu.contains(e.target) &&
+        !avatar.contains(e.target)
+    ) {
+
+        userMenu.classList.remove("active");
+
+    }
+
+});
+
 
 /* ESC */
 
@@ -165,6 +206,43 @@ document.addEventListener("keydown",(e)=>{
 
 });
 
+/* Nút Đăng nhập */
+
+loginBtn.addEventListener("click", () => {
+
+    userMenu.classList.remove("active");
+
+    loginOverlay.style.display = "flex";
+
+});
+
+/* Đóng Login */
+
+closeLogin.addEventListener("click", () => {
+
+    loginOverlay.style.display = "none";
+
+});
+
+/* Click nền tối */
+
+loginOverlay.addEventListener("click", (e) => {
+
+    if (e.target === loginOverlay) {
+
+        loginOverlay.style.display = "none";
+
+    }
+
+});
+
+/* Hướng dẫn */
+
+guideBtn.addEventListener("click", () => {
+
+    alert("Chức năng đang được cập nhật.");
+
+});
 /*==========================================
         LOGIN MODAL
 ==========================================*/
