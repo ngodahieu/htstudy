@@ -398,7 +398,7 @@ loginForm.reset();
 ==========================================*/
 
 function requireLogin(event){
-
+console.log("Đã bấm vào menu");
     if(currentUser) return;
 
     event.preventDefault();
