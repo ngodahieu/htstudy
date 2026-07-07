@@ -3664,3 +3664,27 @@ font-size:18px;
 padding-bottom:120px;
 
 }
+
+.course-card{
+
+transition:.45s;
+
+}
+
+.course-card.hide{
+
+opacity:0;
+
+transform:scale(.8);
+
+pointer-events:none;
+
+position:absolute;
+
+}
+
+.course-grid{
+
+position:relative;
+
+}
