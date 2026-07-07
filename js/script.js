@@ -1,7 +1,12 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
     signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {
+    doc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*==========================================
         THPT 2027 COUNTDOWN
 ==========================================*/
@@ -254,18 +259,36 @@ loginForm.addEventListener("submit", async (e) => {
 
     try{
 
-        await signInWithEmailAndPassword(
+const userCredential = await signInWithEmailAndPassword(
     auth,
     email,
     password
 );
 
-loginOverlay.style.display="none";
+const uid = userCredential.user.uid;
+
+const docRef = doc(db, "users", uid);
+
+const docSnap = await getDoc(docRef);
+
+if (docSnap.exists()) {
+
+    const userData = docSnap.data();
+
+    console.log(userData);
+
+    alert(
+        "Xin chào " +
+        userData.name +
+        "\nVai trò: " +
+        userData.role
+    );
+
+}
+
+loginOverlay.style.display = "none";
 
 loginForm.reset();
-
-alert("Đăng nhập thành công!");
-
     }catch(error){
 
         alert(error.message);
