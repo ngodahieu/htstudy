@@ -181,6 +181,14 @@ const userAvatar = document.getElementById("userAvatar");
 
 const logoutBtn = document.getElementById("logoutBtn");
 
+const coursesLink = document.getElementById("coursesLink");
+
+const examLink = document.getElementById("examLink");
+
+const resultLink = document.getElementById("resultLink");
+
+let currentUser = null;
+
 const myCoursesBtn = document.getElementById("myCoursesBtn");
 
 const manageBtn = document.getElementById("manageBtn");
@@ -387,8 +395,34 @@ loginForm.reset();
         KIỂM TRA ĐĂNG NHẬP
 ==========================================*/
 
+function requireLogin(event){
+
+    if(currentUser) return;
+
+    event.preventDefault();
+
+    loginOverlay.style.display = "flex";
+
+    userMenu.classList.remove("active");
+
+    alert("Bạn cần đăng nhập để sử dụng chức năng này.");
+
+}
+
+coursesLink.addEventListener("click", requireLogin);
+
+examLink.addEventListener("click", requireLogin);
+
+resultLink.addEventListener("click", requireLogin);
+
+myCoursesBtn.addEventListener("click", requireLogin);
+
+manageBtn.addEventListener("click", requireLogin);
+
 onAuthStateChanged(auth, async (user) => {
 
+    currentUser = user;
+    
     if (user) {
 
         await loadUser(user.uid);
