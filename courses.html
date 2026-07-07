@@ -3,25 +3,21 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Khóa học | H&T STUDY</title>
+<title>Khóa học | H&T STUDY</title>
 
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="css/courses.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -30,15 +26,11 @@
 <div class="space-bg"></div>
 <div class="overlay"></div>
 
-<!-- ========================= -->
-<!-- HEADER -->
-<!-- ========================= -->
-
 <header class="header">
 
 <div class="container">
 
-<a href="index.html" class="logo">
+<a class="logo" href="index.html">
 
 <img src="assets/images/logo.png">
 
@@ -70,43 +62,21 @@
 
 </nav>
 
-<div class="header-right">
-
-<button class="notification-btn">
-
-<i class="fa-regular fa-bell"></i>
-
-<span class="badge">3</span>
-
-</button>
-
-<div class="avatar">
-
-<img src="assets/avatars/default.jpg">
-
-</div>
-
-</div>
-
 </div>
 
 </div>
 
 </header>
 
-<!-- ========================= -->
-<!-- HERO -->
-<!-- ========================= -->
-
-<section class="courses-hero">
+<section class="course-hero">
 
 <div class="container">
 
-<h1>KHÓA HỌC H&T STUDY</h1>
+<h1>Khoá học H&T STUDY</h1>
 
 <p>
 
-Lựa chọn khóa học phù hợp với trình độ của bạn
+Lộ trình học từ lớp 10 đến luyện thi THPT Quốc Gia.
 
 </p>
 
@@ -114,51 +84,29 @@ Lựa chọn khóa học phù hợp với trình độ của bạn
 
 </section>
 
-<!-- ========================= -->
-<!-- SEARCH -->
-<!-- ========================= -->
+<section class="course-filter">
 
-<section class="course-toolbar">
-
-<div class="container toolbar">
-
-<div class="search-box">
-
-<i class="fa-solid fa-magnifying-glass"></i>
-
-<input
-type="text"
-id="searchInput"
-placeholder="Tìm khóa học..."
->
-
-</div>
+<div class="container">
 
 <div class="filter-box">
 
-<button class="filter active" data-filter="all">
+<button class="filter-btn active">Tất cả</button>
 
-Tất cả
+<button class="filter-btn">Lớp 10</button>
 
-</button>
+<button class="filter-btn">Lớp 11</button>
 
-<button class="filter" data-filter="10">
+<button class="filter-btn">Lớp 12</button>
 
-Lớp 10
+</div>
 
-</button>
+<div class="search-course">
 
-<button class="filter" data-filter="11">
+<input
+type="text"
+placeholder="Tìm kiếm khóa học...">
 
-Lớp 11
-
-</button>
-
-<button class="filter" data-filter="12">
-
-Lớp 12
-
-</button>
+<i class="fa-solid fa-magnifying-glass"></i>
 
 </div>
 
@@ -166,27 +114,17 @@ Lớp 12
 
 </section>
 
-<!-- ========================= -->
-<!-- COURSE GRID -->
-<!-- ========================= -->
-
-<section class="course-section">
+<section class="all-courses">
 
 <div class="container">
 
 <div class="course-grid">
 
-<!-- CARD -->
+<!-- Card 1 -->
 
-<div class="course-card" data-grade="10">
+<div class="course-card">
 
-<div class="course-badge">
-
-🔥 HOT
-
-</div>
-
-<img src="assets/images/course10.jpg">
+<img src="images/course10.jpg">
 
 <div class="course-content">
 
@@ -194,23 +132,13 @@ Lớp 12
 
 <p>
 
-Kiến thức nền tảng theo chương trình GDPT mới.
+Kiến thức nền tảng chương trình GDPT.
 
 </p>
 
-<div class="course-meta">
+<a href="#" class="btn-course">
 
-<span><i class="fa-solid fa-book"></i>120 bài</span>
-
-<span><i class="fa-solid fa-file-lines"></i>50 đề</span>
-
-</div>
-
-<a
-href="course.html?id=10"
-class="btn-course">
-
-Học ngay
+Vào học
 
 </a>
 
@@ -218,17 +146,11 @@ Học ngay
 
 </div>
 
-<!-- CARD -->
+<!-- Card 2 -->
 
-<div class="course-card" data-grade="11">
+<div class="course-card">
 
-<div class="course-badge premium">
-
-⭐ PREMIUM
-
-</div>
-
-<img src="assets/images/course11.jpg">
+<img src="images/course11.jpg">
 
 <div class="course-content">
 
@@ -236,23 +158,13 @@ Học ngay
 
 <p>
 
-Ôn luyện toàn bộ kiến thức trọng tâm.
+Ôn tập toàn bộ chuyên đề.
 
 </p>
 
-<div class="course-meta">
+<a href="#" class="btn-course">
 
-<span><i class="fa-solid fa-book"></i>145 bài</span>
-
-<span><i class="fa-solid fa-file-lines"></i>65 đề</span>
-
-</div>
-
-<a
-href="course.html?id=11"
-class="btn-course">
-
-Học ngay
+Vào học
 
 </a>
 
@@ -260,17 +172,11 @@ Học ngay
 
 </div>
 
-<!-- CARD -->
+<!-- Card 3 -->
 
-<div class="course-card" data-grade="12">
+<div class="course-card">
 
-<div class="course-badge new">
-
-NEW
-
-</div>
-
-<img src="assets/images/course12.jpg">
+<img src="images/course12.jpg">
 
 <div class="course-content">
 
@@ -278,23 +184,13 @@ NEW
 
 <p>
 
-Luyện thi THPT Quốc Gia 2027.
+Luyện thi THPT Quốc Gia.
 
 </p>
 
-<div class="course-meta">
+<a href="#" class="btn-course">
 
-<span><i class="fa-solid fa-book"></i>180 bài</span>
-
-<span><i class="fa-solid fa-file-lines"></i>100 đề</span>
-
-</div>
-
-<a
-href="course.html?id=12"
-class="btn-course">
-
-Học ngay
+Vào học
 
 </a>
 
@@ -308,9 +204,15 @@ Học ngay
 
 </section>
 
-<!-- JS -->
+<footer class="footer">
 
-<script src="js/courses.js"></script>
+<div class="copyright">
+
+© 2026 H&T STUDY
+
+</div>
+
+</footer>
 
 </body>
 
