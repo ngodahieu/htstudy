@@ -183,6 +183,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const coursesLink = document.getElementById("coursesLink");
 
+console.log(coursesLink);
+
 const examLink = document.getElementById("examLink");
 
 const resultLink = document.getElementById("resultLink");
