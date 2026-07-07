@@ -1,6 +1,8 @@
 import { auth, db } from "./firebase.js";
 import {
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import {
     doc,
@@ -253,7 +255,31 @@ loginOverlay.addEventListener("click",(e)=>{
     }
 
 });
+async function loadUser(uid){
 
+    const docRef = doc(db,"users",uid);
+
+    const docSnap = await getDoc(docRef);
+
+    if(!docSnap.exists()) return;
+
+    const user = docSnap.data();
+
+    // Avatar
+    document.querySelector(".avatar img").src =
+        user.avatar || "assets/avatars/default.jpg";
+
+    // Menu
+    document.getElementById("userName").textContent =
+        user.name;
+
+    document.getElementById("studentId").textContent =
+        user.studentId;
+
+    document.getElementById("userRole").textContent =
+        user.role;
+
+}
 const loginForm = document.getElementById("loginForm");
 
 loginForm.addEventListener("submit", async (e) => {
@@ -286,6 +312,7 @@ const docSnap = await getDoc(docRef);
 if (docSnap.exists()) {
 
     const userData = docSnap.data();
+    await loadUser(uid);
 
     guestBox.style.display = "none";
 
