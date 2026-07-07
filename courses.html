@@ -90,13 +90,29 @@ Lộ trình học từ lớp 10 đến luyện thi THPT Quốc Gia.
 
 <div class="filter-box">
 
-<button class="filter-btn active">Tất cả</button>
+<button class="filter-btn active" data-filter="all">
 
-<button class="filter-btn">Lớp 10</button>
+Tất cả
 
-<button class="filter-btn">Lớp 11</button>
+</button>
 
-<button class="filter-btn">Lớp 12</button>
+<button class="filter-btn" data-filter="10">
+
+Lớp 10
+
+</button>
+
+<button class="filter-btn" data-filter="11">
+
+Lớp 11
+
+</button>
+
+<button class="filter-btn" data-filter="12">
+
+Lớp 12
+
+</button>
 
 </div>
 
@@ -122,59 +138,43 @@ placeholder="Tìm kiếm khóa học...">
 
 <!-- Card 1 -->
 
-<div class="course-card">
+<div class="course-card" data-class="10">
 
-<img src="images/course10.jpg">
+    <img src="images/course10.jpg">
 
-<div class="course-content">
+    <div class="course-content">
 
-<h3>Hóa học 10</h3>
+        <h3>Hóa học 10</h3>
 
-<p>
+        <p>Kiến thức nền tảng chương trình GDPT.</p>
 
-Kiến thức nền tảng chương trình GDPT.
+        <a href="#" class="btn-course">Vào học</a>
 
-</p>
-
-<a href="#" class="btn-course">
-
-Vào học
-
-</a>
-
-</div>
+    </div>
 
 </div>
 
 <!-- Card 2 -->
 
-<div class="course-card">
+<div class="course-card" data-class="11">
 
-<img src="images/course11.jpg">
+    <img src="images/course11.jpg">
 
-<div class="course-content">
+    <div class="course-content">
 
-<h3>Hóa học 11</h3>
+        <h3>Hóa học 11</h3>
 
-<p>
+        <p>Ôn tập toàn bộ chuyên đề.</p>
 
-Ôn tập toàn bộ chuyên đề.
+        <a href="#" class="btn-course">Vào học</a>
 
-</p>
-
-<a href="#" class="btn-course">
-
-Vào học
-
-</a>
-
-</div>
+    </div>
 
 </div>
 
 <!-- Card 3 -->
 
-<div class="course-card">
+<div class="course-card" data-class="12">
 
 <img src="images/course12.jpg">
 
