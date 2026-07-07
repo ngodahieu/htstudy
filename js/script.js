@@ -179,6 +179,14 @@ const userRole = document.getElementById("userRole");
 
 const userAvatar = document.getElementById("userAvatar");
 
+const logoutBtn = document.getElementById("logoutBtn");
+
+logoutBtn.addEventListener("click", async () => {
+
+    await signOut(auth);
+
+});
+
 /* Mở / Đóng User Menu */
 
 avatar.addEventListener("click", (e) => {
@@ -341,6 +349,31 @@ loginForm.reset();
     }catch(error){
 
         alert(error.message);
+
+    }
+
+});
+
+/*==========================================
+        KIỂM TRA ĐĂNG NHẬP
+==========================================*/
+
+onAuthStateChanged(auth, async (user) => {
+
+    if (user) {
+
+        await loadUser(user.uid);
+
+    } else {
+
+        guestBox.style.display = "block";
+        userBox.style.display = "none";
+
+        document.getElementById("guestMenu").style.display = "block";
+        document.getElementById("userMenuList").style.display = "none";
+
+        document.querySelector(".avatar img").src =
+            "assets/avatars/default.jpg";
 
     }
 
