@@ -285,7 +285,13 @@ if (docSnap.exists()) {
     );
 
 }
+else{
 
+    alert("Không tìm thấy dữ liệu người dùng.");
+
+    return;
+
+}
 loginOverlay.style.display = "none";
 
 loginForm.reset();
