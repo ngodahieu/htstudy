@@ -291,6 +291,9 @@ if (docSnap.exists()) {
 
 userBox.style.display = "block";
 
+    document.getElementById("guestMenu").style.display = "none";
+
+document.getElementById("userMenuList").style.display = "block";
 userName.textContent = userData.name;
 
 userStudentId.textContent = userData.studentId;
