@@ -187,25 +187,37 @@
                 
 <div class="user-box" id="userBox" style="display:none;">
 
-    <div class="user-avatar">
+    <div class="user-profile">
 
-        <img id="userAvatar"
-             src="assets/avatars/default.jpg"
-             alt="Avatar">
+        <img
+            id="userAvatar"
+            src="assets/avatars/default.jpg"
+            alt="Avatar"
+        >
+
+        <div class="user-info">
+
+            <h3 id="userName">
+                Nguyễn Văn A
+            </h3>
+
+            <p>
+                Mã học sinh:
+                <span id="userStudentId">
+                    HS0001
+                </span>
+            </p>
+
+            <p>
+                Vai trò:
+                <span id="userRole">
+                    Học sinh
+                </span>
+            </p>
+
+        </div>
 
     </div>
-
-    <h3 id="userName">
-        Họ và tên
-    </h3>
-
-    <p id="userStudentId">
-        HS0000
-    </p>
-
-    <span id="userRole">
-        Học sinh
-    </span>
 
 </div>
 <div class="user-info" id="userInfo" style="display:none;">
@@ -226,25 +238,45 @@
 
 </div>
 
-    <div class="user-menu-list">
+    <div class="user-menu-list" id="guestMenu">
 
-        <button id="openLogin">
+    <button id="openLogin">
 
-            <i class="fa-solid fa-right-to-bracket"></i>
+        <i class="fa-solid fa-right-to-bracket"></i>
 
-            Đăng nhập
+        Đăng nhập
 
-        </button>
+    </button>
 
-        <button id="openGuide">
+    <button id="openGuide">
 
-            <i class="fa-regular fa-circle-question"></i>
+        <i class="fa-regular fa-circle-question"></i>
 
-            Hướng dẫn
+        Hướng dẫn
 
-        </button>
+    </button>
 
-    </div>
+</div>
+
+<div class="user-menu-list" id="userMenuList" style="display:none;">
+
+    <button id="userGuide">
+
+        <i class="fa-regular fa-circle-question"></i>
+
+        Hướng dẫn
+
+    </button>
+
+    <button id="logoutBtn">
+
+        <i class="fa-solid fa-right-from-bracket"></i>
+
+        Đăng xuất
+
+    </button>
+
+</div>
 
 </div>
             </div>
