@@ -30,7 +30,17 @@ document.getElementById("logoutBtn");
 
 const menuStudents =
 document.getElementById("menuStudents");
+const menuHome =
+document.getElementById("menuHome");
+menuHome.addEventListener("click", () => {
 
+    dashboardHeader.style.display = "block";
+
+    dashboardCards.style.display = "grid";
+
+    studentPage.style.display = "none";
+
+});
 const dashboardHeader =
 document.querySelector(".dashboard-header");
 
