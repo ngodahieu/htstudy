@@ -8,10 +8,14 @@ from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
     doc,
-    getDoc
+    getDoc,
+    setDoc,
+    getDocs,
+    collection,
+    query,
+    where
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
 /*====================================
         LẤY CÁC THÀNH PHẦN HTML
 ====================================*/
@@ -30,8 +34,14 @@ document.getElementById("logoutBtn");
 
 const studentIdInput =
 document.getElementById("studentId");
-studentIdInput.value =
-generateStudentId(1);
+const studentName =
+document.getElementById("studentName");
+
+const studentEmail =
+document.getElementById("studentEmail");
+
+const createStudentBtn =
+document.getElementById("createStudentBtn");
 
 const menuStudents =
 document.getElementById("menuStudents");
@@ -57,12 +67,35 @@ document.getElementById("studentPage");
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
+async function generateStudentId(){
 
-function generateStudentId(number){
+    const snapshot =
+    await getDocs(collection(db,"users"));
 
-    return "HT27" +
+    let max = 0;
 
-    String(number).padStart(4,"0");
+    snapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+        if(data.role !== "Học sinh") return;
+
+        if(!data.studentId) return;
+
+        const number =
+        parseInt(data.studentId.replace("HT27",""));
+
+        if(number > max){
+
+            max = number;
+
+        }
+
+    });
+
+    return "HT27"+
+
+    String(max+1).padStart(4,"0");
 
 }
 /*====================================
@@ -128,11 +161,11 @@ onAuthStateChanged(auth, async (user)=>{
 
     teacherAvatar.src =
     data.avatar && data.avatar.trim() !== ""
-
     ? data.avatar
 
     : "../assets/avatars/default.jpg";
-
+    studentIdInput.value =
+await generateStudentId();
 });
 /*====================================
         MENU HỌC SINH
@@ -145,6 +178,105 @@ menuStudents.addEventListener("click", () => {
     dashboardCards.style.display = "none";
 
     studentPage.style.display = "block";
+
+});
+/*====================================
+        TẠO HỌC SINH
+====================================*/
+
+createStudentBtn.addEventListener(
+
+"click",
+
+async()=>{
+
+    const name =
+    studentName.value.trim();
+
+    const email =
+studentEmail.value.trim().toLowerCase();
+
+    const studentId =
+    studentIdInput.value;
+
+    if(name==="" || email===""){
+
+        alert("Vui lòng nhập đầy đủ thông tin.");
+
+        return;
+
+    }
+
+    if(!email.includes("@")){
+
+    alert("Email không hợp lệ.");
+
+    return;
+
+}
+    
+    const emailQuery = query(
+
+        collection(db,"users"),
+
+        where("email","==",email)
+
+    );
+
+    const emailSnap =
+    await getDocs(emailQuery);
+
+    if(!emailSnap.empty){
+
+        alert("Email đã tồn tại.");
+
+        return;
+
+    }
+
+    await setDoc(
+
+        doc(db,"users",studentId),
+
+        {
+
+            name,
+
+            email,
+
+            studentId,
+
+            password:studentId,
+
+            role:"Học sinh",
+
+            avatar:"",
+
+            createdAt:Date.now()
+
+        }
+
+    );
+
+    alert(
+
+`Đã tạo thành công!
+
+Họ tên: ${name}
+
+Mã học sinh: ${studentId}
+
+Mật khẩu: ${studentId}`
+
+    );
+
+    studentName.value="";
+
+    studentEmail.value="";
+
+    studentIdInput.value=
+
+    await generateStudentId();
 
 });
 /*====================================
