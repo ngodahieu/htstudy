@@ -28,6 +28,17 @@ document.getElementById("teacherAvatar");
 const logoutBtn =
 document.getElementById("logoutBtn");
 
+const menuStudents =
+document.getElementById("menuStudents");
+
+const dashboardHeader =
+document.querySelector(".dashboard-header");
+
+const dashboardCards =
+document.querySelector(".dashboard-cards");
+
+const studentPage =
+document.getElementById("studentPage");
 /*====================================
         KIỂM TRA ĐĂNG NHẬP
 ====================================*/
@@ -97,7 +108,19 @@ onAuthStateChanged(auth, async (user)=>{
     : "../assets/avatars/default.jpg";
 
 });
+/*====================================
+        MENU HỌC SINH
+====================================*/
 
+menuStudents.addEventListener("click", () => {
+
+    dashboardHeader.style.display = "none";
+
+    dashboardCards.style.display = "none";
+
+    studentPage.style.display = "block";
+
+});
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
