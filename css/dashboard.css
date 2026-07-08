@@ -1,0 +1,236 @@
+/*==============================
+    DASHBOARD
+==============================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+
+body{
+    background:#f4f7fc;
+    color:#1f2937;
+}
+
+.dashboard{
+    display:flex;
+    min-height:100vh;
+}
+
+/*==============================
+    SIDEBAR
+==============================*/
+
+.sidebar{
+    width:280px;
+    background:linear-gradient(180deg,#2563eb,#1e40af);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    box-shadow:0 10px 35px rgba(0,0,0,.2);
+}
+
+.sidebar-logo{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:28px;
+    border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.sidebar-logo img{
+    width:55px;
+    height:55px;
+}
+
+.sidebar-logo h2{
+    font-size:22px;
+    font-weight:700;
+}
+
+.sidebar-user{
+    text-align:center;
+    padding:30px 20px;
+}
+
+.sidebar-user img{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    border:4px solid white;
+    object-fit:cover;
+    margin-bottom:15px;
+}
+
+.sidebar-user h3{
+    font-size:19px;
+    margin-bottom:5px;
+}
+
+.sidebar-menu{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:20px;
+}
+
+.menu-item{
+    background:none;
+    border:none;
+    color:white;
+    padding:15px;
+    text-align:left;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.3s;
+    font-size:16px;
+}
+
+.menu-item i{
+    width:28px;
+}
+
+.menu-item:hover{
+    background:rgba(255,255,255,.15);
+}
+
+.menu-item.active{
+    background:white;
+    color:#2563eb;
+    font-weight:600;
+}
+
+/*==============================
+    CONTENT
+==============================*/
+
+.dashboard-content{
+    flex:1;
+    margin-left:280px;
+    padding:35px;
+}
+
+.dashboard-header{
+    background:white;
+    padding:25px 35px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    margin-bottom:35px;
+}
+
+.dashboard-header h1{
+    font-size:32px;
+}
+
+.dashboard-cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:25px;
+}
+
+.dashboard-card{
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+    transition:.35s;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-6px);
+}
+
+.dashboard-card h2{
+    font-size:42px;
+    color:#2563eb;
+}
+
+.dashboard-card p{
+    margin-top:12px;
+    color:#666;
+}
+
+/*==============================
+    RESPONSIVE
+==============================*/
+
+@media(max-width:1200px){
+
+.dashboard-cards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:850px){
+
+.sidebar{
+
+width:90px;
+
+}
+
+.sidebar-logo h2,
+
+.sidebar-user h3{
+
+display:none;
+
+}
+
+.sidebar-user img{
+
+width:55px;
+height:55px;
+
+}
+
+.menu-item{
+
+text-align:center;
+
+}
+
+.menu-item i{
+
+width:auto;
+
+display:block;
+
+margin:auto;
+
+margin-bottom:8px;
+
+}
+
+.dashboard-content{
+
+margin-left:90px;
+
+}
+
+}
+
+@media(max-width:650px){
+
+.dashboard-cards{
+
+grid-template-columns:1fr;
+
+}
+
+.dashboard-content{
+
+padding:20px;
+
+}
+
+}
