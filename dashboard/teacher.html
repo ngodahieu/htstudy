@@ -3,18 +3,29 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-    <title>H&T STUDY | Teacher Dashboard</title>
+<title>Teacher Dashboard</title>
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
 
-    <link rel="stylesheet" href="../style.css">
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
 
-    <link rel="stylesheet" href="../css/dashboard.css">
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="../css/dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
@@ -22,180 +33,219 @@
 
 <div class="dashboard">
 
-    <!-- Sidebar -->
+<aside class="sidebar">
 
-    <aside class="sidebar">
+<div class="sidebar-logo">
 
-        <div class="sidebar-logo">
+<img src="../assets/images/logo.png">
 
-            <img src="../assets/images/logo.png">
-
-            <h2>H&T STUDY</h2>
-
-        </div>
-
-        <div class="sidebar-user">
-
-            <img id="teacherAvatar"
-                src="../assets/avatars/default.jpg">
-
-            <h3 id="teacherName">
-
-                Giáo viên
-
-            </h3>
-
-        </div>
-
-        <nav class="sidebar-menu">
-
-            <button class="menu-item active">
-
-                <i class="fa-solid fa-house"></i>
-
-                Tổng quan
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-user-plus"></i>
-
-                Tạo tài khoản học sinh
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-book"></i>
-
-                Quản lí khóa học
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-video"></i>
-
-                Đăng video
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-file-arrow-up"></i>
-
-                Đăng tài liệu
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-users"></i>
-
-                Thêm học sinh
-
-            </button>
-
-            <button class="menu-item">
-
-                <i class="fa-solid fa-clock"></i>
-
-                Chờ Admin duyệt
-
-            </button>
-
-        </nav>
-
-    </aside>
-
-    <!-- Main -->
-
-    <main class="dashboard-content">
-
-        <header class="dashboard-header">
-
-            <h1>
-
-                Teacher Dashboard
-
-            </h1>
-
-        </header>
-
-        <section class="dashboard-cards">
-
-            <div class="dashboard-card">
-
-                <h2>
-
-                    0
-
-                </h2>
-
-                <p>
-
-                    Học sinh
-
-                </p>
-
-            </div>
-
-            <div class="dashboard-card">
-
-                <h2>
-
-                    0
-
-                </h2>
-
-                <p>
-
-                    Khóa học
-
-                </p>
-
-            </div>
-
-            <div class="dashboard-card">
-
-                <h2>
-
-                    0
-
-                </h2>
-
-                <p>
-
-                    Video
-
-                </p>
-
-            </div>
-
-            <div class="dashboard-card">
-
-                <h2>
-
-                    0
-
-                </h2>
-
-                <p>
-
-                    Tài liệu
-
-                </p>
-
-            </div>
-
-        </section>
-
-    </main>
+<h2>H&T STUDY</h2>
 
 </div>
 
-<script type="module" src="../js/teacher.js"></script>
+<div class="sidebar-user">
+
+<img
+id="teacherAvatar"
+src="../assets/avatars/default.jpg">
+
+<h3 id="teacherName">
+
+Đang tải...
+
+</h3>
+
+<p id="teacherRole">
+
+Giáo viên
+
+</p>
+
+</div>
+
+<div class="sidebar-menu">
+
+<button
+class="menu-item active">
+
+<i class="fa-solid fa-house"></i>
+
+Trang chủ
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-users"></i>
+
+Học sinh
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-book"></i>
+
+Khóa học
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-video"></i>
+
+Video
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-file-pdf"></i>
+
+Tài liệu
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-file-circle-check"></i>
+
+Bài kiểm tra
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-bullhorn"></i>
+
+Thông báo
+
+</button>
+
+<button
+class="menu-item">
+
+<i class="fa-solid fa-user-clock"></i>
+
+Chờ duyệt
+
+</button>
+
+<button
+class="menu-item"
+id="logoutBtn">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Đăng xuất
+
+</button>
+
+</div>
+
+</aside>
+
+<main class="dashboard-content">
+
+<div class="dashboard-header">
+
+<h1>
+
+Xin chào Giáo viên 👋
+
+</h1>
+
+<p>
+
+Chúc bạn có một ngày làm việc hiệu quả.
+
+</p>
+
+</div>
+
+<div class="dashboard-cards">
+
+<div class="dashboard-card">
+
+<h2 id="studentCount">
+
+0
+
+</h2>
+
+<p>
+
+Học sinh
+
+</p>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2 id="courseCount">
+
+0
+
+</h2>
+
+<p>
+
+Khóa học
+
+</p>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2 id="videoCount">
+
+0
+
+</h2>
+
+<p>
+
+Video
+
+</p>
+
+</div>
+
+<div class="dashboard-card">
+
+<h2 id="documentCount">
+
+0
+
+</h2>
+
+<p>
+
+Tài liệu
+
+</p>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script
+type="module"
+src="../js/teacher.js">
+
+</script>
 
 </body>
 
