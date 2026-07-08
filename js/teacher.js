@@ -28,6 +28,11 @@ document.getElementById("teacherAvatar");
 const logoutBtn =
 document.getElementById("logoutBtn");
 
+const studentIdInput =
+document.getElementById("studentId");
+studentIdInput.value =
+generateStudentId(1);
+
 const menuStudents =
 document.getElementById("menuStudents");
 const menuHome =
@@ -49,6 +54,17 @@ document.querySelector(".dashboard-cards");
 
 const studentPage =
 document.getElementById("studentPage");
+/*====================================
+        SINH MÃ HỌC SINH
+====================================*/
+
+function generateStudentId(number){
+
+    return "HT27" +
+
+    String(number).padStart(4,"0");
+
+}
 /*====================================
         KIỂM TRA ĐĂNG NHẬP
 ====================================*/
