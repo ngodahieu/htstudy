@@ -427,13 +427,13 @@ manageBtn.addEventListener("click", () => {
 
     if (currentRole === "Giáo viên") {
 
-        window.location.href = "teacher.html";
+        window.location.href = "dashboard/teacher.html";
 
     }
 
     else if (currentRole === "Admin") {
 
-        window.location.href = "admin.html";
+        window.location.href = "dashboard/admin.html";
 
     }
 
