@@ -46,12 +46,25 @@ const menuStudents =
 document.getElementById("menuStudents");
 const menuHome =
 document.getElementById("menuHome");
+const menuItems = document.querySelectorAll(".menu-item");
+
+function setActiveMenu(activeButton){
+
+    menuItems.forEach(item => {
+
+        item.classList.remove("active");
+
+    });
+
+    activeButton.classList.add("active");
+
+}
 menuHome.addEventListener("click", () => {
 
+    setActiveMenu(menuHome);
+
     dashboardHeader.style.display = "block";
-
     dashboardCards.style.display = "grid";
-
     studentPage.style.display = "none";
 
 });
@@ -172,10 +185,10 @@ await generateStudentId();
 
 menuStudents.addEventListener("click", () => {
 
+    setActiveMenu(menuStudents);
+
     dashboardHeader.style.display = "none";
-
     dashboardCards.style.display = "none";
-
     studentPage.style.display = "block";
 
 });
