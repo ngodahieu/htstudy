@@ -9,7 +9,6 @@ from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import {
     doc,
     getDoc,
-    setDoc,
     getDocs,
     collection,
     query,
@@ -184,20 +183,13 @@ menuStudents.addEventListener("click", () => {
         TẠO HỌC SINH
 ====================================*/
 
-createStudentBtn.addEventListener(
+async function createStudentAccount(){
 
-"click",
+    const name = studentName.value.trim();
 
-async()=>{
+    const email = studentEmail.value.trim().toLowerCase();
 
-    const name =
-    studentName.value.trim();
-
-    const email =
-studentEmail.value.trim().toLowerCase();
-
-    const studentId =
-    studentIdInput.value;
+    const studentId = studentIdInput.value;
 
     if(name==="" || email===""){
 
@@ -209,76 +201,68 @@ studentEmail.value.trim().toLowerCase();
 
     if(!email.includes("@")){
 
-    alert("Email không hợp lệ.");
-
-    return;
-
-}
-    
-    const emailQuery = query(
-
-        collection(db,"users"),
-
-        where("email","==",email)
-
-    );
-
-    const emailSnap =
-    await getDocs(emailQuery);
-
-    if(!emailSnap.empty){
-
-        alert("Email đã tồn tại.");
+        alert("Email không hợp lệ.");
 
         return;
 
     }
 
-    await setDoc(
-
-        doc(db,"users",studentId),
-
+    const response = await fetch(
+        "http://localhost:3000/createStudent",
         {
 
-            name,
+            method:"POST",
 
-            email,
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-            studentId,
+            body:JSON.stringify({
 
-            password:studentId,
+                name:name,
 
-            role:"Học sinh",
+                email:email,
 
-            avatar:"",
+                password:studentId,
 
-            createdAt:Date.now()
+                studentId:studentId
+
+            })
 
         }
-
     );
 
-    alert(
+    const result = await response.json();
 
+    if(result.success){
+
+        alert(
 `Đã tạo thành công!
 
-Họ tên: ${name}
-
-Mã học sinh: ${studentId}
+Email: ${email}
 
 Mật khẩu: ${studentId}`
+        );
 
-    );
+        studentName.value="";
 
-    studentName.value="";
+        studentEmail.value="";
 
-    studentEmail.value="";
+        studentIdInput.value=
+        await generateStudentId();
 
-    studentIdInput.value=
+    }else{
 
-    await generateStudentId();
+        alert(result.message);
 
-});
+    }
+
+}
+
+createStudentBtn.addEventListener(
+    "click",
+    createStudentAccount
+);
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
