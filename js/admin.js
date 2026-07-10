@@ -35,7 +35,7 @@ const menuPending = document.getElementById("menuPending");
 const logoutBtn = document.getElementById("logoutBtn");
 const pages = {
 
-    home: document.querySelector(".dashboard-header").parentElement,
+    home: document.getElementById("homePage"),
 
     account: document.getElementById("accountPage"),
 
@@ -151,12 +151,24 @@ onAuthStateChanged(auth, async(user)=>{
         if(snapshot.exists()){
 
             const data = snapshot.val();
+            if(data.role!=="admin"){
 
+    alert("Bạn không có quyền truy cập.");
+
+    location.href="../index.html";
+
+    return;
+
+}
             adminName.textContent=data.name||"Admin";
 
             adminAvatar.src=data.avatar||"../assets/avatars/default.jpg";
 
             adminRole.textContent=data.role||"Admin";
+            const welcomeName=document.getElementById("welcomeName");
+
+welcomeName.textContent=data.name||"Admin";
+            await loadDashboard();
 
         }
 
@@ -176,11 +188,12 @@ onAuthStateChanged(auth, async(user)=>{
 const studentCount=document.getElementById("studentCount");
 const teacherCount=document.getElementById("teacherCount");
 const courseCount=document.getElementById("courseCount");
-const documentCount=document.getElementById("documentCount");
+
+const videoCount=document.getElementById("videoCount");
 async function loadDashboard(){
 
     try{
-
+showLoading();
         const usersSnapshot=await get(ref(db,"users"));
 
         let students=0;
@@ -209,6 +222,6 @@ async function loadDashboard(){
         console.log(err);
 
     }
-
+hideLoading();
 }
-loadDashboard();
+
