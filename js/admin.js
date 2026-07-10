@@ -12,7 +12,6 @@ import {
 import {
     ref,
     get,
-    child,
     set,
     update,
     remove,
@@ -21,8 +20,6 @@ import {
 //==============================
 // DOM
 //==============================
-
-const pageContainer = document.getElementById("pageContainer");
 
 const menuHome = document.getElementById("menuHome");
 const menuAccounts = document.getElementById("menuAccounts");
@@ -115,3 +112,103 @@ logoutBtn.onclick = async () => {
 hideAllPages();
 
 pages.home.style.display = "block";
+//==============================
+// LOADING
+//==============================
+
+const loading = document.getElementById("loading");
+
+function showLoading() {
+    loading.style.display = "flex";
+}
+
+function hideLoading() {
+    loading.style.display = "none";
+}
+//==============================
+// ADMIN INFO
+//==============================
+
+const adminAvatar = document.getElementById("adminAvatar");
+const adminName = document.getElementById("adminName");
+const adminRole = document.getElementById("adminRole");
+
+onAuthStateChanged(auth, async(user)=>{
+
+    if(!user){
+
+        location.href="../login.html";
+        return;
+
+    }
+
+    showLoading();
+
+    try{
+
+        const snapshot = await get(ref(db,"users/"+user.uid));
+
+        if(snapshot.exists()){
+
+            const data = snapshot.val();
+
+            adminName.textContent=data.name||"Admin";
+
+            adminAvatar.src=data.avatar||"../assets/avatars/default.jpg";
+
+            adminRole.textContent=data.role||"Admin";
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+    hideLoading();
+
+});
+//==============================
+// DASHBOARD COUNT
+//==============================
+
+const studentCount=document.getElementById("studentCount");
+const teacherCount=document.getElementById("teacherCount");
+const courseCount=document.getElementById("courseCount");
+const documentCount=document.getElementById("documentCount");
+async function loadDashboard(){
+
+    try{
+
+        const usersSnapshot=await get(ref(db,"users"));
+
+        let students=0;
+        let teachers=0;
+
+        if(usersSnapshot.exists()){
+
+            usersSnapshot.forEach(item=>{
+
+                const user=item.val();
+
+                if(user.role==="student") students++;
+
+                if(user.role==="teacher") teachers++;
+
+            });
+
+        }
+
+        studentCount.textContent=students;
+
+        teacherCount.textContent=teachers;
+
+    }catch(err){
+
+        console.log(err);
+
+    }
+
+}
+loadDashboard();
