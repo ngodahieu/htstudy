@@ -46,16 +46,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <div class="sidebar-user">
 
 <img
-id="teacherAvatar"
+id="adminAvatar"
 src="../assets/avatars/default.jpg">
 
-<h3 id="teacherName">
+<h3 id="adminName">
 
 Đang tải...
 
 </h3>
 
-<p id="teacherRole">
+<p id="adminRole">
 
 Admin 👑
 
@@ -103,7 +103,8 @@ Giáo viên
 
 </button>
 <button
-class="menu-item">
+class="menu-item"
+id="menuCourses">
 
 <i class="fa-solid fa-book"></i>
 
@@ -112,7 +113,8 @@ Khóa học
 </button>
 
 <button
-class="menu-item">
+class="menu-item"
+id="menuVideos">
 
 <i class="fa-solid fa-video"></i>
 
@@ -121,16 +123,17 @@ Video
 </button>
 
 <button
-class="menu-item">
+class="menu-item"
+id="menuDocuments">
 
 <i class="fa-solid fa-file-pdf"></i>
 
 Tài liệu
 
 </button>
-
 <button
-class="menu-item">
+class="menu-item"
+id="menuTests">
 
 <i class="fa-solid fa-file-circle-check"></i>
 
@@ -139,7 +142,8 @@ Bài kiểm tra
 </button>
 
 <button
-class="menu-item">
+class="menu-item"
+id="menuNotifications">
 
 <i class="fa-solid fa-bullhorn"></i>
 
@@ -148,14 +152,14 @@ Thông báo
 </button>
 
 <button
-class="menu-item">
+class="menu-item"
+id="menuPending">
 
 <i class="fa-solid fa-user-clock"></i>
 
 Chờ duyệt
 
 </button>
-
 <button
 class="menu-item"
 id="logoutBtn">
@@ -171,12 +175,20 @@ id="logoutBtn">
 </aside>
 
 <main class="dashboard-content">
-
+<div id="pageContainer">
 <div class="dashboard-header">
 
 <h1>
 
-Xin chào Admin 👋
+Xin chào,
+
+<span id="welcomeName">
+
+Admin
+
+</span>
+
+👋
 
 </h1>
 
@@ -189,85 +201,77 @@ Quản trị toàn bộ hệ thống H&T STUDY.
 </div>
 
 <div class="dashboard-cards">
-
+<!-- Thống kê -->
 <div class="dashboard-card">
 
-<h2 id="studentCount">
+<h2 id="studentCount">0</h2>
 
-0
-
-</h2>
-
-<p>
-
-Học sinh
-
-</p>
+<p>Học sinh</p>
 
 </div>
 
 <div class="dashboard-card">
 
-<h2 id="courseCount">
+<h2 id="teacherCount">0</h2>
 
-0
-
-</h2>
-
-<p>
-
-Khóa học
-
-</p>
+<p>Giáo viên</p>
 
 </div>
 
 <div class="dashboard-card">
 
-<h2 id="videoCount">
+<h2 id="courseCount">0</h2>
 
-0
-
-</h2>
-
-<p>
-
-Video
-
-</p>
+<p>Khóa học</p>
 
 </div>
 
 <div class="dashboard-card">
 
-<h2 id="documentCount">
+<h2 id="videoCount">0</h2>
 
-0
-
-</h2>
-
-<p>
-
-Tài liệu
-
-</p>
+<p>Video</p>
 
 </div>
 
 </div>
+
 <div id="accountPage" style="display:none;">
 
 <div class="dashboard-header">
 
-<h1>
+    <h1>
 
-Quản lý tài khoản
+        Quản lý tài khoản
 
-</h1>
+    </h1>
+
+    <p>
+
+        Xem toàn bộ tài khoản của hệ thống.
+
+    </p>
 
 </div>
 
-<div id="accountList">
+<div class="dashboard-form">
+<input
+type="text"
+id="searchAccount"
+class="search-box"
+placeholder="Tìm theo tên, email hoặc mã..."
+autocomplete="off">
+<div
+id="accountList"
+class="account-list">
+
+<p class="empty">
+
+Đang tải danh sách...
+
+</p>
+
+</div>
 
 </div>
 
@@ -297,8 +301,11 @@ style="display:none;">
             </label>
 
             <input
-            type="text"
-            id="studentName">
+<input
+type="text"
+id="studentName"
+placeholder="Nhập họ và tên"
+autocomplete="off">
 
         </div>
 
@@ -311,8 +318,11 @@ style="display:none;">
             </label>
 
             <input
-            type="email"
-            id="studentEmail">
+<input
+type="email"
+id="studentEmail"
+placeholder="example@gmail.com"
+autocomplete="off">
 
         </div>
 
@@ -338,12 +348,13 @@ style="display:none;">
 </div>
 
         <button
-        id="createStudentBtn">
+id="createTeacherBtn">
 
-            Tạo tài khoản
+<i class="fa-solid fa-user-plus"></i>
 
-        </button>
+Tạo giáo viên
 
+</button>
     </div>
 
 </div>
@@ -365,18 +376,22 @@ style="display:none;">
 
             <label>Họ và tên</label>
 
-            <input
-            id="teacherCreateName">
+<input
+type="text"
+id="teacherCreateName"
+placeholder="Nhập họ và tên"
+autocomplete="off">
 
         </div>
 
         <div class="form-group">
 
             <label>Email</label>
-
-            <input
-            type="email"
-            id="teacherCreateEmail">
+<input
+type="email"
+id="teacherCreateEmail"
+placeholder="example@gmail.com"
+autocomplete="off">
 
         </div>
 
@@ -406,13 +421,234 @@ style="display:none;">
     </div>
 
 </div>
+  <div
+id="coursePage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Quản lý khóa học
+
+</h1>
+
+<p>
+
+Danh sách các khóa học sẽ hiển thị tại đây.
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+<div
+id="videoPage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Quản lý Video
+
+</h1>
+
+<p>
+
+Upload và quản lý video bài giảng.
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+  <div
+id="documentPage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Quản lý tài liệu
+
+</h1>
+
+<p>
+
+Upload PDF, Word, Slide,...
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+  <div
+id="testPage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Quản lý bài kiểm tra
+
+</h1>
+
+<p>
+
+Tạo và quản lý các bài kiểm tra.
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+  <div
+id="notificationPage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Thông báo
+
+</h1>
+
+<p>
+
+Gửi thông báo cho toàn bộ học sinh.
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+  <div
+id="pendingPage"
+style="display:none;">
+
+<div class="dashboard-header">
+
+<h1>
+
+Tài khoản chờ duyệt
+
+</h1>
+
+<p>
+
+Danh sách tài khoản đang chờ Admin xác nhận.
+
+</p>
+
+</div>
+
+<div class="dashboard-form">
+
+Đang phát triển...
+
+</div>
+
+</div>
+  <div
+id="deleteModal"
+class="modal"
+style="display:none;">
+
+<div class="modal-content">
+
+<h2>
+
+Xóa tài khoản
+
+</h2>
+<i class="fa-solid fa-triangle-exclamation modal-icon"></i>
+<p>
+
+Bạn có chắc chắn muốn xóa tài khoản này?
+
+</p>
+
+<div class="modal-buttons">
+
+<button
+id="cancelDelete">
+
+Hủy
+
+</button>
+
+<button
+id="confirmDelete">
+
+Xóa
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+<div
+id="loading"
+class="loading-screen"
+style="display:none;">
+
+<div class="loader"></div>
+
+<p>
+
+Đang xử lý...
+
+</p>
+</div>
+</div>
+  <footer class="dashboard-footer">
+
+© 2026 H&T STUDY - Admin Dashboard
+
+</footer>
 </main>
 
 </div>
 
 <script
 type="module"
-src="../js/teacher.js">
+src="../js/admin.js">
 
 </script>
 
