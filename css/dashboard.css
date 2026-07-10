@@ -56,8 +56,13 @@ body{
 }
 
 .sidebar-user{
-    text-align:center;
-    padding:30px 20px;
+
+text-align:center;
+
+padding:30px 20px;
+
+border-bottom:1px solid rgba(255,255,255,.12);
+
 }
 
 .sidebar-user img{
@@ -123,14 +128,18 @@ flex:1;
 }
 
 .menu-item.active{
+
 border-left:5px solid #60a5fa;
-    background:#fff;
 
-    color:#2563eb;
+background:#fff;
 
-    transform:translateX(10px);
+color:#2563eb;
 
-    box-shadow:0 12px 25px rgba(0,0,0,.15);
+font-weight:600;
+
+transform:translateX(10px);
+
+box-shadow:0 12px 25px rgba(0,0,0,.15);
 
 }
 
@@ -148,12 +157,21 @@ border-left:5px solid #60a5fa;
 ==============================*/
 
 .dashboard-content{
-    flex:1;
-    margin-left:280px;
-    padding:35px;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+
+flex:1;
+
+margin-left:280px;
+
+padding:35px;
+
+min-height:100vh;
+
+display:flex;
+
+flex-direction:column;
+
+overflow-x:hidden;
+
 }
 #pageContainer{
     flex:1;
@@ -183,7 +201,7 @@ border-left:5px solid #60a5fa;
     border-radius:20px;
     padding:30px;
     box-shadow:0 15px 35px rgba(0,0,0,.08);
-
+    cursor:pointer;
     transition:.35s;
 
     opacity:0;
@@ -252,7 +270,7 @@ font-weight:700;
 
 color:#2563eb;
 
-margin-bottom:8px;
+letter-spacing:1px;
 
 }
 
@@ -333,7 +351,17 @@ margin-left:90px;
 }
 
 @media(max-width:650px){
+.dashboard-header{
 
+padding:20px;
+
+}
+
+.dashboard-header h1{
+
+font-size:25px;
+
+}
 .dashboard-cards{
 
 grid-template-columns:1fr;
@@ -348,7 +376,7 @@ padding:20px;
 
 }
 .dashboard-form{
-
+border:1px solid #eef2f7;
 margin-top:25px;
 
 background:white;
@@ -396,6 +424,11 @@ font-weight:500;
 transition:.3s;
 
 background:#fff;
+
+}
+.form-group input:hover{
+
+border-color:#93c5fd;
 
 }
 .form-group input:focus{
@@ -560,7 +593,7 @@ transform:translateY(0);
 .search-box{
 background:white;
 width:100%;
-
+outline:none;
 padding:15px 18px;
 
 border:2px solid #e5e7eb;
@@ -582,6 +615,11 @@ outline:none;
 border-color:#2563eb;
 
 box-shadow:0 0 0 5px rgba(37,99,235,.12);
+
+}
+.search-box:hover{
+
+border-color:#93c5fd;
 
 }
 .account-list{
@@ -622,9 +660,9 @@ border-top:1px solid #e5e7eb;
 .loading-screen{
 transition:.3s;
 position:fixed;
-
+animation:fadeDown .25s;
 inset:0;
-
+display:none;
 background:rgba(255,255,255,.85);
 
 display:flex;
@@ -673,7 +711,7 @@ transform:rotate(360deg);
 
 }
 .modal{
-
+display:none;
 position:fixed;
 
 inset:0;
@@ -699,7 +737,7 @@ background:white;
 border-radius:18px;
 
 padding:30px;
-
+text-align:center;
 animation:formIn .3s;
 
 }
@@ -708,11 +746,11 @@ animation:formIn .3s;
 
 display:flex;
 
-justify-content:flex-end;
+justify-content:center;
 
 gap:15px;
 
-margin-top:25px;
+margin-top:30px;
 
 }
 #cancelDelete,
@@ -744,7 +782,7 @@ color:white;
 
 }
 .account-card{
-
+animation:formIn .4s;
 display:flex;
 
 justify-content:space-between;
@@ -762,7 +800,13 @@ box-shadow:0 8px 18px rgba(0,0,0,.08);
 transition:.3s;
 
 }
+.account-card.selected{
 
+border:2px solid #2563eb;
+
+background:#eff6ff;
+
+}
 .account-card:hover{
 
 transform:translateY(-5px);
@@ -831,6 +875,16 @@ border-radius:10px;
 
 cursor:pointer;
 
+transition:.3s;
+
+}
+
+.edit-btn:hover{
+
+background:#1d4ed8;
+
+transform:translateY(-2px);
+
 }
 
 .delete-btn{
@@ -846,6 +900,16 @@ padding:10px 18px;
 border-radius:10px;
 
 cursor:pointer;
+
+transition:.3s;
+
+}
+
+.delete-btn:hover{
+
+background:#dc2626;
+
+transform:translateY(-2px);
 
 }
 .upload-box{
@@ -896,5 +960,151 @@ th{
 background:#2563eb;
 
 color:white;
+
+}
+button{
+
+font-family:"Poppins",sans-serif;
+
+}
+
+button:disabled{
+
+opacity:.6;
+
+cursor:not-allowed;
+
+}
+
+button{
+
+transition:.3s;
+
+}
+::-webkit-scrollbar{
+
+width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+background:#2563eb;
+
+border-radius:20px;
+
+}
+
+::-webkit-scrollbar-track{
+
+background:#edf2f7;
+
+}
+.dashboard-header p{
+
+margin-top:8px;
+
+color:#6b7280;
+
+}
+.dashboard-card::before{
+
+content:"";
+
+position:absolute;
+
+left:0;
+
+top:0;
+
+height:5px;
+
+width:100%;
+
+background:linear-gradient(90deg,#2563eb,#60a5fa);
+
+}
+.toast{
+
+position:fixed;
+
+top:25px;
+
+right:25px;
+
+padding:15px 22px;
+
+border-radius:14px;
+
+background:#2563eb;
+
+color:#fff;
+
+font-weight:600;
+
+box-shadow:0 15px 35px rgba(0,0,0,.2);
+
+z-index:99999;
+
+animation:fadeDown .35s;
+
+}
+
+.toast.success{
+
+background:#16a34a;
+
+}
+
+.toast.error{
+
+background:#dc2626;
+
+}
+.badge{
+
+display:inline-block;
+
+padding:5px 12px;
+
+border-radius:999px;
+
+font-size:13px;
+
+font-weight:600;
+
+}
+
+.badge-admin{
+
+background:#dbeafe;
+
+color:#2563eb;
+
+}
+
+.badge-teacher{
+
+background:#dcfce7;
+
+color:#15803d;
+
+}
+
+.badge-student{
+
+background:#fef3c7;
+
+color:#ca8a04;
+
+}
+button:active{
+
+transform:scale(.97);
+
+}
+.dashboard-card h2{
+
+user-select:none;
 
 }
