@@ -17,6 +17,10 @@ import {
     remove,
     push
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import{
+    collection,
+    getDocs
+}from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 //==============================
 // DOM
 //==============================
@@ -205,6 +209,7 @@ const teacherCount=document.getElementById("teacherCount");
 const courseCount=document.getElementById("courseCount");
 
 const videoCount=document.getElementById("videoCount");
+
 //==============================
 // CREATE ACCOUNT
 //==============================
@@ -263,33 +268,31 @@ async function loadDashboard(){
 
 async function generateMemberId(){
 
-    const snapshot = await get(ref(db,"users"));
+    const snapshot =
+    await getDocs(collection(db,"users"));
 
     let max = 0;
 
-    if(snapshot.exists()){
+    snapshot.forEach((doc)=>{
 
-        snapshot.forEach(item=>{
+        const data = doc.data();
 
-            const user = item.val();
+        if(!data.memberId) return;
 
-            if(!user.memberId) return;
+        const number =
+        parseInt(data.memberId.replace("HT27",""));
 
-            const number = parseInt(
-                user.memberId.replace("HT27","")
-            );
+        if(number > max){
 
-            if(number > max){
+            max = number;
 
-                max = number;
+        }
 
-            }
+    });
 
-        });
+    return "HT27"+
 
-    }
-
-    return "HT27" + String(max + 1).padStart(4,"0");
+    String(max+1).padStart(4,"0");
 
 }
 //==============================
