@@ -72,13 +72,17 @@ function setActiveMenu(activeButton){
     activeButton.classList.add("active");
 
 }
-menuHome.addEventListener("click", () => {
+menuHome.addEventListener("click",()=>{
 
     setActiveMenu(menuHome);
 
-    dashboardHeader.style.display = "block";
-    dashboardCards.style.display = "grid";
-    studentPage.style.display = "none";
+    dashboardHeader.style.display="block";
+
+    dashboardCards.style.display="grid";
+
+    studentPage.style.display="none";
+
+    teacherPage.style.display="none";
 
 });
 const dashboardHeader =
@@ -202,13 +206,17 @@ teacherCreateId.value=id;
         MENU HỌC SINH
 ====================================*/
 
-menuStudents.addEventListener("click", () => {
+menuStudents.addEventListener("click",()=>{
 
     setActiveMenu(menuStudents);
 
-    dashboardHeader.style.display = "none";
-    dashboardCards.style.display = "none";
-    studentPage.style.display = "block";
+    dashboardHeader.style.display="none";
+
+    dashboardCards.style.display="none";
+
+    teacherPage.style.display="none";
+
+    studentPage.style.display="block";
 
 });
 menuTeachers.addEventListener("click",()=>{
