@@ -67,10 +67,14 @@ function hideAllPages() {
 
 }
 function openPage(pageName, button) {
-
+if(pages[pageName].style.display==="block") return;
     hideAllPages();
 
     pages[pageName].style.display = "block";
+    window.scrollTo({
+    top:0,
+    behavior:"smooth"
+});
 
     menuButtons.forEach(btn => {
 
