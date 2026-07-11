@@ -1,266 +1,93 @@
-//==============================
-// FIREBASE
-//==============================
-
 import { auth, db } from "./firebase.js";
-
 import {
     onAuthStateChanged,
     signOut
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-import{
+import {
     doc,
     getDoc,
+    getDocs,
     collection,
-    getDocs
-}from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-//==============================
-// DOM
-//==============================
+    query,
+    where
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+/*====================================
+        LẤY CÁC THÀNH PHẦN HTML
+====================================*/
 
-const menuHome = document.getElementById("menuHome");
-const menuAccounts = document.getElementById("menuAccounts");
-const menuStudents = document.getElementById("menuStudents");
-const menuTeachers = document.getElementById("menuTeachers");
-const menuCourses = document.getElementById("menuCourses");
-const menuVideos = document.getElementById("menuVideos");
-const menuDocuments = document.getElementById("menuDocuments");
-const menuTests = document.getElementById("menuTests");
-const menuNotifications = document.getElementById("menuNotifications");
-const menuPending = document.getElementById("menuPending");
+const adminName =
+document.getElementById("adminName");
 
-const logoutBtn = document.getElementById("logoutBtn");
-const pages = {
+const adminRole =
+document.getElementById("adminRole");
 
-    home: document.getElementById("homePage"),
+const adminAvatar =
+document.getElementById("adminAvatar");
 
-    account: document.getElementById("accountPage"),
+const logoutBtn =
+document.getElementById("logoutBtn");
 
-    student: document.getElementById("studentPage"),
+const studentIdInput =
+document.getElementById("studentId");
+const studentName =
+document.getElementById("studentName");
 
-    teacher: document.getElementById("teacherPage"),
+const studentEmail =
+document.getElementById("studentEmail");
 
-    course: document.getElementById("coursePage"),
+const createStudentBtn =
+document.getElementById("createStudentBtn");
+const teacherCreateId =
+document.getElementById("teacherCreateId");
 
-    video: document.getElementById("videoPage"),
+const teacherCreateName =
+document.getElementById("teacherCreateName");
 
-    document: document.getElementById("documentPage"),
+const teacherCreateEmail =
+document.getElementById("teacherCreateEmail");
 
-    test: document.getElementById("testPage"),
+const createTeacherBtn =
+document.getElementById("createTeacherBtn");
+const menuStudents =
+document.getElementById("menuStudents");
+const menuHome =
+document.getElementById("menuHome");
+const menuItems = document.querySelectorAll(".menu-item");
 
-    notification: document.getElementById("notificationPage"),
+function setActiveMenu(activeButton){
 
-    pending: document.getElementById("pendingPage")
+    menuItems.forEach(item => {
 
-};
-const menuButtons = document.querySelectorAll(".menu-item");
-function hideAllPages() {
-
-    Object.values(pages).forEach(page => {
-
-        page.style.display = "none";
+        item.classList.remove("active");
 
     });
 
-}
-function openPage(pageName, button) {
-if(pages[pageName].style.display==="block") return;
-    hideAllPages();
-
-    pages[pageName].style.display = "block";
-    window.scrollTo({
-    top:0,
-    behavior:"smooth"
-});
-
-    menuButtons.forEach(btn => {
-
-        btn.classList.remove("active");
-
-    });
-
-    button.classList.add("active");
+    activeButton.classList.add("active");
 
 }
-menuHome.onclick = () => openPage("home", menuHome);
+menuHome.addEventListener("click", () => {
 
-menuAccounts.onclick = () => openPage("account", menuAccounts);
+    setActiveMenu(menuHome);
 
-menuStudents.onclick = () => openPage("student", menuStudents);
-
-menuTeachers.onclick = () => openPage("teacher", menuTeachers);
-
-menuCourses.onclick = () => openPage("course", menuCourses);
-
-menuVideos.onclick = () => openPage("video", menuVideos);
-
-menuDocuments.onclick = () => openPage("document", menuDocuments);
-
-menuTests.onclick = () => openPage("test", menuTests);
-
-menuNotifications.onclick = () => openPage("notification", menuNotifications);
-
-menuPending.onclick = () => openPage("pending", menuPending);
-logoutBtn.onclick = async () => {
-
-    if (!confirm("Bạn muốn đăng xuất?")) return;
-
-    try{
-
-    await signOut(auth);
-
-    location.href="../index.html";
-
-}catch(err){
-
-    alert("Không thể đăng xuất.");
-
-}
-
-};
-hideAllPages();
-
-pages.home.style.display = "block";
-//==============================
-// LOADING
-//==============================
-
-const loading = document.getElementById("loading");
-
-function showLoading() {
-    loading.style.display = "flex";
-}
-
-function hideLoading() {
-    loading.style.display = "none";
-}
-//==============================
-// ADMIN INFO
-//==============================
-
-const adminAvatar = document.getElementById("adminAvatar");
-const adminName = document.getElementById("adminName");
-const adminRole = document.getElementById("adminRole");
-
-onAuthStateChanged(auth, async(user)=>{
-
-    if(!user){
-
-        location.href="../login.html";
-        return;
-
-    }
-
-    showLoading();
-
-    try{
-
-        const snapshot =
-await getDoc(doc(db,"users",user.uid));
-
-        if(snapshot.exists()){
-
-            const data = snapshot.data();
-            if(data.role!=="admin"){
-
-    alert("Bạn không có quyền truy cập.");
-
-    location.href="../index.html";
-
-    return;
-
-}
-            adminName.textContent=data.name||"Admin";
-
-            adminAvatar.src=data.avatar||"../assets/avatars/default.jpg";
-
-            adminRole.textContent=data.role||"Admin";
-            const welcomeName=document.getElementById("welcomeName");
-
-welcomeName.textContent=data.name||"Admin";
-            await loadDashboard();
-            studentId.value = await generateMemberId();
-
-teacherCreateId.value = studentId.value;
-
-        }
-
-    }catch(err){
-
-        console.log(err);
-
-    }
-
-    hideLoading();
+    dashboardHeader.style.display = "block";
+    dashboardCards.style.display = "grid";
+    studentPage.style.display = "none";
 
 });
-//==============================
-// DASHBOARD COUNT
-//==============================
+const dashboardHeader =
+document.querySelector(".dashboard-header");
 
-const studentCount=document.getElementById("studentCount");
-const teacherCount=document.getElementById("teacherCount");
-const courseCount=document.getElementById("courseCount");
+const dashboardCards =
+document.querySelector(".dashboard-cards");
 
-const videoCount=document.getElementById("videoCount");
-
-//==============================
-// CREATE ACCOUNT
-//==============================
-
-const studentName = document.getElementById("studentName");
-const studentEmail = document.getElementById("studentEmail");
-const studentId = document.getElementById("studentId");
-const createStudentBtn = document.getElementById("createStudentBtn");
-
-const teacherCreateName = document.getElementById("teacherCreateName");
-const teacherCreateEmail = document.getElementById("teacherCreateEmail");
-const teacherCreateId = document.getElementById("teacherCreateId");
-const createTeacherBtn = document.getElementById("createTeacherBtn");
-async function loadDashboard(){
-
-    showLoading();
-
-    try{
-
-        const usersSnapshot = await get(ref(db,"users"));
-
-        let students = 0;
-        let teachers = 0;
-
-        if(usersSnapshot.exists()){
-
-            usersSnapshot.forEach(item=>{
-
-                const user = item.val();
-
-                if(user.role==="student") students++;
-
-                if(user.role==="teacher") teachers++;
-
-            });
-
-        }
-
-        studentCount.textContent = students;
-        teacherCount.textContent = teachers;
-
-    }catch(err){
-
-        console.log(err);
-
-    }finally{
-
-        hideLoading();
-
-    }
-
-}
-//==============================
-// MEMBER ID
-//==============================
-
+const studentPage =
+document.getElementById("studentPage");
+/*====================================
+        SINH MÃ HỌC SINH
+====================================*/
 async function generateMemberId(){
 
     const snapshot =
@@ -290,17 +117,105 @@ async function generateMemberId(){
     String(max+1).padStart(4,"0");
 
 }
-//==============================
-// CREATE STUDENT
-//==============================
+/*====================================
+        KIỂM TRA ĐĂNG NHẬP
+====================================*/
 
-async function createStudent(){
+onAuthStateChanged(auth, async (user)=>{
+
+    if(!user){
+
+        alert("Bạn cần đăng nhập.");
+
+        window.location.href="../index.html";
+
+        return;
+
+    }
+
+    const docRef =
+    doc(db,"users",user.uid);
+
+    const docSnap =
+    await getDoc(docRef);
+
+    if(!docSnap.exists()){
+
+        alert("Không tìm thấy tài khoản.");
+
+        await signOut(auth);
+
+        window.location.href="../index.html";
+
+        return;
+
+    }
+
+    const data =
+    docSnap.data();
+
+    /*=========================
+            KIỂM TRA QUYỀN
+    =========================*/
+
+    if(data.role !== "Admin"){
+
+        alert("Bạn không có quyền truy cập.");
+
+        window.location.href="../index.html";
+
+        return;
+
+    }
+
+    /*=========================
+        HIỂN THỊ THÔNG TIN
+    =========================*/
+
+    adminName.textContent =
+data.name;
+
+adminRole.textContent =
+data.role;
+
+adminAvatar.src =
+data.avatar && data.avatar.trim()!==""
+?data.avatar
+:"../assets/avatars/default.jpg";
+    document.getElementById("welcomeName").textContent =
+data.name;
+const id =
+await generateMemberId();
+
+studentIdInput.value=id;
+
+teacherCreateId.value=id;
+});
+/*====================================
+        MENU HỌC SINH
+====================================*/
+
+menuStudents.addEventListener("click", () => {
+
+    setActiveMenu(menuStudents);
+
+    dashboardHeader.style.display = "none";
+    dashboardCards.style.display = "none";
+    studentPage.style.display = "block";
+
+});
+/*====================================
+        TẠO HỌC SINH
+====================================*/
+
+async function createStudentAccount(){
 
     const name = studentName.value.trim();
 
     const email = studentEmail.value.trim().toLowerCase();
 
-    const memberId = studentId.value;
+    const memberId =
+studentIdInput.value;
 
     if(name==="" || email===""){
 
@@ -318,91 +233,71 @@ async function createStudent(){
 
     }
 
-    showLoading();
+    const response = await fetch(
+        "http://localhost:3000/createStudent",
+        {
 
-    try{
+            method:"POST",
 
-        const response = await fetch(
-            "http://localhost:3000/createStudent",
-            {
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-                method:"POST",
+            body:JSON.stringify({
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
+                name:name,
 
-                body:JSON.stringify({
+                email:email,
 
-                    name:name,
+                password:memberId,
 
-                    email:email,
+memberId:memberId
 
-                    password:memberId,
+            })
 
-                    memberId:memberId
+        }
+    );
 
-                })
+    const result = await response.json();
 
-            }
-        );
+    if(result.success){
 
-        const result = await response.json();
-
-        if(result.success){
-
-            alert(
-
-`Đã tạo thành công.
+        alert(
+`Đã tạo thành công!
 
 Email: ${email}
 
 Mật khẩu: ${memberId}`
+        );
 
-            );
+        studentName.value="";
 
-            studentName.value="";
+        studentEmail.value="";
 
-            studentEmail.value="";
+        const id =
+await generateMemberId();
 
-            const newId = await generateMemberId();
+studentIdInput.value=id;
 
-            studentId.value = newId;
+teacherCreateId.value=id;
 
-            teacherCreateId.value = newId;
+    }else{
 
-            await loadDashboard();
-
-        }else{
-
-            alert(result.message);
-
-        }
-
-    }catch(err){
-
-        console.log(err);
-
-        alert("Không thể tạo tài khoản.");
-
-    }finally{
-
-        hideLoading();
+        alert(result.message);
 
     }
 
 }
-//==============================
-// CREATE TEACHER
-//==============================
+async function createTeacherAccount(){
 
-async function createTeacher(){
+    const name =
+    teacherCreateName.value.trim();
 
-    const name = teacherCreateName.value.trim();
+    const email =
+    teacherCreateEmail.value.trim().toLowerCase();
 
-    const email = teacherCreateEmail.value.trim().toLowerCase();
-
-    const memberId = teacherCreateId.value;
+    const memberId =
+    teacherCreateId.value;
 
     if(name==="" || email===""){
 
@@ -420,84 +315,82 @@ async function createTeacher(){
 
     }
 
-    showLoading();
+    const response = await fetch(
 
-    try{
+        "http://localhost:3000/createTeacher",
 
-        const response = await fetch(
-            "http://localhost:3000/createTeacher",
-            {
+        {
 
-                method:"POST",
+            method:"POST",
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-                body:JSON.stringify({
+            body:JSON.stringify({
 
-                    name:name,
+                name:name,
 
-                    email:email,
+                email:email,
 
-                    password:memberId,
+                password:memberId,
 
-                    memberId:memberId
+                memberId:memberId
 
-                })
+            })
 
-            }
-        );
+        }
 
-        const result = await response.json();
+    );
 
-        if(result.success){
+    const result = await response.json();
 
-            alert(
+    if(result.success){
 
-`Đã tạo thành công.
+        alert(
+
+`Đã tạo thành công!
 
 Email: ${email}
 
 Mật khẩu: ${memberId}`
 
-            );
+        );
 
-            teacherCreateName.value="";
+        teacherCreateName.value="";
 
-            teacherCreateEmail.value="";
+        teacherCreateEmail.value="";
 
-            const newId = await generateMemberId();
+        const id =
+        await generateMemberId();
 
-            studentId.value = newId;
+        teacherCreateId.value=id;
 
-            teacherCreateId.value = newId;
+        studentIdInput.value=id;
 
-            await loadDashboard();
+    }else{
 
-        }else{
-
-            alert(result.message);
-
-        }
-
-    }catch(err){
-
-        console.log(err);
-
-        alert("Không thể tạo tài khoản.");
-
-    }finally{
-
-        hideLoading();
+        alert(result.message);
 
     }
 
 }
-//==============================
-// EVENT
-//==============================
+createStudentBtn.addEventListener(
+    "click",
+    createStudentAccount
+);
+createTeacherBtn.addEventListener(
+    "click",
+    createTeacherAccount
+);
+/*====================================
+        ĐĂNG XUẤT
+====================================*/
 
-createStudentBtn.onclick = createStudent;
+logoutBtn.addEventListener("click",async()=>{
 
-createTeacherBtn.onclick = createTeacher;
+    await signOut(auth);
+
+    window.location.href="../index.html";
+
+});
