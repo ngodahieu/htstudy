@@ -108,9 +108,17 @@ logoutBtn.onclick = async () => {
 
     if (!confirm("Bạn muốn đăng xuất?")) return;
 
+    try{
+
     await signOut(auth);
 
-    location.href = "../index.html";
+    location.href="../index.html";
+
+}catch(err){
+
+    alert("Không thể đăng xuất.");
+
+}
 
 };
 hideAllPages();
@@ -196,18 +204,20 @@ const courseCount=document.getElementById("courseCount");
 const videoCount=document.getElementById("videoCount");
 async function loadDashboard(){
 
-    try{
-showLoading();
-        const usersSnapshot=await get(ref(db,"users"));
+    showLoading();
 
-        let students=0;
-        let teachers=0;
+    try{
+
+        const usersSnapshot = await get(ref(db,"users"));
+
+        let students = 0;
+        let teachers = 0;
 
         if(usersSnapshot.exists()){
 
             usersSnapshot.forEach(item=>{
 
-                const user=item.val();
+                const user = item.val();
 
                 if(user.role==="student") students++;
 
@@ -217,15 +227,17 @@ showLoading();
 
         }
 
-        studentCount.textContent=students;
-
-        teacherCount.textContent=teachers;
+        studentCount.textContent = students;
+        teacherCount.textContent = teachers;
 
     }catch(err){
 
         console.log(err);
 
-    }
-hideLoading();
-}
+    }finally{
 
+        hideLoading();
+
+    }
+
+}
