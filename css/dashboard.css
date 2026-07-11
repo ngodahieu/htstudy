@@ -665,18 +665,12 @@ inset:0;
 display:none;
 background:rgba(255,255,255,.85);
 
-display:flex;
-
 justify-content:center;
-
 align-items:center;
-
 flex-direction:column;
 
 z-index:9999;
-
 backdrop-filter:blur(4px);
-
 }
 .loader{
 
@@ -717,8 +711,6 @@ position:fixed;
 inset:0;
 
 background:rgba(0,0,0,.4);
-
-display:flex;
 
 justify-content:center;
 
