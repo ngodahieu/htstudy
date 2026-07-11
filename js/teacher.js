@@ -78,7 +78,7 @@ document.getElementById("studentPage");
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
-async function generateStudentId(){
+async function generateMemberId(){
 
     const snapshot =
     await getDocs(collection(db,"users"));
@@ -89,12 +89,10 @@ async function generateStudentId(){
 
         const data = doc.data();
 
-        if(data.role !== "Học sinh") return;
-
-        if(!data.studentId) return;
+        if(!data.memberId) return;
 
         const number =
-        parseInt(data.studentId.replace("HT27",""));
+parseInt(data.memberId.replace("HT27",""));
 
         if(number > max){
 
@@ -176,7 +174,7 @@ onAuthStateChanged(auth, async (user)=>{
 
     : "../assets/avatars/default.jpg";
     studentIdInput.value =
-await generateStudentId();
+await generateMemberId();
 });
 /*====================================
         MENU HỌC SINH
@@ -201,7 +199,8 @@ async function createStudentAccount(){
 
     const email = studentEmail.value.trim().toLowerCase();
 
-    const studentId = studentIdInput.value;
+    const memberId =
+studentIdInput.value;
 
     if(name==="" || email===""){
 
@@ -235,9 +234,9 @@ async function createStudentAccount(){
 
                 email:email,
 
-                password:studentId,
+                password:memberId,
 
-                studentId:studentId
+                memberId:memberId
 
             })
 
@@ -253,7 +252,7 @@ async function createStudentAccount(){
 
 Email: ${email}
 
-Mật khẩu: ${studentId}`
+Mật khẩu: ${memberId}`
         );
 
         studentName.value="";
