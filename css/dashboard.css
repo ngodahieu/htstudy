@@ -588,7 +588,7 @@ transform:translateY(0);
 }
 
 .sidebar-user img:hover{
-    transform:scale(1.08);
+    transform:scale(1.08) rotate(5deg);
     box-shadow:0 0 25px rgba(255,255,255,.35);
 }
 .search-box{
