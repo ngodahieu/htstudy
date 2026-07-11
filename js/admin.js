@@ -11,7 +11,9 @@ import {
     getDocs,
     collection,
     query,
-    where
+    where,
+    deleteDoc,
+    documentId
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -53,6 +55,8 @@ const createTeacherBtn =
 document.getElementById("createTeacherBtn");
 const menuStudents =
 document.getElementById("menuStudents");
+const menuTeachers =
+document.getElementById("menuTeachers");
 const menuHome =
 document.getElementById("menuHome");
 const menuItems = document.querySelectorAll(".menu-item");
@@ -85,6 +89,8 @@ document.querySelector(".dashboard-cards");
 
 const studentPage =
 document.getElementById("studentPage");
+const teacherPage =
+document.getElementById("teacherPage");
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
@@ -190,6 +196,7 @@ await generateMemberId();
 studentIdInput.value=id;
 
 teacherCreateId.value=id;
+    await loadDashboard();
 });
 /*====================================
         MENU HỌC SINH
@@ -202,6 +209,19 @@ menuStudents.addEventListener("click", () => {
     dashboardHeader.style.display = "none";
     dashboardCards.style.display = "none";
     studentPage.style.display = "block";
+
+});
+menuTeachers.addEventListener("click",()=>{
+
+    setActiveMenu(menuTeachers);
+
+    dashboardHeader.style.display="none";
+
+    dashboardCards.style.display="none";
+
+    studentPage.style.display="none";
+
+    teacherPage.style.display="block";
 
 });
 /*====================================
