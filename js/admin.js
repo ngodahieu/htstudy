@@ -76,13 +76,11 @@ menuHome.addEventListener("click",()=>{
 
     setActiveMenu(menuHome);
 
+    hideAllPages();
+
     dashboardHeader.style.display="block";
 
     dashboardCards.style.display="grid";
-
-    studentPage.style.display="none";
-
-    teacherPage.style.display="none";
 
 });
 const dashboardHeader =
@@ -95,6 +93,51 @@ const studentPage =
 document.getElementById("studentPage");
 const teacherPage =
 document.getElementById("teacherPage");
+const accountPage =
+document.getElementById("accountPage");
+
+const coursePage =
+document.getElementById("coursePage");
+
+const videoPage =
+document.getElementById("videoPage");
+
+const documentPage =
+document.getElementById("documentPage");
+
+const testPage =
+document.getElementById("testPage");
+
+const notificationPage =
+document.getElementById("notificationPage");
+
+const pendingPage =
+document.getElementById("pendingPage");
+function hideAllPages(){
+
+    dashboardHeader.style.display="none";
+
+    dashboardCards.style.display="none";
+
+    studentPage.style.display="none";
+
+    teacherPage.style.display="none";
+
+    accountPage.style.display="none";
+
+    coursePage.style.display="none";
+
+    videoPage.style.display="none";
+
+    documentPage.style.display="none";
+
+    testPage.style.display="none";
+
+    notificationPage.style.display="none";
+
+    pendingPage.style.display="none";
+
+}
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
@@ -203,6 +246,43 @@ teacherCreateId.value=id;
     await loadDashboard();
 });
 /*====================================
+        DASHBOARD
+====================================*/
+
+async function loadDashboard(){
+
+    const snapshot =
+    await getDocs(collection(db,"users"));
+
+    let student = 0;
+    let teacher = 0;
+
+    snapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+        if(data.role==="Học sinh"){
+
+            student++;
+
+        }
+
+        if(data.role==="Giáo viên"){
+
+            teacher++;
+
+        }
+
+    });
+
+    document.getElementById("studentCount").textContent =
+    student;
+
+    document.getElementById("teacherCount").textContent =
+    teacher;
+
+}
+/*====================================
         MENU HỌC SINH
 ====================================*/
 
@@ -210,11 +290,7 @@ menuStudents.addEventListener("click",()=>{
 
     setActiveMenu(menuStudents);
 
-    dashboardHeader.style.display="none";
-
-    dashboardCards.style.display="none";
-
-    teacherPage.style.display="none";
+    hideAllPages();
 
     studentPage.style.display="block";
 
@@ -223,11 +299,7 @@ menuTeachers.addEventListener("click",()=>{
 
     setActiveMenu(menuTeachers);
 
-    dashboardHeader.style.display="none";
-
-    dashboardCards.style.display="none";
-
-    studentPage.style.display="none";
+    hideAllPages();
 
     teacherPage.style.display="block";
 
