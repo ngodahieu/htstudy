@@ -183,8 +183,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const coursesLink = document.getElementById("coursesLink");
 
-console.log(coursesLink);
-
 const examLink = document.getElementById("examLink");
 
 const resultLink = document.getElementById("resultLink");
@@ -198,6 +196,12 @@ let currentRole = "";
 logoutBtn.addEventListener("click", async () => {
 
     await signOut(auth);
+loginForm.reset();
+    currentUser = null;
+
+    currentRole = "";
+
+    userMenu.classList.remove("active");
 
 });
 
@@ -283,7 +287,13 @@ async function loadUser(uid){
 
     const docSnap = await getDoc(docRef);
 
-    if(!docSnap.exists()) return;
+    if(!docSnap.exists()){
+
+    await signOut(auth);
+
+    return;
+
+}
 
     const user = docSnap.data();
 
@@ -303,7 +313,7 @@ document.querySelector(".avatar img").src = avatarUrl;
 userAvatar.src = avatarUrl;
     userName.textContent = user.name;
 
-    userStudentId.textContent = user.studentId;
+    userStudentId.textContent = user.memberId;
     
     userRole.textContent = user.role;
     currentRole = user.role;
@@ -331,6 +341,7 @@ else if (user.role === "Admin") {
     manageBtn.style.display = "flex";
 
 }
+    currentUser = auth.currentUser;
 }
 const loginForm = document.getElementById("loginForm");
 
@@ -364,6 +375,7 @@ const docSnap = await getDoc(docRef);
 if (docSnap.exists()) {
 
     const userData = docSnap.data();
+    currentRole = userData.role;
     await loadUser(uid);
 
     console.log(userData);
@@ -388,10 +400,27 @@ loginOverlay.style.display = "none";
 loginForm.reset();
     }catch(error){
 
-        alert(error.message);
+    switch(error.code){
+
+        case "auth/invalid-credential":
+            alert("Sai email hoặc mật khẩu.");
+            break;
+
+        case "auth/user-not-found":
+            alert("Không tìm thấy tài khoản.");
+            break;
+
+        case "auth/too-many-requests":
+            alert("Bạn đăng nhập quá nhiều lần. Vui lòng thử lại sau.");
+            break;
+
+        default:
+            alert("Đăng nhập thất bại.");
+            console.error(error);
 
     }
 
+}
 });
 
 /*==========================================
@@ -399,12 +428,12 @@ loginForm.reset();
 ==========================================*/
 
 function requireLogin(event){
-console.log("Đã bấm vào menu");
-    if(currentUser) return;
+
+    if(auth.currentUser) return;
 
     event.preventDefault();
 
-    loginOverlay.style.display = "flex";
+    loginOverlay.style.display="flex";
 
     userMenu.classList.remove("active");
 
@@ -423,26 +452,28 @@ myCoursesBtn.addEventListener("click", requireLogin);
 manageBtn.addEventListener("click", requireLogin);
 manageBtn.addEventListener("click", () => {
 
-    if (!currentUser) return;
+    if(!auth.currentUser) return;
 
-    if (currentRole === "Giáo viên") {
+    switch(currentRole){
 
-        window.location.href = "dashboard/teacher.html";
+        case "Admin":
 
-    }
+            window.location.href="dashboard/admin.html";
+            break;
 
-    else if (currentRole === "Admin") {
+        case "Giáo viên":
 
-        window.location.href = "dashboard/admin.html";
+            window.location.href="dashboard/teacher.html";
+            break;
 
     }
 
 });
 myCoursesBtn.addEventListener("click", () => {
 
-    if (!currentUser) return;
+    if(!auth.currentUser) return;
 
-    window.location.href = "my-courses.html";
+    window.location.href="my-courses.html";
 
 });
 
@@ -456,17 +487,31 @@ onAuthStateChanged(auth, async (user) => {
 
     } else {
 
-        guestBox.style.display = "block";
-        userBox.style.display = "none";
+    currentUser = null;
 
-        document.getElementById("guestMenu").style.display = "block";
-        document.getElementById("userMenuList").style.display = "none";
+    currentRole = "";
 
-        document.querySelector(".avatar img").src =
-            "assets/avatars/default.jpg";
-        myCoursesBtn.style.display = "none";
+    guestBox.style.display = "block";
 
-manageBtn.style.display = "none";
-    }
+    userBox.style.display = "none";
+
+    document.getElementById("guestMenu").style.display = "block";
+
+    document.getElementById("userMenuList").style.display = "none";
+
+    document.querySelector(".avatar img").src =
+        "assets/avatars/default.jpg";
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "none";
+
+    userName.textContent = "";
+
+    userStudentId.textContent = "";
+
+    userRole.textContent = "";
+
+}
 
 });
