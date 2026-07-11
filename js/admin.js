@@ -181,6 +181,9 @@ onAuthStateChanged(auth, async(user)=>{
 
 welcomeName.textContent=data.name||"Admin";
             await loadDashboard();
+            studentId.value = await generateMemberId();
+
+teacherCreateId.value = studentId.value;
 
         }
 
@@ -202,6 +205,19 @@ const teacherCount=document.getElementById("teacherCount");
 const courseCount=document.getElementById("courseCount");
 
 const videoCount=document.getElementById("videoCount");
+//==============================
+// CREATE ACCOUNT
+//==============================
+
+const studentName = document.getElementById("studentName");
+const studentEmail = document.getElementById("studentEmail");
+const studentId = document.getElementById("studentId");
+const createStudentBtn = document.getElementById("createStudentBtn");
+
+const teacherCreateName = document.getElementById("teacherCreateName");
+const teacherCreateEmail = document.getElementById("teacherCreateEmail");
+const teacherCreateId = document.getElementById("teacherCreateId");
+const createTeacherBtn = document.getElementById("createTeacherBtn");
 async function loadDashboard(){
 
     showLoading();
@@ -241,3 +257,249 @@ async function loadDashboard(){
     }
 
 }
+//==============================
+// MEMBER ID
+//==============================
+
+async function generateMemberId(){
+
+    const snapshot = await get(ref(db,"users"));
+
+    let max = 0;
+
+    if(snapshot.exists()){
+
+        snapshot.forEach(item=>{
+
+            const user = item.val();
+
+            if(!user.memberId) return;
+
+            const number = parseInt(
+                user.memberId.replace("HT27","")
+            );
+
+            if(number > max){
+
+                max = number;
+
+            }
+
+        });
+
+    }
+
+    return "HT27" + String(max + 1).padStart(4,"0");
+
+}
+//==============================
+// CREATE STUDENT
+//==============================
+
+async function createStudent(){
+
+    const name = studentName.value.trim();
+
+    const email = studentEmail.value.trim().toLowerCase();
+
+    const memberId = studentId.value;
+
+    if(name==="" || email===""){
+
+        alert("Vui lòng nhập đầy đủ thông tin.");
+
+        return;
+
+    }
+
+    if(!email.includes("@")){
+
+        alert("Email không hợp lệ.");
+
+        return;
+
+    }
+
+    showLoading();
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:3000/createStudent",
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    name:name,
+
+                    email:email,
+
+                    password:memberId,
+
+                    memberId:memberId
+
+                })
+
+            }
+        );
+
+        const result = await response.json();
+
+        if(result.success){
+
+            alert(
+
+`Đã tạo thành công.
+
+Email: ${email}
+
+Mật khẩu: ${memberId}`
+
+            );
+
+            studentName.value="";
+
+            studentEmail.value="";
+
+            const newId = await generateMemberId();
+
+            studentId.value = newId;
+
+            teacherCreateId.value = newId;
+
+            await loadDashboard();
+
+        }else{
+
+            alert(result.message);
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+        alert("Không thể tạo tài khoản.");
+
+    }finally{
+
+        hideLoading();
+
+    }
+
+}
+//==============================
+// CREATE TEACHER
+//==============================
+
+async function createTeacher(){
+
+    const name = teacherCreateName.value.trim();
+
+    const email = teacherCreateEmail.value.trim().toLowerCase();
+
+    const memberId = teacherCreateId.value;
+
+    if(name==="" || email===""){
+
+        alert("Vui lòng nhập đầy đủ thông tin.");
+
+        return;
+
+    }
+
+    if(!email.includes("@")){
+
+        alert("Email không hợp lệ.");
+
+        return;
+
+    }
+
+    showLoading();
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:3000/createTeacher",
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    name:name,
+
+                    email:email,
+
+                    password:memberId,
+
+                    memberId:memberId
+
+                })
+
+            }
+        );
+
+        const result = await response.json();
+
+        if(result.success){
+
+            alert(
+
+`Đã tạo thành công.
+
+Email: ${email}
+
+Mật khẩu: ${memberId}`
+
+            );
+
+            teacherCreateName.value="";
+
+            teacherCreateEmail.value="";
+
+            const newId = await generateMemberId();
+
+            studentId.value = newId;
+
+            teacherCreateId.value = newId;
+
+            await loadDashboard();
+
+        }else{
+
+            alert(result.message);
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+        alert("Không thể tạo tài khoản.");
+
+    }finally{
+
+        hideLoading();
+
+    }
+
+}
+//==============================
+// EVENT
+//==============================
+
+createStudentBtn.onclick = createStudent;
+
+createTeacherBtn.onclick = createTeacher;
