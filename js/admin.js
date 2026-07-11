@@ -9,18 +9,12 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-import {
-    ref,
-    get,
-    set,
-    update,
-    remove,
-    push
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 import{
+    doc,
+    getDoc,
     collection,
     getDocs
-}from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+}from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 //==============================
 // DOM
 //==============================
@@ -162,11 +156,12 @@ onAuthStateChanged(auth, async(user)=>{
 
     try{
 
-        const snapshot = await get(ref(db,"users/"+user.uid));
+        const snapshot =
+await getDoc(doc(db,"users",user.uid));
 
         if(snapshot.exists()){
 
-            const data = snapshot.val();
+            const data = snapshot.data();
             if(data.role!=="admin"){
 
     alert("Bạn không có quyền truy cập.");
