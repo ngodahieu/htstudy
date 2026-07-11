@@ -244,6 +244,11 @@ studentIdInput.value=id;
 
 teacherCreateId.value=id;
     await loadDashboard();
+    hideAllPages();
+
+dashboardHeader.style.display = "block";
+
+dashboardCards.style.display = "grid";
 });
 /*====================================
         DASHBOARD
@@ -380,7 +385,7 @@ await generateMemberId();
 studentIdInput.value=id;
 
 teacherCreateId.value=id;
-
+await loadDashboard();
     }else{
 
         alert(result.message);
@@ -467,7 +472,7 @@ Mật khẩu: ${memberId}`
         teacherCreateId.value=id;
 
         studentIdInput.value=id;
-
+await loadDashboard();
     }else{
 
         alert(result.message);
