@@ -168,3 +168,22 @@ refList.innerHTML+=
 createCard(course,true);
 
 });
+/*======================================
+            LOADING
+======================================*/
+
+window.addEventListener("load", () => {
+
+    const loading = document.querySelector(".loading-screen");
+
+    if (!loading) return;
+
+    loading.classList.add("hide");
+
+    setTimeout(() => {
+
+        loading.remove();
+
+    }, 500);
+
+});
