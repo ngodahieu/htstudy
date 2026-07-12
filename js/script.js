@@ -440,7 +440,23 @@ function requireLogin(event){
     alert("Bạn cần đăng nhập để sử dụng chức năng này.");
 
 }
+document.querySelectorAll(".need-login").forEach(link => {
 
+    link.addEventListener("click", function(event){
+
+        if(auth.currentUser) return;
+
+        event.preventDefault();
+
+        loginOverlay.style.display = "flex";
+
+        userMenu.classList.remove("active");
+
+        alert("Bạn cần đăng nhập để sử dụng chức năng này.");
+
+    });
+
+});
 coursesLink.addEventListener("click", requireLogin);
 
 examLink.addEventListener("click", requireLogin);
