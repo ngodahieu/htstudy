@@ -286,7 +286,7 @@ Mật khẩu: ${memberId}`
         studentEmail.value="";
 
         studentIdInput.value=
-        await generateStudentId();
+        await generateMemberId();
 await loadDashboard();
     }else{
 
