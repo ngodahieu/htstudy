@@ -108,6 +108,31 @@ parseInt(data.memberId.replace("HT27",""));
 
 }
 /*====================================
+        DASHBOARD
+====================================*/
+
+async function loadDashboard(){
+
+    const snapshot = await getDocs(collection(db,"users"));
+
+    let student = 0;
+
+    snapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+        if(data.role === "Học sinh"){
+
+            student++;
+
+        }
+
+    });
+
+    document.getElementById("studentCount").textContent = student;
+
+}
+/*====================================
         KIỂM TRA ĐĂNG NHẬP
 ====================================*/
 
@@ -175,6 +200,7 @@ onAuthStateChanged(auth, async (user)=>{
     : "../assets/avatars/default.jpg";
     studentIdInput.value =
 await generateMemberId();
+    await loadDashboard();
 });
 /*====================================
         MENU HỌC SINH
@@ -261,7 +287,7 @@ Mật khẩu: ${memberId}`
 
         studentIdInput.value=
         await generateStudentId();
-
+await loadDashboard();
     }else{
 
         alert(result.message);
