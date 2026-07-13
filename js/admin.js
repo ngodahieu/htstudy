@@ -78,16 +78,11 @@ menuHome.addEventListener("click",()=>{
 
     hideAllPages();
 
-    dashboardHeader.style.display="block";
-
-    dashboardCards.style.display="grid";
+    homePage.style.display="block";
 
 });
-const dashboardHeader =
-document.querySelector(".dashboard-header");
-
-const dashboardCards =
-document.querySelector(".dashboard-cards");
+const homePage =
+document.getElementById("homePage");
 
 const studentPage =
 document.getElementById("studentPage");
@@ -127,9 +122,7 @@ console.log("notificationPage", notificationPage);
 console.log("pendingPage", pendingPage);
 function hideAllPages(){
 
-    dashboardHeader.style.display="none";
-
-    dashboardCards.style.display="none";
+    homePage.style.display="none";
 
     studentPage.style.display="none";
 
@@ -256,11 +249,10 @@ studentIdInput.value=id;
 
 teacherCreateId.value=id;
     await loadDashboard();
-    hideAllPages();
 
-dashboardHeader.style.display = "block";
+hideAllPages();
 
-dashboardCards.style.display = "grid";
+homePage.style.display="block";
 });
 /*====================================
         DASHBOARD
