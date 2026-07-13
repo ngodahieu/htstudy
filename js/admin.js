@@ -18,6 +18,7 @@ import {
     addDoc,
     serverTimestamp
 }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
         LẤY CÁC THÀNH PHẦN HTML
 ====================================*/
@@ -678,23 +679,57 @@ async function createCourse(){
 
     }
 
-    await addDoc(collection(db,"courses"),{
+async function createCourse(){
 
-        subject,
+    try{
 
-        grade,
+        const subject = courseSubject.value;
+        const grade = courseGrade.value;
+        const name = courseName.value.trim();
+        const description = courseDescription.value.trim();
+        const image = courseImage.value.trim();
 
-        name,
+        if(subject===""){
+            alert("Vui lòng chọn môn.");
+            return;
+        }
 
-        description,
+        if(name===""){
+            alert("Nhập tên khóa học.");
+            return;
+        }
 
-        image,
+        await addDoc(collection(db,"courses"),{
 
-        active:true,
+            subject,
+            grade,
+            name,
+            description,
+            image,
+            active:true,
+            createdAt:serverTimestamp()
 
-        createdAt:serverTimestamp()
+        });
 
-    });
+        alert("Đã tạo khóa học.");
+
+        courseName.value="";
+        courseDescription.value="";
+        courseImage.value="";
+
+        await loadCourses();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(err.message);
+
+    }
+
+}
 
     alert("Đã tạo khóa học.");
 
