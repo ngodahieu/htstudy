@@ -59,6 +59,26 @@ const menuTeachers =
 document.getElementById("menuTeachers");
 const menuHome =
 document.getElementById("menuHome");
+const menuAccounts =
+document.getElementById("menuAccounts");
+
+const menuCourses =
+document.getElementById("menuCourses");
+
+const menuVideos =
+document.getElementById("menuVideos");
+
+const menuDocuments =
+document.getElementById("menuDocuments");
+
+const menuTests =
+document.getElementById("menuTests");
+
+const menuNotifications =
+document.getElementById("menuNotifications");
+
+const menuPending =
+document.getElementById("menuPending");
 const menuItems = document.querySelectorAll(".menu-item");
 
 function setActiveMenu(activeButton){
@@ -83,7 +103,11 @@ menuHome.addEventListener("click",()=>{
 });
 const homePage =
 document.getElementById("homePage");
+const dashboardHeader =
+document.querySelector("#homePage .dashboard-header");
 
+const dashboardCards =
+document.querySelector("#homePage .dashboard-cards");
 const studentPage =
 document.getElementById("studentPage");
 const teacherPage =
@@ -311,6 +335,75 @@ menuTeachers.addEventListener("click",()=>{
     hideAllPages();
 
     teacherPage.style.display="block";
+
+});
+menuAccounts.addEventListener("click",()=>{
+
+    setActiveMenu(menuAccounts);
+
+    hideAllPages();
+
+    accountPage.style.display="block";
+
+});
+
+menuCourses.addEventListener("click",()=>{
+
+    setActiveMenu(menuCourses);
+
+    hideAllPages();
+
+    coursePage.style.display="block";
+
+});
+
+menuVideos.addEventListener("click",()=>{
+
+    setActiveMenu(menuVideos);
+
+    hideAllPages();
+
+    videoPage.style.display="block";
+
+});
+
+menuDocuments.addEventListener("click",()=>{
+
+    setActiveMenu(menuDocuments);
+
+    hideAllPages();
+
+    documentPage.style.display="block";
+
+});
+
+menuTests.addEventListener("click",()=>{
+
+    setActiveMenu(menuTests);
+
+    hideAllPages();
+
+    testPage.style.display="block";
+
+});
+
+menuNotifications.addEventListener("click",()=>{
+
+    setActiveMenu(menuNotifications);
+
+    hideAllPages();
+
+    notificationPage.style.display="block";
+
+});
+
+menuPending.addEventListener("click",()=>{
+
+    setActiveMenu(menuPending);
+
+    hideAllPages();
+
+    pendingPage.style.display="block";
 
 });
 /*====================================
