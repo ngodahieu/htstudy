@@ -14,9 +14,10 @@ import {
     where,
     deleteDoc,
     documentId,
-    orderBy
+    orderBy,
+    addDoc,
+    serverTimestamp
 }
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
         LẤY CÁC THÀNH PHẦN HTML
 ====================================*/
@@ -135,6 +136,23 @@ const pendingPage =
 document.getElementById("pendingPage");
 const courseSubject =
 document.getElementById("courseSubject");
+const courseGrade =
+document.getElementById("courseGrade");
+
+const courseName =
+document.getElementById("courseName");
+
+const courseDescription =
+document.getElementById("courseDescription");
+
+const courseImage =
+document.getElementById("courseImage");
+
+const createCourseBtn =
+document.getElementById("createCourseBtn");
+
+const courseList =
+document.getElementById("courseList");
 console.log("dashboardHeader", dashboardHeader);
 console.log("dashboardCards", dashboardCards);
 
@@ -352,13 +370,15 @@ menuAccounts.addEventListener("click",()=>{
 
 });
 
-menuCourses.addEventListener("click",()=>{
+menuCourses.addEventListener("click",async()=>{
 
     setActiveMenu(menuCourses);
 
     hideAllPages();
 
     coursePage.style.display="block";
+
+    await loadCourses();
 
 });
 
@@ -627,9 +647,107 @@ createTeacherBtn.addEventListener(
     createTeacherAccount
 );
 /*====================================
-        ĐĂNG XUẤT
+        TẠO KHÓA HỌC
 ====================================*/
 
+async function createCourse(){
+
+    const subject = courseSubject.value;
+
+    const grade = courseGrade.value;
+
+    const name = courseName.value.trim();
+
+    const description = courseDescription.value.trim();
+
+    const image = courseImage.value.trim();
+
+    if(subject===""){
+
+        alert("Vui lòng chọn môn học.");
+
+        return;
+
+    }
+
+    if(name===""){
+
+        alert("Nhập tên khóa học.");
+
+        return;
+
+    }
+
+    await addDoc(collection(db,"courses"),{
+
+        subject,
+
+        grade,
+
+        name,
+
+        description,
+
+        image,
+
+        active:true,
+
+        createdAt:serverTimestamp()
+
+    });
+
+    alert("Đã tạo khóa học.");
+
+    courseName.value="";
+
+    courseDescription.value="";
+
+    courseImage.value="";
+
+    loadCourses();
+
+}
+/*====================================
+        LOAD KHÓA HỌC
+====================================*/
+
+async function loadCourses(){
+
+    courseList.innerHTML="Đang tải...";
+
+    const snapshot =
+    await getDocs(collection(db,"courses"));
+
+    courseList.innerHTML="";
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        courseList.innerHTML+=`
+
+        <div class="course-item">
+
+            <h3>${data.name}</h3>
+
+            <p>Môn: ${data.subject}</p>
+
+            <p>Lớp: ${data.grade}</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+/*====================================
+        ĐĂNG XUẤT
+====================================*/
+createCourseBtn.addEventListener(
+    "click",
+    createCourse
+);
 logoutBtn.addEventListener("click",async()=>{
 
     await signOut(auth);
