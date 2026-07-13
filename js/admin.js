@@ -13,7 +13,8 @@ import {
     query,
     where,
     deleteDoc,
-    documentId
+    documentId,
+    orderBy
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -132,6 +133,8 @@ document.getElementById("notificationPage");
 
 const pendingPage =
 document.getElementById("pendingPage");
+const courseSubject =
+document.getElementById("courseSubject");
 console.log("dashboardHeader", dashboardHeader);
 console.log("dashboardCards", dashboardCards);
 
@@ -272,7 +275,9 @@ await generateMemberId();
 studentIdInput.value=id;
 
 teacherCreateId.value=id;
-    await loadDashboard();
+await loadDashboard();
+
+await loadSubjects();
 
 hideAllPages();
 
@@ -406,6 +411,42 @@ menuPending.addEventListener("click",()=>{
     pendingPage.style.display="block";
 
 });
+/*====================================
+        LOAD DANH SÁCH MÔN HỌC
+====================================*/
+
+async function loadSubjects(){
+
+    courseSubject.innerHTML =
+    `<option value="">-- Chọn môn --</option>`;
+
+    const q = query(
+
+        collection(db,"subjects"),
+
+        orderBy("order")
+
+    );
+
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach(doc=>{
+
+        const data = doc.data();
+
+        if(data.active){
+
+            courseSubject.innerHTML += `
+            <option value="${doc.id}">
+                ${data.name}
+            </option>
+            `;
+
+        }
+
+    });
+
+}
 /*====================================
         TẠO HỌC SINH
 ====================================*/
