@@ -653,34 +653,6 @@ createTeacherBtn.addEventListener(
 
 async function createCourse(){
 
-    const subject = courseSubject.value;
-
-    const grade = courseGrade.value;
-
-    const name = courseName.value.trim();
-
-    const description = courseDescription.value.trim();
-
-    const image = courseImage.value.trim();
-
-    if(subject===""){
-
-        alert("Vui lòng chọn môn học.");
-
-        return;
-
-    }
-
-    if(name===""){
-
-        alert("Nhập tên khóa học.");
-
-        return;
-
-    }
-
-async function createCourse(){
-
     try{
 
         const subject = courseSubject.value;
@@ -690,7 +662,7 @@ async function createCourse(){
         const image = courseImage.value.trim();
 
         if(subject===""){
-            alert("Vui lòng chọn môn.");
+            alert("Vui lòng chọn môn học.");
             return;
         }
 
@@ -723,23 +695,11 @@ async function createCourse(){
 
     catch(err){
 
-        console.log(err);
+        console.error(err);
 
         alert(err.message);
 
     }
-
-}
-
-    alert("Đã tạo khóa học.");
-
-    courseName.value="";
-
-    courseDescription.value="";
-
-    courseImage.value="";
-
-    loadCourses();
 
 }
 /*====================================
