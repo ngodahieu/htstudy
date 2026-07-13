@@ -113,6 +113,18 @@ document.getElementById("notificationPage");
 
 const pendingPage =
 document.getElementById("pendingPage");
+console.log("dashboardHeader", dashboardHeader);
+console.log("dashboardCards", dashboardCards);
+
+console.log("studentPage", studentPage);
+console.log("teacherPage", teacherPage);
+console.log("accountPage", accountPage);
+console.log("coursePage", coursePage);
+console.log("videoPage", videoPage);
+console.log("documentPage", documentPage);
+console.log("testPage", testPage);
+console.log("notificationPage", notificationPage);
+console.log("pendingPage", pendingPage);
 function hideAllPages(){
 
     dashboardHeader.style.display="none";
