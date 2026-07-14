@@ -16,7 +16,9 @@ import {
     documentId,
     orderBy,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    setDoc,
+    arrayUnion
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -808,11 +810,65 @@ async function loadCoursesForEnrollment(){
 
 }
 /*====================================
+        CẤP QUYỀN KHÓA HỌC
+====================================*/
+
+async function assignCourse(){
+
+    const studentId = enrollmentStudent.value;
+    const courseId = enrollmentCourse.value;
+
+    if(studentId==="" || courseId===""){
+
+        alert("Vui lòng chọn học sinh và khóa học.");
+
+        return;
+
+    }
+
+    try{
+
+        await setDoc(
+
+            doc(db,"enrollments",studentId),
+
+            {
+
+                courses: arrayUnion(courseId)
+
+            },
+
+            {
+
+                merge:true
+
+            }
+
+        );
+
+        alert("Đã cấp quyền thành công.");
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(err.message);
+
+    }
+
+}
+/*====================================
         ĐĂNG XUẤT
 ====================================*/
 createCourseBtn.addEventListener(
     "click",
     createCourse
+);
+assignCourseBtn.addEventListener(
+    "click",
+    assignCourse
 );
 logoutBtn.addEventListener("click",async()=>{
 
