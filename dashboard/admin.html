@@ -111,7 +111,15 @@ id="menuCourses">
 Khóa học
 
 </button>
+<button
+class="menu-item"
+id="menuEnrollments">
 
+<i class="fa-solid fa-user-check"></i>
+
+Phân quyền khóa học
+
+</button>
 <button
 class="menu-item"
 id="menuVideos">
@@ -521,6 +529,47 @@ Danh sách khóa học
 
 Đang tải...
 </div>
+</div>
+<div id="enrollmentPage" style="display:none;">
+
+    <div class="dashboard-header">
+
+        <h1>Phân quyền khóa học</h1>
+
+        <p>Cấp quyền học sinh vào khóa học.</p>
+
+    </div>
+
+    <div class="dashboard-form">
+
+        <div class="form-group">
+
+            <label>Chọn học sinh</label>
+
+            <select id="enrollmentStudent">
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Chọn khóa học</label>
+
+            <select id="enrollmentCourse">
+
+            </select>
+
+        </div>
+
+        <button id="assignCourseBtn">
+
+            Cấp quyền
+
+        </button>
+
+    </div>
+
 </div>
 <div
 id="videoPage"
