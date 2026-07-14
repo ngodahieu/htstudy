@@ -67,7 +67,8 @@ document.getElementById("menuAccounts");
 
 const menuCourses =
 document.getElementById("menuCourses");
-
+const menuEnrollments =
+document.getElementById("menuEnrollments");
 const menuVideos =
 document.getElementById("menuVideos");
 
@@ -135,6 +136,16 @@ document.getElementById("notificationPage");
 
 const pendingPage =
 document.getElementById("pendingPage");
+const enrollmentPage =
+document.getElementById("enrollmentPage");
+const enrollmentStudent =
+document.getElementById("enrollmentStudent");
+
+const enrollmentCourse =
+document.getElementById("enrollmentCourse");
+
+const assignCourseBtn =
+document.getElementById("assignCourseBtn");
 const courseSubject =
 document.getElementById("courseSubject");
 const courseGrade =
@@ -187,6 +198,8 @@ function hideAllPages(){
     notificationPage.style.display="none";
 
     pendingPage.style.display="none";
+
+    enrollmentPage.style.display="none";
 
 }
 /*====================================
@@ -430,6 +443,20 @@ menuPending.addEventListener("click",()=>{
     hideAllPages();
 
     pendingPage.style.display="block";
+
+});
+
+menuEnrollments.addEventListener("click", async ()=>{
+
+    setActiveMenu(menuEnrollments);
+
+    hideAllPages();
+
+    enrollmentPage.style.display="block";
+
+    await loadStudentsForEnrollment();
+
+    await loadCoursesForEnrollment();
 
 });
 /*====================================
@@ -731,6 +758,50 @@ async function loadCourses(){
 
         </div>
 
+        `;
+
+    });
+
+}
+async function loadStudentsForEnrollment(){
+
+    enrollmentStudent.innerHTML="";
+
+    const q=query(
+        collection(db,"users"),
+        where("role","==","Học sinh")
+    );
+
+    const snapshot=await getDocs(q);
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        enrollmentStudent.innerHTML+=`
+            <option value="${doc.id}">
+                ${data.name}
+            </option>
+        `;
+
+    });
+
+}
+async function loadCoursesForEnrollment(){
+
+    enrollmentCourse.innerHTML="";
+
+    const snapshot=
+    await getDocs(collection(db,"courses"));
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        enrollmentCourse.innerHTML+=`
+            <option value="${doc.id}">
+                ${data.name}
+            </option>
         `;
 
     });
