@@ -145,7 +145,11 @@ async function loadMyCourses(uid){
 
         console.log(enrollData);
         console.log(enrollData.courses);
-        const myCourseIds = enrollData.courses;
+        const myCourseIds = enrollData.courses || [];
+
+console.log(typeof myCourseIds);
+console.log(Array.isArray(myCourseIds));
+console.log(myCourseIds);
 
 ownedCount.textContent = myCourseIds.length;
 
@@ -163,7 +167,12 @@ courseSnapshot.forEach(courseDoc=>{
         courseSnapshot.forEach(courseDoc=>{
 
     const courseData = courseDoc.data();
-
+console.log("courseDoc.id =", courseDoc.id);
+console.log("myCourseIds =", myCourseIds);
+console.log(
+    "includes =",
+    myCourseIds.includes(courseDoc.id)
+);
     if(myCourseIds.includes(courseDoc.id)){
 
         myList.innerHTML += createCard({
