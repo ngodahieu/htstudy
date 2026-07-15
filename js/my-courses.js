@@ -152,6 +152,14 @@ ownedCount.textContent = myCourseIds.length;
 myList.innerHTML = "";
         const courseSnapshot =
 await getDocs(collection(db,"courses"));
+        console.log(courseSnapshot.size);
+
+courseSnapshot.forEach(courseDoc=>{
+
+    console.log(courseDoc.id);
+    console.log(courseDoc.data());
+
+});
         courseSnapshot.forEach(courseDoc=>{
 
     const courseData = courseDoc.data();
