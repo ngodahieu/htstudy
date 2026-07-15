@@ -99,6 +99,20 @@ onAuthStateChanged(auth, async(user)=>{
 
     }
 
+    const userSnap =
+    await getDoc(doc(db,"users",user.uid));
+
+    if(userSnap.exists()){
+
+        const data=userSnap.data();
+
+        studentAvatar.src =
+        data.avatar && data.avatar!==""
+        ? data.avatar
+        : "assets/avatars/default.jpg";
+
+    }
+
     await loadMyCourses(user.uid);
 
 });
