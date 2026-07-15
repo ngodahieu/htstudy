@@ -131,6 +131,34 @@ async function loadMyCourses(uid){
 
         console.log(enrollData);
         console.log(enrollData.courses);
+        const myCourseIds = enrollData.courses;
+
+ownedCount.textContent = myCourseIds.length;
+
+myList.innerHTML = "";
+        const courseSnapshot =
+await getDocs(collection(db,"courses"));
+        courseSnapshot.forEach(courseDoc=>{
+
+    const courseData = courseDoc.data();
+
+    if(myCourseIds.includes(courseDoc.id)){
+
+        myList.innerHTML += createCard({
+
+            subject: courseData.subject,
+
+            course: courseData.name,
+
+            description: courseData.description,
+
+            image: courseData.image
+
+        });
+
+    }
+
+});
 
     }
 
