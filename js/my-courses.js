@@ -1,92 +1,26 @@
-const myCourses = [
+import { auth, db } from "./firebase.js";
 
-{
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-subject:"Hóa học 12",
-
-course:"XPS",
-
-description:
-"Lộ trình XPS chinh phục 9+ THPT.",
-
-image:"images/hoahoc12.jpg"
-
-},
-
-{
-
-subject:"Hóa học 11",
-
-course:"Nền tảng",
-
-description:
-"Ôn tập toàn bộ Hóa 11.",
-
-image:"images/hoahoc11.jpg"
-
-}
-
-];
-
-
-const referenceCourses=[
-
-{
-
-subject:"Hóa học 12",
-
-course:"Về Đích",
-
-image:"images/hoahoc12.jpg"
-
-},
-
-{
-
-subject:"Hóa học 12",
-
-course:"THPT Quốc Gia",
-
-image:"images/hoahoc12.jpg"
-
-},
-
-{
-
-subject:"Hóa học 12",
-
-course:"Cấp tốc",
-
-image:"images/hoahoc12.jpg"
-
-},
-
-{
-
-subject:"Hóa học 12",
-
-course:"HSG",
-
-image:"images/hoahoc12.jpg"
-
-},
-
-{
-
-subject:"Hóa học 10",
-
-course:"Nền tảng",
-
-image:"images/hoahoc10.jpg"
-
-}
-
-];
-const myList=
+import {
+    doc,
+    getDoc,
+    getDocs,
+    collection
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+const myList =
 document.getElementById("myCourseList");
 
-const refList=
+const refList =
 document.getElementById("referenceCourseList");
+
+const ownedCount =
+document.getElementById("ownedCount");
+
+const studentAvatar =
+document.getElementById("studentAvatar");
 function createCard(course,locked=false){
 
     return `
@@ -155,17 +89,17 @@ Vào học
 `;
 
 }
-myCourses.forEach(course=>{
+onAuthStateChanged(auth, async(user)=>{
 
-myList.innerHTML+=
-createCard(course);
+    if(!user){
 
-});
+        window.location.href="index.html";
 
-referenceCourses.forEach(course=>{
+        return;
 
-refList.innerHTML+=
-createCard(course,true);
+    }
+
+    await loadMyCourses(user.uid);
 
 });
 /*======================================
