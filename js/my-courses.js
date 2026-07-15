@@ -102,6 +102,45 @@ onAuthStateChanged(auth, async(user)=>{
     await loadMyCourses(user.uid);
 
 });
+async function loadMyCourses(uid){
+
+    try{
+
+        const enrollRef =
+        doc(db,"enrollments",uid);
+
+        const enrollSnap =
+        await getDoc(enrollRef);
+
+        if(!enrollSnap.exists()){
+
+            myList.innerHTML=`
+                <p>
+                    Bạn chưa được cấp khóa học nào.
+                </p>
+            `;
+
+            ownedCount.textContent="0";
+
+            return;
+
+        }
+
+        const enrollData =
+        enrollSnap.data();
+
+        console.log(enrollData);
+        console.log(enrollData.courses);
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
+
+}
 /*======================================
             LOADING
 ======================================*/
