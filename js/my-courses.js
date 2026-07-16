@@ -21,6 +21,8 @@ document.getElementById("ownedCount");
 
 const studentAvatar =
 document.getElementById("studentAvatar");
+const courseSidebar =
+document.getElementById("courseSidebar");
 function createCard(course,locked=false){
 
     return `
