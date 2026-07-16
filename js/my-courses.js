@@ -21,6 +21,11 @@ document.getElementById("ownedCount");
 
 const studentAvatar =
 document.getElementById("studentAvatar");
+const myCourseMenu =
+document.getElementById("myCourseMenu");
+
+const referenceMenu =
+document.getElementById("referenceMenu");
 const courseSidebar =
 document.getElementById("courseSidebar");
 function createCard(course,locked=false){
@@ -89,6 +94,71 @@ Vào học
 </div>
 
 `;
+
+}
+function buildMenu(courses, container){
+
+    container.innerHTML = "";
+
+    const tree = {};
+
+    courses.forEach(course=>{
+
+        if(!tree[course.grade]){
+
+            tree[course.grade] = {};
+
+        }
+
+        if(!tree[course.grade][course.subject]){
+
+            tree[course.grade][course.subject] = [];
+
+        }
+
+        tree[course.grade][course.subject].push(course);
+
+    });
+
+    for(const grade in tree){
+
+        const gradeDiv = document.createElement("div");
+
+        gradeDiv.className = "menu-grade";
+
+        gradeDiv.innerHTML = `
+            <h4>📚 Lớp ${grade}</h4>
+        `;
+
+        for(const subject in tree[grade]){
+
+            const subjectDiv = document.createElement("div");
+
+            subjectDiv.className = "menu-subject";
+
+            subjectDiv.innerHTML = `
+                <h5>${subject}</h5>
+            `;
+
+            tree[grade][subject].forEach(course=>{
+
+                const a = document.createElement("a");
+
+                a.href = "#";
+
+                a.textContent = course.name;
+
+                subjectDiv.appendChild(a);
+
+            });
+
+            gradeDiv.appendChild(subjectDiv);
+
+        }
+
+        container.appendChild(gradeDiv);
+
+    }
 
 }
 onAuthStateChanged(auth, async(user)=>{
