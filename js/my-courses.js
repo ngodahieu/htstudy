@@ -129,18 +129,50 @@ function buildMenu(courses, container){
         gradeDiv.className = "menu-grade";
 
         gradeDiv.innerHTML = `
-            <h4>📚 Lớp ${grade}</h4>
-        `;
+<h4 class="grade-title">
+
+<span class="arrow">
+
+▶
+
+</span>
+
+Lớp ${grade}
+
+</h4>
+`;
 
         for(const subject in tree[grade]){
 
             const subjectDiv = document.createElement("div");
+const subjectTitle =
+document.createElement("h5");
+const courseContainer =
+document.createElement("div");
 
+courseContainer.className =
+"course-links";
+
+courseContainer.style.display =
+"none";
+subjectTitle.className =
+"subject-title";
+
+subjectTitle.innerHTML = `
+
+<span class="arrow">
+
+▶
+
+</span>
+
+${subject}
+
+`;
+
+subjectDiv.appendChild(subjectTitle);
             subjectDiv.className = "menu-subject";
 
-            subjectDiv.innerHTML = `
-                <h5>${subject}</h5>
-            `;
 
             tree[grade][subject].forEach(course=>{
 
@@ -151,14 +183,62 @@ function buildMenu(courses, container){
                 a.innerHTML =
 `📘 ${course.name}`;
 
-                subjectDiv.appendChild(a);
+                courseContainer.appendChild(a);
 
             });
-
+subjectDiv.appendChild(courseContainer);
             gradeDiv.appendChild(subjectDiv);
+            subjectTitle.onclick = ()=>{
+
+    if(courseContainer.style.display==="none"){
+
+        courseContainer.style.display="block";
+
+        subjectTitle.querySelector(".arrow").textContent="▼";
+
+    }
+
+    else{
+
+        courseContainer.style.display="none";
+
+        subjectTitle.querySelector(".arrow").textContent="▶";
+
+    }
+
+};
 
         }
+const subjects =
+gradeDiv.querySelectorAll(".menu-subject");
 
+subjects.forEach(item=>{
+
+    item.style.display="none";
+
+});
+        gradeDiv.querySelector(".grade-title").onclick = ()=>{
+
+    const show =
+subjects[0]?.style.display==="none";
+
+    subjects.forEach(item=>{
+
+        item.style.display =
+        show
+        ? "block"
+        : "none";
+
+    });
+
+    gradeDiv
+    .querySelector(".arrow")
+    .textContent =
+    show
+    ? "▼"
+    : "▶";
+
+};
         container.appendChild(gradeDiv);
 
     }
