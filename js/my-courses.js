@@ -32,7 +32,9 @@ function createCard(course,locked=false){
 
     return `
 
-<div class="course-card">
+<div
+class="course-card"
+id="course-${course.id}">
 
 <div class="course-banner">
 
@@ -144,9 +146,10 @@ function buildMenu(courses, container){
 
                 const a = document.createElement("a");
 
-                a.href = "#";
+                a.href = "#course-" + course.id;
 
-                a.textContent = course.name;
+                a.innerHTML =
+`📘 ${course.name}`;
 
                 subjectDiv.appendChild(a);
 
@@ -218,14 +221,18 @@ async function loadMyCourses(uid){
         console.log(enrollData);
         console.log(enrollData.courses);
         const myCourseIds = enrollData.courses || [];
+        const myCourses = [];
+const referenceCourses = [];
 
 console.log(typeof myCourseIds);
 console.log(Array.isArray(myCourseIds));
 console.log(myCourseIds);
 
 ownedCount.textContent = myCourseIds.length;
-
 myList.innerHTML = "";
+
+refList.innerHTML = "";
+
         const courseSnapshot =
 await getDocs(collection(db,"courses"));
         console.log(courseSnapshot.size);
@@ -236,32 +243,78 @@ courseSnapshot.forEach(courseDoc=>{
     console.log(courseDoc.data());
 
 });
-        courseSnapshot.forEach(courseDoc=>{
+courseSnapshot.forEach(courseDoc=>{
 
     const courseData = courseDoc.data();
-console.log("courseDoc.id =", courseDoc.id);
-console.log("myCourseIds =", myCourseIds);
-console.log(
-    "includes =",
-    myCourseIds.includes(courseDoc.id)
-);
+
+    const course = {
+
+        id: courseDoc.id,
+
+        grade: courseData.grade,
+
+        subject: courseData.subject,
+
+        name: courseData.name,
+
+        description: courseData.description,
+
+        image: courseData.image
+
+    };
+
     if(myCourseIds.includes(courseDoc.id)){
 
-        myList.innerHTML += createCard({
+    myCourses.push(course);
 
-            subject: courseData.subject,
+    // Hiển thị bên phải
+    myList.innerHTML += createCard({
 
-            course: courseData.name,
+        id: course.id,
 
-            description: courseData.description,
+        subject: course.subject,
 
-            image: courseData.image
+        course: course.name,
 
-        });
+        description: course.description,
 
-    }
+        image: course.image
+
+    });
+
+}
+
+else{
+
+    referenceCourses.push(course);
+
+    // Hiển thị khóa học tham khảo
+    refList.innerHTML += createCard({
+
+        id: course.id,
+
+        subject: course.subject,
+
+        course: course.name,
+
+        description: course.description,
+
+        image: course.image
+
+    }, true);
+
+}
 
 });
+        buildMenu(
+    myCourses,
+    myCourseMenu
+);
+
+buildMenu(
+    referenceCourses,
+    referenceMenu
+);
 
     }
 
