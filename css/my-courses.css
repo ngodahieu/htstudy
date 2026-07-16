@@ -1259,3 +1259,162 @@ bottom:18px;
 }
 
 }
+/*======================================
+        TREE MENU
+======================================*/
+
+.menu-group{
+
+    margin-bottom:22px;
+
+}
+
+.menu-title{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#6cb6ff;
+
+    margin-bottom:15px;
+
+}
+
+.menu-grade{
+
+    margin-bottom:12px;
+
+}
+
+.grade-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 14px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:16px;
+
+}
+
+.grade-title:hover{
+
+    background:rgba(78,162,255,.12);
+
+}
+
+.menu-subject{
+
+    margin-left:20px;
+
+    margin-top:8px;
+
+}
+
+.subject-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 12px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-size:15px;
+
+    color:#dce8ff;
+
+}
+
+.subject-title:hover{
+
+    background:rgba(78,162,255,.10);
+
+}
+
+.course-links{
+
+    margin-left:24px;
+
+    margin-top:6px;
+
+    display:none;
+
+    animation:fadeMenu .25s ease;
+
+}
+
+.course-links a{
+
+    display:block;
+
+    padding:8px 10px;
+
+    border-radius:8px;
+
+    color:#cfdcff;
+
+    transition:.25s;
+
+    font-size:14px;
+
+}
+
+.course-links a:hover{
+
+    background:rgba(78,162,255,.15);
+
+    color:#fff;
+
+    padding-left:18px;
+
+}
+
+.arrow{
+
+    display:inline-block;
+
+    width:18px;
+
+    color:#6cb6ff;
+
+    transition:.25s;
+
+}
+
+@keyframes fadeMenu{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-8px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+}
