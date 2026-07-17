@@ -1356,7 +1356,21 @@ bottom:18px;
     margin-bottom:12px;
 
 }
+.grade-content{
 
+    overflow:hidden;
+
+    max-height:0;
+
+    opacity:0;
+
+    transition:
+
+        max-height .45s ease,
+
+        opacity .35s ease;
+
+}
 .grade-title{
 
     display:flex;
@@ -1546,8 +1560,14 @@ transform:none;
 
 }
 
-.menu-grade.open .course-links,
-.menu-subject.open .course-links{
+.menu-grade.open > .grade-content{
+
+    max-height:1000px;
+
+    opacity:1;
+
+}
+.menu-subject.open > .course-links{
 
     max-height:600px;
 
