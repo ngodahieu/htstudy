@@ -7,7 +7,20 @@ const params = new URLSearchParams(window.location.search);
 const subject = params.get("subject");
 
 const grade = params.get("grade");
+const pageTitle =
+document.getElementById("pageTitle");
 
+const pageDescription =
+document.getElementById("pageDescription");
+if(subject && grade){
+
+    pageTitle.textContent =
+    `Hóa Học ${grade}`;
+
+    pageDescription.textContent =
+    `Các khóa học dành cho Hóa Học lớp ${grade}.`;
+
+}
 console.log(subject);
 
 console.log(grade);
