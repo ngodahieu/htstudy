@@ -1,8 +1,16 @@
+/*====================================
+        LẤY DỮ LIỆU TỪ URL
+====================================*/
+
 const params = new URLSearchParams(window.location.search);
 
 const subject = params.get("subject");
 
 const grade = params.get("grade");
+
+console.log(subject);
+
+console.log(grade);
 /*====================================
         FILTER COURSE
 ====================================*/
