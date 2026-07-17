@@ -292,6 +292,17 @@ loginForm.reset();
 
 }
 });
+logoutBtn.addEventListener("click", async () => {
+
+    await signOut(auth);
+loginForm.reset();
+    currentUser = null;
+
+    currentRole = "";
+
+    userMenu.classList.remove("active");
+
+});
 /*====================================
         LẤY DỮ LIỆU TỪ URL
 ====================================*/
