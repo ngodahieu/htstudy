@@ -1,3 +1,17 @@
+import { auth, db } from "./firebase.js";
+
+import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+    doc,
+    getDoc
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
         LẤY DỮ LIỆU TỪ URL
 ====================================*/
