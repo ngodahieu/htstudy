@@ -151,6 +151,68 @@ const myCoursesBtn=document.getElementById("myCoursesBtn");
 const manageBtn=document.getElementById("manageBtn");
 
 let currentRole="";
+async function loadUser(uid){
+
+    const docRef = doc(db, "users", uid);
+
+    const docSnap = await getDoc(docRef);
+
+    if(!docSnap.exists()){
+
+    await signOut(auth);
+
+    return;
+
+}
+
+    const user = docSnap.data();
+
+    guestBox.style.display = "none";
+    userBox.style.display = "block";
+
+    document.getElementById("guestMenu").style.display = "none";
+    document.getElementById("userMenuList").style.display = "block";
+
+    const avatarUrl =
+    user.avatar && user.avatar.trim() !== ""
+        ? user.avatar
+        : "assets/avatars/default.jpg";
+
+document.querySelector(".avatar img").src = avatarUrl;
+
+userAvatar.src = avatarUrl;
+    userName.textContent = user.name;
+
+    userStudentId.textContent = user.memberId;
+    
+    userRole.textContent = user.role;
+    currentRole = user.role;
+
+    if (user.role === "Học sinh") {
+
+    myCoursesBtn.style.display = "flex";
+
+    manageBtn.style.display = "none";
+
+}
+
+else if (user.role === "Giáo viên") {
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "flex";
+
+}
+
+else if (user.role === "Admin") {
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "flex";
+
+}
+    currentUser = auth.currentUser;
+}
 /*====================================
         LẤY DỮ LIỆU TỪ URL
 ====================================*/
