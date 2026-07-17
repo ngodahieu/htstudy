@@ -46,21 +46,196 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
 <div class="header-actions">
 
-<nav>
+    <nav>
 
-<ul class="nav-menu">
+        <ul class="nav-menu">
 
-<li><a href="index.html">Trang chủ</a></li>
+            <li><a href="index.html">Trang chủ</a></li>
 
-<li><a class="active" href="courses.html">Khóa học</a></li>
+            <li><a class="active" href="courses.html">Khóa học</a></li>
 
-<li><a href="#">Thi thử</a></li>
+            <li><a href="#">Thi thử</a></li>
 
-<li><a href="#">Kết quả</a></li>
+            <li><a href="#">Kết quả</a></li>
 
-</ul>
+        </ul>
 
-</nav>
+    </nav>
+
+    <div class="header-right">
+
+        <!-- Thông báo -->
+
+        <button class="notification-btn">
+
+            <i class="fa-regular fa-bell"></i>
+
+            <span class="badge">3</span>
+
+        </button>
+
+        <div class="notification-panel" id="notificationPanel">
+
+            <div class="notification-header">
+
+                <h3>Thông báo</h3>
+
+                <button id="closeNotification">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+            <div class="notification-list">
+
+                <div class="notification-item unread">
+
+                    <div class="notification-icon">
+
+                        <i class="fa-solid fa-book"></i>
+
+                    </div>
+
+                    <div class="notification-content">
+
+                        <h4>Có bài học mới</h4>
+
+                        <p>Chương Este đã được cập nhật.</p>
+
+                        <span>5 phút trước</span>
+
+                    </div>
+
+                </div>
+
+                <div class="notification-item">
+
+                    <div class="notification-icon">
+
+                        <i class="fa-solid fa-file-pen"></i>
+
+                    </div>
+
+                    <div class="notification-content">
+
+                        <h4>Đề thi thử mới</h4>
+
+                        <p>Đề số 05 đã mở.</p>
+
+                        <span>1 giờ trước</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Avatar -->
+
+        <div class="avatar">
+
+            <img src="assets/avatars/default.jpg" alt="Avatar">
+
+        </div>
+
+        <div class="user-menu" id="userMenu">
+
+            <div class="guest-box" id="guestBox">
+
+                <div class="guest-avatar">
+
+                    <i class="fa-regular fa-user"></i>
+
+                </div>
+
+                <h3>Bạn chưa đăng nhập</h3>
+
+                <p>Đăng nhập để sử dụng đầy đủ chức năng.</p>
+
+            </div>
+
+            <div class="user-box" id="userBox" style="display:none;">
+
+                <div class="user-profile">
+
+                    <img
+                        id="userAvatar"
+                        src="assets/avatars/default.jpg"
+                        alt="Avatar">
+
+                    <div class="user-info">
+
+                        <h3 id="userName"></h3>
+
+                        <p>
+
+                            Mã học sinh:
+
+                            <span id="userStudentId"></span>
+
+                        </p>
+
+                        <p>
+
+                            Vai trò:
+
+                            <span id="userRole"></span>
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="user-menu-list" id="guestMenu">
+
+                <button id="openLogin">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Đăng nhập
+
+                </button>
+
+            </div>
+
+            <div class="user-menu-list" id="userMenuList" style="display:none;">
+
+                <button id="myCoursesBtn">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                    Khóa học của tôi
+
+                </button>
+
+                <button id="manageBtn" style="display:none;">
+
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                    Quản lí
+
+                </button>
+
+                <button id="logoutBtn">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                    Đăng xuất
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
