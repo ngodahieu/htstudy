@@ -1,4 +1,8 @@
+const params = new URLSearchParams(window.location.search);
 
+const subject = params.get("subject");
+
+const grade = params.get("grade");
 /*====================================
         FILTER COURSE
 ====================================*/
