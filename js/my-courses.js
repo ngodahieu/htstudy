@@ -152,9 +152,6 @@ document.createElement("div");
 
 courseContainer.className =
 "course-links";
-
-courseContainer.style.display =
-"none";
 subjectTitle.className =
 "subject-title";
 
@@ -188,7 +185,9 @@ subjectDiv.appendChild(subjectTitle);
             });
 subjectDiv.appendChild(courseContainer);
             gradeContent.appendChild(subjectDiv);
-subjectTitle.onclick = () => {
+subjectTitle.onclick = (e)=>{
+
+    e.stopPropagation();
 
     subjectDiv.classList.toggle("open");
 
@@ -199,7 +198,9 @@ subjectTitle.onclick = () => {
 const gradeTitle =
 gradeDiv.querySelector(".grade-title");
 
-gradeTitle.onclick = () => {
+gradeTitle.onclick = (e)=>{
+
+    e.stopPropagation();
 
     gradeDiv.classList.toggle("open");
 
