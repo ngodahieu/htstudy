@@ -19,8 +19,6 @@ document.getElementById("referenceCourseList");
 const ownedCount =
 document.getElementById("ownedCount");
 
-const studentAvatar =
-document.getElementById("studentAvatar");
 const myCourseMenu =
 document.getElementById("myCourseMenu");
 
@@ -260,11 +258,6 @@ onAuthStateChanged(auth, async(user)=>{
     if(userSnap.exists()){
 
         const data=userSnap.data();
-
-        studentAvatar.src =
-        data.avatar && data.avatar!==""
-        ? data.avatar
-        : "assets/avatars/default.jpg";
 
     }
 
