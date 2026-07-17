@@ -152,33 +152,67 @@ img{
 
 .logo{
 
-    display:flex;
+display:flex;
 
-    align-items:center;
+align-items:center;
 
-    gap:15px;
-margin-right:80px;
+gap:16px;
+
+color:white;
+
 }
+
+
 
 .logo img{
 
-    width:56px;
+width:60px;
+
+height:60px;
+
+border-radius:50%;
+
+border:2px solid rgba(255,255,255,.1);
+
+box-shadow:
+
+0 0 25px rgba(0,180,255,.35);
+
+transition:.4s;
 
 }
 
-.logo h2{
 
-    font-size:24px;
 
-    font-weight:700;
+.logo:hover img{
+
+transform:rotate(-8deg) scale(1.08);
+
+box-shadow:
+
+0 0 40px rgba(0,200,255,.55);
 
 }
 
-.logo span{
 
-    font-size:13px;
 
-    color:#8fb5ff;
+.logo-text h2{
+
+font-size:1.45rem;
+
+font-weight:800;
+
+letter-spacing:1px;
+
+}
+
+
+
+.logo-text span{
+
+font-size:.83rem;
+
+color:#99b7de;
 
 }
 
