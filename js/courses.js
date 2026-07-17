@@ -213,6 +213,85 @@ else if (user.role === "Admin") {
 }
     currentUser = auth.currentUser;
 }
+const loginForm = document.getElementById("loginForm");
+
+loginForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const email = document
+        .getElementById("studentEmail")
+        .value
+        .trim();
+
+    const password = document
+        .getElementById("studentPassword")
+        .value;
+
+    try{
+
+const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+);
+
+const uid = userCredential.user.uid;
+
+const docRef = doc(db, "users", uid);
+
+const docSnap = await getDoc(docRef);
+
+if (docSnap.exists()) {
+
+    const userData = docSnap.data();
+    currentRole = userData.role;
+    await loadUser(uid);
+
+    console.log(userData);
+
+    alert(
+        "Xin chào " +
+        userData.name +
+        "\nVai trò: " +
+        userData.role
+    );
+
+}
+else{
+
+    alert("Không tìm thấy dữ liệu người dùng.");
+
+    return;
+
+}
+loginOverlay.style.display = "none";
+
+loginForm.reset();
+    }catch(error){
+
+    switch(error.code){
+
+        case "auth/invalid-credential":
+            alert("Sai email hoặc mật khẩu.");
+            break;
+
+        case "auth/user-not-found":
+            alert("Không tìm thấy tài khoản.");
+            break;
+
+        case "auth/too-many-requests":
+            alert("Bạn đăng nhập quá nhiều lần. Vui lòng thử lại sau.");
+            break;
+
+        default:
+            alert("Đăng nhập thất bại.");
+            console.error(error);
+
+    }
+
+}
+});
 /*====================================
         LẤY DỮ LIỆU TỪ URL
 ====================================*/
