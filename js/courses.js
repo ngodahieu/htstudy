@@ -101,29 +101,6 @@ document.addEventListener("click",(e)=>{
 
 });
 
-closeLogin.addEventListener("click",()=>{
-
-    loginOverlay.style.display="none";
-
-});
-
-loginBtn.addEventListener("click",()=>{
-
-    userMenu.classList.remove("active");
-
-    loginOverlay.style.display="flex";
-
-});
-
-loginOverlay.addEventListener("click",(e)=>{
-
-    if(e.target===loginOverlay){
-
-        loginOverlay.style.display="none";
-
-    }
-
-});
 const guestBox=document.getElementById("guestBox");
 
 const userBox=document.getElementById("userBox");
