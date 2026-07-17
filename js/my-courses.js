@@ -139,7 +139,9 @@ Lớp ${grade}
 
 </h4>
 `;
+const gradeContent = document.createElement("div");
 
+gradeContent.className = "grade-content";
         for(const subject in tree[grade]){
 
             const subjectDiv = document.createElement("div");
@@ -176,7 +178,7 @@ subjectDiv.appendChild(subjectTitle);
 
                 const a = document.createElement("a");
 
-                a.href = "#course-" + course.id;
+                a.href = `course.html?id=${course.id}`;
 
                 a.innerHTML =
 `📘 ${course.name}`;
@@ -185,7 +187,7 @@ subjectDiv.appendChild(subjectTitle);
 
             });
 subjectDiv.appendChild(courseContainer);
-            gradeDiv.appendChild(subjectDiv);
+            gradeContent.appendChild(subjectDiv);
 subjectTitle.onclick = () => {
 
     subjectDiv.classList.toggle("open");
@@ -194,11 +196,15 @@ subjectTitle.onclick = () => {
 
         }
 
-gradeDiv.querySelector(".grade-title").onclick = () => {
+const gradeTitle =
+gradeDiv.querySelector(".grade-title");
+
+gradeTitle.onclick = () => {
 
     gradeDiv.classList.toggle("open");
 
 };
+        gradeDiv.appendChild(gradeContent);
         container.appendChild(gradeDiv);
 
     }
