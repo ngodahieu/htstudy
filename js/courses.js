@@ -303,6 +303,44 @@ loginForm.reset();
     userMenu.classList.remove("active");
 
 });
+onAuthStateChanged(auth, async (user) => {
+
+    currentUser = user;
+    
+    if (user) {
+
+        await loadUser(user.uid);
+
+    } else {
+
+    currentUser = null;
+
+    currentRole = "";
+
+    guestBox.style.display = "block";
+
+    userBox.style.display = "none";
+
+    document.getElementById("guestMenu").style.display = "block";
+
+    document.getElementById("userMenuList").style.display = "none";
+
+    document.querySelector(".avatar img").src =
+        "assets/avatars/default.jpg";
+
+    myCoursesBtn.style.display = "none";
+
+    manageBtn.style.display = "none";
+
+    userName.textContent = "";
+
+    userStudentId.textContent = "";
+
+    userRole.textContent = "";
+
+}
+
+});
 /*====================================
         LẤY DỮ LIỆU TỪ URL
 ====================================*/
