@@ -186,55 +186,17 @@ subjectDiv.appendChild(subjectTitle);
             });
 subjectDiv.appendChild(courseContainer);
             gradeDiv.appendChild(subjectDiv);
-            subjectTitle.onclick = ()=>{
+subjectTitle.onclick = () => {
 
-    if(courseContainer.style.display==="none"){
-
-        courseContainer.style.display="block";
-
-        subjectTitle.querySelector(".arrow").textContent="▼";
-
-    }
-
-    else{
-
-        courseContainer.style.display="none";
-
-        subjectTitle.querySelector(".arrow").textContent="▶";
-
-    }
+    subjectDiv.classList.toggle("open");
 
 };
 
         }
-const subjects =
-gradeDiv.querySelectorAll(".menu-subject");
 
-subjects.forEach(item=>{
+gradeDiv.querySelector(".grade-title").onclick = () => {
 
-    item.style.display="none";
-
-});
-        gradeDiv.querySelector(".grade-title").onclick = ()=>{
-
-    const show =
-subjects[0]?.style.display==="none";
-
-    subjects.forEach(item=>{
-
-        item.style.display =
-        show
-        ? "block"
-        : "none";
-
-    });
-
-    gradeDiv
-    .querySelector(".arrow")
-    .textContent =
-    show
-    ? "▼"
-    : "▶";
+    gradeDiv.classList.toggle("open");
 
 };
         container.appendChild(gradeDiv);
