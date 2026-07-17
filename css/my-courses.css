@@ -144,8 +144,6 @@ img{
 
     display:flex;
 
-    justify-content:space-between;
-
     align-items:center;
 
     height:82px;
@@ -159,7 +157,7 @@ img{
     align-items:center;
 
     gap:15px;
-
+margin-right:80px;
 }
 
 .logo img{
