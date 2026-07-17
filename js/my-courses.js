@@ -342,7 +342,7 @@ courseSnapshot.forEach(courseDoc=>{
         image: courseData.image
 
     };
-
+console.log(course);
     if(myCourseIds.includes(courseDoc.id)){
 
     myCourses.push(course);
