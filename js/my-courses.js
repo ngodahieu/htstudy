@@ -24,6 +24,8 @@ document.getElementById("myCourseMenu");
 
 const referenceMenu =
 document.getElementById("referenceMenu");
+const searchInput =
+document.getElementById("searchCourse");
 const courseSidebar =
 document.getElementById("courseSidebar");
 function createCard(course,locked=false){
@@ -233,6 +235,8 @@ onAuthStateChanged(auth, async(user)=>{
     await loadMyCourses(user.uid);
 
 });
+let allMyCourses = [];
+let allReferenceCourses = [];
 async function loadMyCourses(uid){
 
     try{
@@ -357,7 +361,8 @@ buildMenu(
     referenceCourses,
     referenceMenu
 );
-
+allMyCourses = myCourses;
+allReferenceCourses = referenceCourses;
     }
 
     catch(err){
@@ -365,6 +370,66 @@ buildMenu(
         console.log(err);
 
     }
+
+}
+function renderSearch(keyword){
+
+    keyword = keyword.toLowerCase();
+
+    myList.innerHTML = "";
+    refList.innerHTML = "";
+
+    const myResult = allMyCourses.filter(course =>
+
+        course.name.toLowerCase().includes(keyword) ||
+
+        course.subject.toLowerCase().includes(keyword)
+
+    );
+
+    const refResult = allReferenceCourses.filter(course =>
+
+        course.name.toLowerCase().includes(keyword) ||
+
+        course.subject.toLowerCase().includes(keyword)
+
+    );
+
+    myResult.forEach(course=>{
+
+        myList.innerHTML += createCard({
+
+            id:course.id,
+
+            subject:course.subject,
+
+            course:course.name,
+
+            description:course.description,
+
+            image:course.image
+
+        });
+
+    });
+
+    refResult.forEach(course=>{
+
+        refList.innerHTML += createCard({
+
+            id:course.id,
+
+            subject:course.subject,
+
+            course:course.name,
+
+            description:course.description,
+
+            image:course.image
+
+        },true);
+
+    });
 
 }
 /*======================================
@@ -384,5 +449,10 @@ window.addEventListener("load", () => {
         loading.remove();
 
     }, 500);
+
+});
+searchInput.addEventListener("input",()=>{
+
+    renderSearch(searchInput.value);
 
 });
