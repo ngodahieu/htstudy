@@ -7,9 +7,17 @@ import {
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
+
     doc,
-    getDoc
+
+    getDoc,
+
+    getDocs,
+
+    collection
+
 }
+
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*==========================================
         NOTIFICATION PANEL
@@ -236,6 +244,23 @@ const params = new URLSearchParams(window.location.search);
 const subject = params.get("subject");
 
 const grade = params.get("grade");
+const subjectNames = {
+
+    hoa: "Hóa Học",
+
+    toan: "Toán Học",
+
+    ly: "Vật Lý",
+
+    sinh: "Sinh Học",
+
+    van: "Ngữ Văn",
+
+    anh: "Tiếng Anh"
+
+};
+const subjectName =
+subjectNames[subject] || "Khóa học";
 const pageTitle =
 document.getElementById("pageTitle");
 
@@ -261,10 +286,21 @@ document.getElementById("referenceCourses");
 if(subject && grade){
 
     pageTitle.textContent =
-    `Hóa Học ${grade}`;
+`${subjectName} ${grade}`;
 
-    pageDescription.textContent =
-    `Các khóa học dành cho Hóa Học lớp ${grade}.`;
+pageDescription.textContent =
+`Các khóa học ${subjectName} lớp ${grade}.`;
+
+pageDescription.textContent =
+`Các khóa học ${subjectName} lớp ${grade}.`;
+
+    subjectSection.style.display = "none";
+
+    courseFilter.style.display = "none";
+
+    realCourseSection.style.display = "block";
+
+    backButton.style.display = "inline-flex";
 
 }
 /*====================================
@@ -311,5 +347,10 @@ card.classList.add("hide");
 });
 
 });
+
+});
+backButton.addEventListener("click",()=>{
+
+    window.location.href="courses.html";
 
 });
