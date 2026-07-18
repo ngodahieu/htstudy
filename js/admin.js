@@ -797,7 +797,7 @@ async function loadCourses(){
 
         <h3>${data.name}</h3>
 
-        <p>Môn học : ${data.subject}</p>
+        <p>Môn học : ${data.subjectName}</p>
 
         <p>Lớp : ${data.grade}</p>
 
@@ -923,10 +923,8 @@ async function loadNotificationCourses(){
         notificationCourse.innerHTML+=`
 
         <option value="${doc.id}">
-
-            ${data.subject} ${data.grade} | Khóa: ${data.name}
-
-        </option>
+    ${data.subjectName} ${data.grade} | Khóa: ${data.name}
+</option>
 
         `;
 
@@ -1026,7 +1024,10 @@ async function createNotification(){
         const type = notificationType.value;
 
         const courseId = notificationCourse.value;
-
+const courseName =
+notificationCourse.options[
+notificationCourse.selectedIndex
+].text;
         const title = notificationTitle.value.trim();
 
         const content = notificationContent.value.trim();
