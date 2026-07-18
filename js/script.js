@@ -6,7 +6,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import {
     doc,
-    getDoc
+    getDoc,
+    collection,
+    query,
+    orderBy,
+    onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*==========================================
@@ -520,7 +524,84 @@ myCoursesBtn.addEventListener("click", () => {
     window.location.href="my-courses.html";
 
 });
+/*==========================================
+        NOTIFICATION
+==========================================*/
 
+function renderNotifications(list){
+
+    // Không có thông báo
+    if(list.length === 0){
+
+        notificationList.innerHTML = `
+            <div class="notification-empty">
+
+                <i class="fa-regular fa-bell-slash"></i>
+
+                <p>Chưa có thông báo nào.</p>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+    let html = "";
+
+    list.forEach(item=>{
+
+        html += `
+        <div class="notification-item" data-link="${item.link}">
+
+            <div class="notification-icon">
+
+                <i class="${item.icon}"></i>
+
+            </div>
+
+            <div class="notification-content">
+
+                <h4>${item.title}</h4>
+
+                <p>${item.content}</p>
+
+                <span>${item.time}</span>
+
+            </div>
+
+        </div>
+        `;
+
+    });
+
+    notificationList.innerHTML = html;
+
+}
+function loadNotifications(){
+
+    const q = query(
+        collection(db,"notifications"),
+        orderBy("createdAt","desc")
+    );
+
+    onSnapshot(q,(snapshot)=>{
+
+        const notifications = [];
+
+        snapshot.forEach(doc=>{
+
+            notifications.push(doc.data());
+
+        });
+
+        renderNotifications(notifications);
+
+        showNotificationBadge(notifications.length);
+
+    });
+
+}
 onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
@@ -528,9 +609,12 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
 
         await loadUser(user.uid);
+        loadNotifications();
+    }
+    else {
+        renderNotifications([]);
 
-    } else {
-
+showNotificationBadge(0);
     currentUser = null;
 
     currentRole = "";
