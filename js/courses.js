@@ -187,7 +187,21 @@ else if (user.role === "Admin") {
 }
     currentUser = auth.currentUser;
 }
+async function loadSubjectCourses(){
+    myRealCourses.innerHTML = "";
 
+referenceCourses.innerHTML = "";
+    const courseSnapshot =
+await getDocs(collection(db,"courses"));
+    courseSnapshot.forEach(courseDoc=>{
+
+    console.log(courseDoc.id);
+
+    console.log(courseDoc.data());
+
+});
+
+}
 logoutBtn.addEventListener("click", async () => {
 
     await signOut(auth);
@@ -301,8 +315,9 @@ pageDescription.textContent =
     realCourseSection.style.display = "block";
 
     backButton.style.display = "inline-flex";
-
+loadSubjectCourses();
 }
+
 /*====================================
         FILTER COURSE
 ====================================*/
