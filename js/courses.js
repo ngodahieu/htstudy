@@ -241,6 +241,23 @@ document.getElementById("pageTitle");
 
 const pageDescription =
 document.getElementById("pageDescription");
+const backButton =
+document.getElementById("backButton");
+
+const courseFilter =
+document.getElementById("courseFilter");
+
+const subjectSection =
+document.getElementById("subjectSection");
+
+const realCourseSection =
+document.getElementById("realCourseSection");
+
+const myRealCourses =
+document.getElementById("myRealCourses");
+
+const referenceCourses =
+document.getElementById("referenceCourses");
 if(subject && grade){
 
     pageTitle.textContent =
