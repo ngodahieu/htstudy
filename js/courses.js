@@ -209,9 +209,45 @@ courseSnapshot.forEach(courseDoc=>{
 
     }
 
-    console.log(course);
+    referenceCourses.innerHTML +=
+createCard(course);
 
 });
+
+}
+function createCard(course, owned = false){
+
+    return `
+
+<div class="course-card">
+
+    <img src="${course.image}">
+
+    <div class="course-content">
+
+        <h3>
+
+            ${course.name}
+
+        </h3>
+
+        <p>
+
+            ${course.description || ""}
+
+        </p>
+
+        <button class="btn-course">
+
+            ${owned ? "Vào học" : "Xem chi tiết"}
+
+        </button>
+
+    </div>
+
+</div>
+
+`;
 
 }
 logoutBtn.addEventListener("click", async () => {
