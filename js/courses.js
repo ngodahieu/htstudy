@@ -193,11 +193,23 @@ async function loadSubjectCourses(){
 referenceCourses.innerHTML = "";
     const courseSnapshot =
 await getDocs(collection(db,"courses"));
-    courseSnapshot.forEach(courseDoc=>{
+courseSnapshot.forEach(courseDoc=>{
 
-    console.log(courseDoc.id);
+    const course = courseDoc.data();
 
-    console.log(courseDoc.data());
+    if(
+
+        course.subject !== subjectName ||
+
+        course.grade != grade
+
+    ){
+
+        return;
+
+    }
+
+    console.log(course);
 
 });
 
