@@ -115,7 +115,7 @@ const logoutBtn=document.getElementById("logoutBtn");
 const myCoursesBtn=document.getElementById("myCoursesBtn");
 
 const manageBtn=document.getElementById("manageBtn");
-
+const userGuide = document.getElementById("userGuide");
 let currentRole="";
 
 let currentUser = null;
@@ -205,6 +205,11 @@ manageBtn.addEventListener("click", () => {
         window.location.href = "dashboard/teacher.html";
 
     }
+
+});
+userGuide.addEventListener("click", () => {
+
+    alert("Chức năng hướng dẫn đang được cập nhật.");
 
 });
 onAuthStateChanged(auth, async (user) => {
