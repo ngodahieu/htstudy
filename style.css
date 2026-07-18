@@ -3327,8 +3327,13 @@ ITEM
 .notification-item:hover{
 
     background:
+    linear-gradient(
+        90deg,
+        rgba(40,120,255,.10),
+        rgba(80,210,255,.06)
+    );
 
-    rgba(60,170,255,.08);
+    transform:translateX(6px);
 
 }
 
@@ -3350,47 +3355,55 @@ ICON
 
 .notification-icon{
 
-    width:52px;
-
-    height:52px;
-
-    min-width:52px;
-
-    border-radius:50%;
+    width:56px;
+    height:56px;
+    min-width:56px;
 
     display:flex;
-
+    align-items:center;
     justify-content:center;
 
-    align-items:center;
+    border-radius:18px;
 
     background:
+    linear-gradient(
+        135deg,
+        rgba(30,120,255,.18),
+        rgba(70,220,255,.12)
+    );
 
-    rgba(0,160,255,.08);
+    border:1px solid rgba(120,210,255,.18);
 
-    border:1px solid rgba(110,190,255,.15);
+    color:#7fe0ff;
 
-    color:#5fd8ff;
+    font-size:22px;
 
-    font-size:20px;
+    box-shadow:
+    inset 0 0 15px rgba(255,255,255,.05),
+    0 0 20px rgba(0,170,255,.18);
 
-    transition:.35s;
+    transition:.4s;
 
 }
 
 .notification-item:hover .notification-icon{
 
     transform:
+    rotate(12deg)
+    scale(1.12);
 
-    rotate(360deg)
-
-    scale(1.08);
+    background:
+    linear-gradient(
+        135deg,
+        #1180ff,
+        #41d7ff
+    );
 
     color:white;
 
     box-shadow:
 
-    0 0 25px rgba(0,180,255,.35);
+    0 0 35px rgba(60,210,255,.45);
 
 }
 
@@ -3406,33 +3419,43 @@ TEXT
 
 .notification-content h4{
 
-    color:white;
+    color:#fff;
 
-    font-size:1rem;
+    font-size:16px;
+
+    font-weight:700;
 
     margin-bottom:6px;
+
+    letter-spacing:.3px;
 
 }
 
 .notification-content p{
 
-    color:#a7bddb;
+    color:#bfd6ef;
 
-    font-size:.92rem;
+    font-size:14px;
 
-    line-height:1.6;
+    line-height:1.8;
+
+    margin-bottom:10px;
 
 }
 
 .notification-content span{
 
-    display:block;
+    display:inline-flex;
 
-    margin-top:8px;
+    align-items:center;
 
-    color:#69d8ff;
+    gap:6px;
 
-    font-size:.78rem;
+    font-size:12px;
+
+    color:#74d8ff;
+
+    opacity:.9;
 
 }
 
@@ -4245,5 +4268,106 @@ radial-gradient(circle,
 rgba(50,120,255,.10),
 
 transparent 70%);
+
+}
+.notification-content span::before{
+
+    content:"\f017";
+
+    font-family:"Font Awesome 6 Free";
+
+    font-weight:900;
+
+    font-size:11px;
+
+}
+.notification-item{
+
+    position:relative;
+
+}
+.notification-item::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:18px;
+
+    bottom:18px;
+
+    width:4px;
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        180deg,
+        #39c8ff,
+        #0f67ff
+    );
+
+    opacity:0;
+
+    transition:.35s;
+
+}
+
+.notification-item:hover::before{
+
+    opacity:1;
+
+}
+.notification-item{
+
+    overflow:hidden;
+
+}
+
+.notification-item::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-120%;
+
+    width:60%;
+
+    height:100%;
+
+    background:
+
+    linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.06),
+        transparent
+    );
+
+}
+
+.notification-item:hover::after{
+
+    animation:notifyLight .8s;
+
+}
+
+@keyframes notifyLight{
+
+    from{
+
+        left:-120%;
+
+    }
+
+    to{
+
+        left:180%;
+
+    }
 
 }
