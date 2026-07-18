@@ -167,6 +167,30 @@ document.getElementById("createCourseBtn");
 
 const courseList =
 document.getElementById("courseList");
+/*==============================
+    THÔNG BÁO
+==============================*/
+
+const notificationType =
+document.getElementById("notificationType");
+
+const notificationCourse =
+document.getElementById("notificationCourse");
+
+const notificationContentLink =
+document.getElementById("notificationContentLink");
+
+const notificationTitle =
+document.getElementById("notificationTitle");
+
+const notificationContent =
+document.getElementById("notificationContent");
+
+const createNotificationBtn =
+document.getElementById("createNotificationBtn");
+
+const notificationList =
+document.getElementById("notificationList");
 console.log("dashboardHeader", dashboardHeader);
 console.log("dashboardCards", dashboardCards);
 
@@ -428,13 +452,17 @@ menuTests.addEventListener("click",()=>{
 
 });
 
-menuNotifications.addEventListener("click",()=>{
+menuNotifications.addEventListener("click", async ()=>{
 
     setActiveMenu(menuNotifications);
 
     hideAllPages();
 
     notificationPage.style.display="block";
+
+    await loadNotificationCourses();
+
+    await loadNotifications();
 
 });
 
@@ -857,6 +885,112 @@ async function assignCourse(){
         alert(err.message);
 
     }
+
+}
+/*====================================
+      LOAD KHÓA HỌC CHO THÔNG BÁO
+====================================*/
+
+async function loadNotificationCourses(){
+
+    notificationCourse.innerHTML=
+    `<option value="">-- Chọn khóa học --</option>`;
+
+    const snapshot=
+    await getDocs(collection(db,"courses"));
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        notificationCourse.innerHTML+=`
+
+        <option value="${doc.id}">
+
+            ${data.subject} ${data.grade} | Khóa: ${data.name}
+
+        </option>
+
+        `;
+
+    });
+
+}
+notificationType.addEventListener("change",loadContentList);
+
+notificationCourse.addEventListener("change",loadContentList);
+async function loadContentList(){
+
+    notificationContentLink.innerHTML="";
+
+    const courseId=
+    notificationCourse.value;
+
+    if(courseId===""){
+
+        notificationContentLink.innerHTML=
+        `<option value="">Chọn khóa học trước</option>`;
+
+        return;
+
+    }
+
+    if(notificationType.value==="general"){
+
+        notificationContentLink.innerHTML=
+        `<option value="">Không cần chọn</option>`;
+
+        notificationContentLink.disabled=true;
+
+        return;
+
+    }
+
+    notificationContentLink.disabled=false;
+
+    let collectionName="lessons";
+
+    if(notificationType.value==="test"){
+
+        collectionName="tests";
+
+    }
+
+    const snapshot=
+
+    await getDocs(
+
+        collection(
+
+            db,
+
+            "courses",
+
+            courseId,
+
+            collectionName
+
+        )
+
+    );
+
+    notificationContentLink.innerHTML="";
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        notificationContentLink.innerHTML+=`
+
+        <option value="${doc.id}">
+
+            ${data.title}
+
+        </option>
+
+        `;
+
+    });
 
 }
 /*====================================
