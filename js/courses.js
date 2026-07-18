@@ -452,6 +452,10 @@ card.classList.add("hide");
 });
 backButton.addEventListener("click",()=>{
 
-    window.location.href="courses.html";
+    if(document.referrer){
+        history.back();
+    }else{
+        window.location.href="courses.html";
+    }
 
 });
