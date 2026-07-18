@@ -18,7 +18,8 @@ import {
     addDoc,
     serverTimestamp,
     setDoc,
-    arrayUnion
+    arrayUnion,
+    updateDoc
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -713,6 +714,10 @@ async function createCourse(){
     try{
 
         const subject = courseSubject.value;
+        const subjectName =
+courseSubject.options[
+courseSubject.selectedIndex
+].text;
         const grade = courseGrade.value;
         const name = courseName.value.trim();
         const description = courseDescription.value.trim();
@@ -730,15 +735,23 @@ async function createCourse(){
 
         await addDoc(collection(db,"courses"),{
 
-            subject,
-            grade,
-            name,
-            description,
-            image,
-            active:true,
-            createdAt:serverTimestamp()
+    subject,
 
-        });
+    subjectName,
+
+    grade,
+
+    name,
+
+    description,
+
+    image,
+
+    active:true,
+
+    createdAt:serverTimestamp()
+
+});
 
         alert("Đã tạo khóa học.");
 
@@ -782,7 +795,7 @@ async function loadCourses(){
 
             <h3>${data.name}</h3>
 
-            <p>Môn: ${data.subject}</p>
+            <p>Môn: ${data.subjectName}</p>
 
             <p>Lớp: ${data.grade}</p>
 
@@ -924,8 +937,13 @@ async function loadContentList(){
     notificationContentLink.innerHTML="";
 
     const courseId=
-    notificationCourse.value;
+notificationCourse.value;
 
+const courseName=
+
+notificationCourse.options[
+notificationCourse.selectedIndex
+].text;
     if(courseId===""){
 
         notificationContentLink.innerHTML=
@@ -994,6 +1012,148 @@ async function loadContentList(){
 
 }
 /*====================================
+        GỬI THÔNG BÁO
+====================================*/
+
+async function createNotification(){
+
+    try{
+
+        const type = notificationType.value;
+
+        const courseId = notificationCourse.value;
+
+        const title = notificationTitle.value.trim();
+
+        const content = notificationContent.value.trim();
+
+        const contentId = notificationContentLink.value;
+
+        if(title===""){
+
+            alert("Nhập tiêu đề.");
+
+            return;
+
+        }
+
+        if(content===""){
+
+            alert("Nhập nội dung.");
+
+            return;
+
+        }
+
+        await addDoc(collection(db,"notifications"),{
+
+    type,
+
+    courseId,
+
+    courseName,
+
+    title,
+
+    content,
+
+    contentId,
+
+    active:true,
+
+    createdAt:serverTimestamp()
+
+});
+
+        alert("Đã gửi thông báo.");
+
+        notificationTitle.value="";
+
+        notificationContent.value="";
+
+        await loadNotifications();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(err.message);
+
+    }
+
+}
+/*====================================
+        LOAD THÔNG BÁO
+====================================*/
+
+async function loadNotifications(){
+
+    notificationList.innerHTML="Đang tải...";
+
+    const q=query(
+
+        collection(db,"notifications"),
+
+        orderBy("createdAt","desc")
+
+    );
+
+    const snapshot=await getDocs(q);
+
+    notificationList.innerHTML="";
+
+    snapshot.forEach(docItem=>{
+
+        const data=docItem.data();
+
+        notificationList.innerHTML += `
+
+<div class="course-item">
+
+<h3>${data.title}</h3>
+
+<p>
+
+<b>${data.courseName}</b>
+
+</p>
+
+<p>
+
+${data.content}
+
+</p>
+
+<button
+onclick="deleteNotification('${docItem.id}')">
+
+Xóa
+
+</button>
+
+</div>
+
+`;
+
+    });
+
+}
+/*====================================
+        XÓA THÔNG BÁO
+====================================*/
+
+window.deleteNotification=async function(id){
+
+    if(!confirm("Xóa thông báo?")) return;
+
+    await deleteDoc(doc(db,"notifications",id));
+
+    loadNotifications();
+
+}
+/*====================================
         ĐĂNG XUẤT
 ====================================*/
 createCourseBtn.addEventListener(
@@ -1003,6 +1163,13 @@ createCourseBtn.addEventListener(
 assignCourseBtn.addEventListener(
     "click",
     assignCourse
+);
+createNotificationBtn.addEventListener(
+
+    "click",
+
+    createNotification
+
 );
 logoutBtn.addEventListener("click",async()=>{
 
