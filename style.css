@@ -3938,3 +3938,20 @@ position:relative;
     font-weight:600;
 
 }
+.back-button{
+
+display:none;
+
+padding:12px 20px;
+
+border:none;
+
+border-radius:12px;
+
+cursor:pointer;
+
+font-size:15px;
+
+margin-bottom:20px;
+
+}
