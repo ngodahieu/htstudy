@@ -96,14 +96,36 @@ const timer = setInterval(updateCountdown,1000);
 /*==========================================
         NOTIFICATION PANEL
 ==========================================*/
-
-const notificationBtn = document.querySelector(".notification-btn");
+const notificationBtn = document.getElementById("notificationBtn");
 
 const notificationPanel = document.getElementById("notificationPanel");
 
 const closeNotification = document.getElementById("closeNotification");
 
-const notificationBadge = document.querySelector(".badge");
+const notificationBadge = document.getElementById("notificationBadge");
+
+const notificationList = document.getElementById("notificationList");
+function showNotificationBadge(number){
+
+    if(number <= 0){
+
+        notificationBadge.style.display = "none";
+
+        return;
+
+    }
+
+    notificationBadge.style.display = "flex";
+
+    notificationBadge.textContent = number;
+
+}
+
+function hideNotificationBadge(){
+
+    notificationBadge.style.display = "none";
+
+}
 
 const avatar = document.querySelector(".avatar");
 
@@ -112,24 +134,30 @@ const loginOverlay = document.getElementById("loginOverlay");
 const closeLogin = document.getElementById("closeLogin");
 
 /* Mở / Đóng */
-
 notificationBtn.addEventListener("click",(e)=>{
 
     e.stopPropagation();
 
+    // Chưa đăng nhập
+    if(!auth.currentUser){
+
+        loginOverlay.style.display="flex";
+
+        alert("Bạn cần đăng nhập để xem thông báo.");
+
+        return;
+
+    }
+
     notificationPanel.classList.toggle("active");
 
-    // Khi mở thì ẩn badge
     if(notificationPanel.classList.contains("active")){
 
-        notificationBadge.style.opacity="0";
-
-        notificationBadge.style.transform="scale(0)";
+        hideNotificationBadge();
 
     }
 
 });
-
 /* Nút X */
 
 closeNotification.addEventListener("click",()=>{
