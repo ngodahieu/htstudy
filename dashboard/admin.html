@@ -646,9 +646,13 @@ Upload PDF, Word, Slide,...
 
     <div class="dashboard-header">
 
-        <h1>Thông báo</h1>
+        <h1>
+            Quản lý thông báo
+        </h1>
 
-        <p>Gửi thông báo đến toàn bộ học sinh.</p>
+        <p>
+            Gửi thông báo theo từng khóa học hoặc toàn bộ học sinh.
+        </p>
 
     </div>
 
@@ -656,23 +660,92 @@ Upload PDF, Word, Slide,...
 
         <div class="form-group">
 
-            <label>Tiêu đề</label>
+            <label>
+                Loại thông báo
+            </label>
 
-            <input
-                id="notificationTitle"
-                type="text"
-                placeholder="Ví dụ: Nghỉ học ngày mai">
+            <select id="notificationType">
+
+                <option value="lesson">
+                    📚 Có bài học mới
+                </option>
+
+                <option value="test">
+                    📝 Có bài kiểm tra mới
+                </option>
+
+                <option value="general">
+                    📢 Thông báo chung
+                </option>
+
+            </select>
 
         </div>
 
         <div class="form-group">
 
-            <label>Nội dung</label>
+            <label>
+                Gửi đến
+            </label>
+
+            <select id="notificationCourse">
+
+                <option value="all">
+                    🌍 Tất cả học sinh
+                </option>
+
+            </select>
+
+            <small class="auto-text">
+
+                Các khóa học sẽ được tải tự động từ Firestore.
+
+            </small>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Tiêu đề
+            </label>
+
+            <input
+                id="notificationTitle"
+                type="text"
+                placeholder="Ví dụ: Chương Este đã có bài mới">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Nội dung
+            </label>
 
             <textarea
                 id="notificationContent"
                 rows="6"
                 placeholder="Nhập nội dung thông báo..."></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Liên kết
+            </label>
+
+            <input
+                id="notificationLink"
+                type="text"
+                placeholder="../courses/hoa12/este.html">
+
+            <small class="auto-text">
+
+                Học sinh bấm vào thông báo sẽ mở liên kết này.
+
+            </small>
 
         </div>
 
