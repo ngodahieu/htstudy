@@ -1,7 +1,6 @@
 import { auth, db } from "./firebase.js";
 
 import {
-    signInWithEmailAndPassword,
     onAuthStateChanged,
     signOut
 }
@@ -188,6 +187,26 @@ logoutBtn.addEventListener("click", async () => {
     window.location.href = "index.html";
 
 });
+myCoursesBtn.addEventListener("click", () => {
+
+    window.location.href = "my-courses.html";
+
+});
+manageBtn.addEventListener("click", () => {
+
+    if(currentRole === "Admin"){
+
+        window.location.href = "dashboard/admin.html";
+
+    }
+
+    else if(currentRole === "Giáo viên"){
+
+        window.location.href = "dashboard/teacher.html";
+
+    }
+
+});
 onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
@@ -226,9 +245,6 @@ if(subject && grade){
     `Các khóa học dành cho Hóa Học lớp ${grade}.`;
 
 }
-console.log(subject);
-
-console.log(grade);
 /*====================================
         FILTER COURSE
 ====================================*/
