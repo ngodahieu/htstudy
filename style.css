@@ -3955,3 +3955,38 @@ font-size:15px;
 margin-bottom:20px;
 
 }
+/*================================
+        REAL COURSES
+================================*/
+
+#realCourseSection{
+
+padding:80px 0;
+
+}
+
+.real-title{
+
+font-size:28px;
+
+font-weight:700;
+
+margin-bottom:25px;
+
+color:white;
+
+}
+
+#myRealCourses,
+#referenceCourses{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fill,minmax(300px,1fr));
+
+gap:25px;
+
+margin-bottom:50px;
+
+}
