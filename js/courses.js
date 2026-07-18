@@ -101,8 +101,6 @@ document.addEventListener("click",(e)=>{
 
 });
 
-const guestBox=document.getElementById("guestBox");
-
 const userBox=document.getElementById("userBox");
 
 const userName=document.getElementById("userName");
@@ -120,6 +118,8 @@ const myCoursesBtn=document.getElementById("myCoursesBtn");
 const manageBtn=document.getElementById("manageBtn");
 
 let currentRole="";
+
+let currentUser = null;
 async function loadUser(uid){
 
     const docRef = doc(db, "users", uid);
@@ -136,11 +136,9 @@ async function loadUser(uid){
 
     const user = docSnap.data();
 
-    guestBox.style.display = "none";
     userBox.style.display = "block";
 
-    document.getElementById("guestMenu").style.display = "none";
-    document.getElementById("userMenuList").style.display = "block";
+document.getElementById("userMenuList").style.display = "block";
 
     const avatarUrl =
     user.avatar && user.avatar.trim() !== ""
