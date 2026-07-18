@@ -191,6 +191,16 @@ async function loadSubjectCourses(){
     myRealCourses.innerHTML = "";
 
 referenceCourses.innerHTML = "";
+    const enrollSnap =
+await getDoc(doc(db,"enrollments",currentUser.uid));
+
+let myCourseIds = [];
+
+if(enrollSnap.exists()){
+
+    myCourseIds = enrollSnap.data().courses || [];
+
+}
     const courseSnapshot =
 await getDocs(collection(db,"courses"));
 courseSnapshot.forEach(courseDoc=>{
@@ -209,8 +219,19 @@ courseSnapshot.forEach(courseDoc=>{
 
     }
 
+if(myCourseIds.includes(courseDoc.id)){
+
+    myRealCourses.innerHTML +=
+    createCard(course,true);
+
+}
+
+else{
+
     referenceCourses.innerHTML +=
-createCard(course);
+    createCard(course,false);
+
+}
 
 });
 
@@ -237,11 +258,23 @@ function createCard(course, owned = false){
 
         </p>
 
-        <button class="btn-course">
+        <div class="course-footer">
 
-            ${owned ? "Vào học" : "Xem chi tiết"}
+<span class="${owned ? "owned-tag":"lock-tag"}">
 
-        </button>
+${owned ? "Đã được cấp":"Chưa được cấp"}
+
+</span>
+
+<button
+class="btn-course"
+${owned ? "" : "disabled"}>
+
+${owned ? "Vào học":"Chưa mở"}
+
+</button>
+
+</div>
 
     </div>
 
