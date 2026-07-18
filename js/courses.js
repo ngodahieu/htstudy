@@ -318,16 +318,22 @@ userGuide.addEventListener("click", () => {
 onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
-    
+
     if (user) {
 
         await loadUser(user.uid);
 
-    }else{
+        if(subject && grade){
 
-    window.location.href = "index.html";
+            await loadSubjectCourses();
 
-}
+        }
+
+    } else {
+
+        window.location.href = "index.html";
+
+    }
 
 });
 /*====================================
@@ -396,7 +402,6 @@ pageDescription.textContent =
     realCourseSection.style.display = "block";
 
     backButton.style.display = "inline-flex";
-loadSubjectCourses();
 }
 
 /*====================================
