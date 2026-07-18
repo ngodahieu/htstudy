@@ -348,35 +348,37 @@ homePage.style.display="block";
 
 async function loadDashboard(){
 
-    const snapshot =
-    await getDocs(collection(db,"users"));
+    // Đếm tài khoản
+    const userSnapshot = await getDocs(collection(db,"users"));
 
     let student = 0;
     let teacher = 0;
 
-    snapshot.forEach((doc)=>{
+    userSnapshot.forEach((doc)=>{
 
         const data = doc.data();
 
-        if(data.role==="Học sinh"){
-
+        if(data.role === "Học sinh"){
             student++;
-
         }
 
-        if(data.role==="Giáo viên"){
-
+        if(data.role === "Giáo viên"){
             teacher++;
-
         }
 
     });
 
-    document.getElementById("studentCount").textContent =
-    student;
+    // Đếm khóa học
+    const courseSnapshot =
+    await getDocs(collection(db,"courses"));
 
-    document.getElementById("teacherCount").textContent =
-    teacher;
+    // Đếm video (chưa có collection nên tạm = 0)
+    let video = 0;
+
+    document.getElementById("studentCount").textContent = student;
+    document.getElementById("teacherCount").textContent = teacher;
+    document.getElementById("courseCount").textContent = courseSnapshot.size;
+    document.getElementById("videoCount").textContent = video;
 
 }
 /*====================================
@@ -785,25 +787,27 @@ async function loadCourses(){
 
     courseList.innerHTML="";
 
-    snapshot.forEach(doc=>{
+    snapshot.forEach(courseDoc=>{
 
-        const data=doc.data();
+    const data = courseDoc.data();
 
-        courseList.innerHTML+=`
+    courseList.innerHTML += `
 
-        <div class="course-item">
+    <div class="course-item">
 
-            <h3>${data.name}</h3>
+        <h3>${data.name}</h3>
 
-            <p>Môn: ${data.subjectName}</p>
+        <p>Môn học : ${data.subject}</p>
 
-            <p>Lớp: ${data.grade}</p>
+        <p>Lớp : ${data.grade}</p>
 
-        </div>
+        <p>${data.description}</p>
 
-        `;
+    </div>
 
-    });
+    `;
+
+});
 
 }
 async function loadStudentsForEnrollment(){
