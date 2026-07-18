@@ -690,11 +690,13 @@ Upload PDF, Word, Slide,...
 
             <select id="notificationCourse">
 
-                <option value="all">
-                    🌍 Tất cả học sinh
-                </option>
+    <option value="">
 
-            </select>
+        -- Chọn khóa học --
+
+    </option>
+
+</select>
 
             <small class="auto-text">
 
@@ -732,23 +734,29 @@ Upload PDF, Word, Slide,...
 
         <div class="form-group">
 
-            <label>
-                Liên kết
-            </label>
+    <label>
 
-            <input
-                id="notificationLink"
-                type="text"
-                placeholder="../courses/hoa12/este.html">
+        Bài học / Bài kiểm tra
 
-            <small class="auto-text">
+    </label>
 
-                Học sinh bấm vào thông báo sẽ mở liên kết này.
+    <select id="notificationContentLink">
 
-            </small>
+        <option value="">
 
-        </div>
+            -- Chọn trước loại thông báo và khóa học --
 
+        </option>
+
+    </select>
+
+    <small class="auto-text">
+
+        Danh sách sẽ tự động thay đổi theo loại thông báo và khóa học.
+
+    </small>
+
+</div>
         <button id="createNotificationBtn">
 
             <i class="fa-solid fa-paper-plane"></i>
