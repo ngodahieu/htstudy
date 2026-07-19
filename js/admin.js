@@ -1209,7 +1209,7 @@ async function loadAccounts(){
 
                         <span>
 
-                        📘 ${c.subjectName} - ${c.name}
+                        📘 ${c.subjectName || c.subject || "Chưa xác định"} - ${c.name}
 
                         </span>
 
