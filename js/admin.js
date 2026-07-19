@@ -797,7 +797,7 @@ async function loadCourses(){
 
         <h3>${data.name}</h3>
 
-        <p>Môn học : ${data.subjectName}</p>
+        <p>Môn học : ${data.subjectName || data.subject}</p>
 
         <p>Lớp : ${data.grade}</p>
 
