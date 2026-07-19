@@ -527,7 +527,38 @@ myCoursesBtn.addEventListener("click", () => {
 /*==========================================
         NOTIFICATION
 ==========================================*/
+function formatTime(timestamp){
 
+    if(!timestamp) return "Vừa xong";
+
+    const date = timestamp.toDate();
+
+    const now = new Date();
+
+    const diff = Math.floor((now - date) / 1000);
+
+    if(diff < 60){
+        return "Vừa xong";
+    }
+
+    if(diff < 3600){
+        return Math.floor(diff / 60) + " phút trước";
+    }
+
+    if(diff < 86400){
+        return Math.floor(diff / 3600) + " giờ trước";
+    }
+
+    if(diff < 172800){
+        return "Hôm qua";
+    }
+
+    if(diff < 604800){
+        return Math.floor(diff / 86400) + " ngày trước";
+    }
+
+    return date.toLocaleDateString("vi-VN");
+}
 function renderNotifications(list){
 
     // Không có thông báo
@@ -549,35 +580,49 @@ function renderNotifications(list){
 
     let html = "";
 
-    list.forEach(item=>{
+list.forEach(item=>{
 
-        html += `
-        <div class="notification-item" data-link="${item.link}">
+    let icon = "fa-solid fa-bullhorn";
 
-            <div class="notification-icon">
+    switch(item.type){
 
-                <i class="${item.icon}"></i>
+        case "lesson":
+            icon = "fa-solid fa-book-open";
+            break;
 
-            </div>
+        case "test":
+            icon = "fa-solid fa-file-pen";
+            break;
 
-            <div class="notification-content">
+        case "general":
+            icon = "fa-solid fa-bullhorn";
+            break;
 
-                <h4>${item.title}</h4>
+    }
 
-                <p>${item.content}</p>
+    html += `
+    <div class="notification-item" data-link="${item.link}">
 
-                <span>${
-    item.createdAt
-        ? item.createdAt.toDate().toLocaleString("vi-VN")
-        : "Vừa xong"
-}</span>
+        <div class="notification-icon">
 
-            </div>
+            <i class="${icon}"></i>
 
         </div>
-        `;
 
-    });
+        <div class="notification-content">
+
+            <h4>${item.title}</h4>
+
+            <p>${item.content}</p>
+
+            <span>${formatTime(item.createdAt)}</span>
+
+        </div>
+
+    </div>
+    `;
+
+});
 
     notificationList.innerHTML = html;
 
@@ -589,21 +634,29 @@ function loadNotifications(){
         orderBy("createdAt","desc")
     );
 
-    onSnapshot(q,(snapshot)=>{
+onSnapshot(q,(snapshot)=>{
 
-        const notifications = [];
+    const notifications = [];
 
-        snapshot.forEach(doc=>{
+    let unreadCount = 0;
 
-            notifications.push(doc.data());
+    snapshot.forEach(doc=>{
 
-        });
+        const data = doc.data();
 
-        renderNotifications(notifications);
+        notifications.push(data);
 
-        showNotificationBadge(notifications.length);
+        if(!data.read){
+            unreadCount++;
+        }
 
     });
+
+    renderNotifications(notifications);
+
+    showNotificationBadge(unreadCount);
+
+});
 
 }
 onAuthStateChanged(auth, async (user) => {
