@@ -847,7 +847,9 @@ async function loadCoursesForEnrollment(){
 
         enrollmentCourse.innerHTML += `
 <option value="${doc.id}">
-    ${data.subjectName} | Lớp ${data.grade} | ${data.name}
+    ${(data.subjectName || data.subject)}
+    | Lớp ${data.grade || ""}
+    | ${data.name}
 </option>
 `;
 
