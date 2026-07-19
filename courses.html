@@ -66,13 +66,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
         <!-- Thông báo -->
 
-        <button class="notification-btn">
+        <button class="notification-btn" id="notificationBtn">
 
-            <i class="fa-regular fa-bell"></i>
+    <i class="fa-regular fa-bell"></i>
 
-            <span class="badge">3</span>
+    <span
+        class="badge"
+        id="notificationBadge"
+        style="display:none;">
+        0
+    </span>
 
-        </button>
+</button>
 
         <div class="notification-panel" id="notificationPanel">
 
@@ -88,47 +93,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
             </div>
 
-            <div class="notification-list">
+            <div
+    class="notification-list"
+    id="notificationList">
+<div class="notification-empty">
 
-                <div class="notification-item unread">
+    <i class="fa-regular fa-bell-slash"></i>
 
-                    <div class="notification-icon">
+    <p>Chưa có thông báo nào.</p>
 
-                        <i class="fa-solid fa-book"></i>
-
-                    </div>
-
-                    <div class="notification-content">
-
-                        <h4>Có bài học mới</h4>
-
-                        <p>Chương Este đã được cập nhật.</p>
-
-                        <span>5 phút trước</span>
-
-                    </div>
-
-                </div>
-
-                <div class="notification-item">
-
-                    <div class="notification-icon">
-
-                        <i class="fa-solid fa-file-pen"></i>
-
-                    </div>
-
-                    <div class="notification-content">
-
-                        <h4>Đề thi thử mới</h4>
-
-                        <p>Đề số 05 đã mở.</p>
-
-                        <span>1 giờ trước</span>
-
-                    </div>
-
-                </div>
+</div>
 
             </div>
 
