@@ -9,12 +9,13 @@ from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import {
 
     doc,
-
     getDoc,
-
     getDocs,
-
-    collection
+    updateDoc,
+    collection,
+    query,
+    orderBy,
+    onSnapshot
 
 }
 
@@ -32,18 +33,28 @@ const closeNotification =
 document.getElementById("closeNotification");
 
 const notificationBadge =
-document.querySelector(".badge");
+document.getElementById("notificationBadge");
+
+const notificationList =
+document.getElementById("notificationList");
 
 notificationBtn.addEventListener("click",(e)=>{
 
     e.stopPropagation();
 
+    if(!auth.currentUser){
+
+        alert("Bạn cần đăng nhập để xem thông báo.");
+
+        return;
+
+    }
+
     notificationPanel.classList.toggle("active");
 
     if(notificationPanel.classList.contains("active")){
 
-        notificationBadge.style.opacity="0";
-        notificationBadge.style.transform="scale(0)";
+        markAllNotificationsAsRead();
 
     }
 
@@ -315,6 +326,183 @@ userGuide.addEventListener("click", () => {
     alert("Chức năng hướng dẫn đang được cập nhật.");
 
 });
+function showNotificationBadge(number){
+
+    if(number<=0){
+
+        notificationBadge.style.display="none";
+
+        return;
+
+    }
+
+    notificationBadge.style.display="flex";
+
+    notificationBadge.textContent=number;
+
+}
+function formatTime(timestamp){
+
+    if(!timestamp) return "Vừa xong";
+
+    const date=timestamp.toDate();
+
+    const now=new Date();
+
+    const diff=Math.floor((now-date)/1000);
+
+    if(diff<60) return "Vừa xong";
+
+    if(diff<3600)
+        return Math.floor(diff/60)+" phút trước";
+
+    if(diff<86400)
+        return Math.floor(diff/3600)+" giờ trước";
+
+    if(diff<172800)
+        return "Hôm qua";
+
+    if(diff<604800)
+        return Math.floor(diff/86400)+" ngày trước";
+
+    return date.toLocaleDateString("vi-VN");
+
+}
+function renderNotifications(list){
+
+    if(list.length===0){
+
+        notificationList.innerHTML=`
+
+        <div class="notification-empty">
+
+            <i class="fa-regular fa-bell-slash"></i>
+
+            <p>Chưa có thông báo nào.</p>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+    let html="";
+
+    list.forEach(item=>{
+
+        let icon="fa-solid fa-bullhorn";
+
+        switch(item.type){
+
+            case "lesson":
+
+                icon="fa-solid fa-book-open";
+
+                break;
+
+            case "test":
+
+                icon="fa-solid fa-file-pen";
+
+                break;
+
+        }
+
+        html+=`
+
+        <div class="notification-item">
+
+            <div class="notification-icon">
+
+                <i class="${icon}"></i>
+
+            </div>
+
+            <div class="notification-content">
+
+                <h4>${item.title}</h4>
+
+                <p>${item.content}</p>
+
+                <span>${formatTime(item.createdAt)}</span>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    notificationList.innerHTML=html;
+
+}
+function loadNotifications(){
+
+    const q=query(
+
+        collection(db,"notifications"),
+
+        orderBy("createdAt","desc")
+
+    );
+
+    onSnapshot(q,(snapshot)=>{
+
+        const notifications=[];
+
+        let unreadCount=0;
+
+        snapshot.forEach(doc=>{
+
+            const data=doc.data();
+
+            notifications.push(data);
+
+            if(!data.read){
+
+                unreadCount++;
+
+            }
+
+        });
+
+        renderNotifications(notifications);
+
+        showNotificationBadge(unreadCount);
+
+    });
+
+}
+async function markAllNotificationsAsRead(){
+
+    const snapshot=
+
+    await getDocs(collection(db,"notifications"));
+
+    snapshot.forEach(async(docItem)=>{
+
+        if(!docItem.data().read){
+
+            await updateDoc(
+
+                doc(db,"notifications",docItem.id),
+
+                {
+
+                    read:true
+
+                }
+
+            );
+
+        }
+
+    });
+
+}
 onAuthStateChanged(auth, async (user) => {
 
     currentUser = user;
@@ -323,11 +511,13 @@ onAuthStateChanged(auth, async (user) => {
 
         await loadUser(user.uid);
 
-        if(subject && grade){
+loadNotifications();
 
-            await loadSubjectCourses();
+if(subject && grade){
 
-        }
+    await loadSubjectCourses();
+
+}
 
     } else {
 
