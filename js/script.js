@@ -566,7 +566,11 @@ function renderNotifications(list){
 
                 <p>${item.content}</p>
 
-                <span>${item.time}</span>
+                <span>${
+    item.createdAt
+        ? item.createdAt.toDate().toLocaleString("vi-VN")
+        : "Vừa xong"
+}</span>
 
             </div>
 
