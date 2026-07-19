@@ -126,6 +126,15 @@ document.getElementById("accountList");
 
 const searchAccount =
 document.getElementById("searchAccount");
+
+const accountDetailModal =
+document.getElementById("accountDetailModal");
+
+const detailContent =
+document.getElementById("detailContent");
+
+const closeDetailBtn =
+document.getElementById("closeDetailBtn");
 const coursePage =
 document.getElementById("coursePage");
 
@@ -1269,8 +1278,17 @@ Khóa học
 ${htmlCourses}
 
 <button
-class="delete-account"
+class="detail-account"
+onclick="showAccountDetail('${userDoc.id}')">
 
+<i class="fa-solid fa-eye"></i>
+
+Xem chi tiết
+
+</button>
+
+<button
+class="delete-account"
 onclick="deleteStudent('${userDoc.id}')">
 
 🗑 Xóa tài khoản
@@ -1334,6 +1352,77 @@ async function(uid){
     loadDashboard();
 
 }
+window.showAccountDetail = async function(uid){
+
+    const userSnap = await getDoc(doc(db,"users",uid));
+
+    if(!userSnap.exists()) return;
+
+    const user = userSnap.data();
+
+    let htmlCourses = "";
+
+    const enrollSnap =
+    await getDoc(doc(db,"enrollments",uid));
+
+    if(enrollSnap.exists()){
+
+        const ids = enrollSnap.data().courses || [];
+
+        for(const id of ids){
+
+            const courseSnap =
+            await getDoc(doc(db,"courses",id));
+
+            if(courseSnap.exists()){
+
+                const c = courseSnap.data();
+
+                htmlCourses += `
+                    <li>
+                        📘 ${c.subjectName || c.subject} - ${c.name}
+                    </li>
+                `;
+            }
+        }
+    }
+
+    if(htmlCourses===""){
+
+        htmlCourses="<li>Chưa có khóa học.</li>";
+
+    }
+
+    detailContent.innerHTML = `
+
+        <h2>${user.name}</h2>
+
+        <p><b>Mã:</b> ${user.memberId}</p>
+
+        <p><b>Email:</b> ${user.email}</p>
+
+        <p><b>Vai trò:</b> ${user.role}</p>
+
+        <hr>
+
+        <h3>Khóa học</h3>
+
+        <ul>
+
+            ${htmlCourses}
+
+        </ul>
+
+    `;
+
+    accountDetailModal.style.display="flex";
+
+};
+closeDetailBtn.addEventListener("click",()=>{
+
+    accountDetailModal.style.display="none";
+
+});
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
