@@ -7,6 +7,8 @@ import {
 import {
     doc,
     getDoc,
+    getDocs,
+    updateDoc,
     collection,
     query,
     orderBy,
@@ -155,11 +157,11 @@ notificationBtn.addEventListener("click",(e)=>{
 
     notificationPanel.classList.toggle("active");
 
-    if(notificationPanel.classList.contains("active")){
+if(notificationPanel.classList.contains("active")){
 
-        hideNotificationBadge();
+    markAllNotificationsAsRead();
 
-    }
+}
 
 });
 /* Nút X */
@@ -657,6 +659,25 @@ onSnapshot(q,(snapshot)=>{
     showNotificationBadge(unreadCount);
 
 });
+
+}
+async function markAllNotificationsAsRead(){
+
+    const snapshot = await getDocs(collection(db,"notifications"));
+
+    snapshot.forEach(async(docItem)=>{
+
+        if(!docItem.data().read){
+
+            await updateDoc(doc(db,"notifications",docItem.id),{
+
+                read:true
+
+            });
+
+        }
+
+    });
 
 }
 onAuthStateChanged(auth, async (user) => {
