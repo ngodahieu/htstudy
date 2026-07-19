@@ -121,7 +121,11 @@ const teacherPage =
 document.getElementById("teacherPage");
 const accountPage =
 document.getElementById("accountPage");
+const accountList =
+document.getElementById("accountList");
 
+const searchAccount =
+document.getElementById("searchAccount");
 const coursePage =
 document.getElementById("coursePage");
 
@@ -403,7 +407,7 @@ menuTeachers.addEventListener("click",()=>{
     teacherPage.style.display="block";
 
 });
-menuAccounts.addEventListener("click",()=>{
+menuAccounts.addEventListener("click",async()=>{
 
     setActiveMenu(menuAccounts);
 
@@ -411,8 +415,9 @@ menuAccounts.addEventListener("click",()=>{
 
     accountPage.style.display="block";
 
-});
+    await loadAccounts();
 
+});
 menuCourses.addEventListener("click",async()=>{
 
     setActiveMenu(menuCourses);
@@ -1158,6 +1163,175 @@ window.deleteNotification=async function(id){
     await deleteDoc(doc(db,"notifications",id));
 
     loadNotifications();
+
+}
+async function loadAccounts(){
+
+    accountList.innerHTML="Đang tải...";
+
+    const snapshot =
+    await getDocs(
+
+        query(
+            collection(db,"users"),
+            where("role","==","Học sinh")
+        )
+
+    );
+
+    accountList.innerHTML="";
+
+    for(const userDoc of snapshot.docs){
+
+        const user=userDoc.data();
+
+        let htmlCourses="";
+
+        const enrollRef=
+        await getDoc(doc(db,"enrollments",userDoc.id));
+
+        if(enrollRef.exists()){
+
+            const ids=enrollRef.data().courses || [];
+
+            for(const id of ids){
+
+                const courseSnap=
+                await getDoc(doc(db,"courses",id));
+
+                if(courseSnap.exists()){
+
+                    const c=courseSnap.data();
+
+                    htmlCourses+=`
+
+                    <div class="course-line">
+
+                        <span>
+
+                        📘 ${c.subjectName} - ${c.name}
+
+                        </span>
+
+                        <button
+                        onclick="removeCourse('${userDoc.id}','${id}')">
+
+                        Gỡ
+
+                        </button>
+
+                    </div>
+
+                    `;
+
+                }
+
+            }
+
+        }
+
+        if(htmlCourses===""){
+
+            htmlCourses="<i>Chưa có khóa học.</i>";
+
+        }
+
+        accountList.innerHTML+=`
+
+<div class="account-card">
+
+<h3>
+
+${user.name}
+
+</h3>
+
+<p>
+
+${user.memberId}
+
+</p>
+
+<p>
+
+${user.email}
+
+</p>
+
+<hr>
+
+<h4>
+
+Khóa học
+
+</h4>
+
+${htmlCourses}
+
+<button
+class="delete-account"
+
+onclick="deleteStudent('${userDoc.id}')">
+
+🗑 Xóa tài khoản
+
+</button>
+
+</div>
+
+`;
+
+    }
+
+}
+window.removeCourse =
+async function(userId,courseId){
+
+    if(!confirm("Gỡ quyền khóa học này?")) return;
+
+    const ref=
+    doc(db,"enrollments",userId);
+
+    const snap=
+    await getDoc(ref);
+
+    if(!snap.exists()) return;
+
+    let list=snap.data().courses || [];
+
+    list=list.filter(id=>id!==courseId);
+
+    await updateDoc(ref,{
+
+        courses:list
+
+    });
+
+    loadAccounts();
+
+}
+window.deleteStudent =
+async function(uid){
+
+    if(!confirm("Xóa tài khoản học sinh?")) return;
+
+    await deleteDoc(doc(db,"users",uid));
+
+    const enroll=
+    doc(db,"enrollments",uid);
+
+    const snap=
+    await getDoc(enroll);
+
+    if(snap.exists()){
+
+        await deleteDoc(enroll);
+
+    }
+
+    loadAccounts();
+
+    loadDashboard();
 
 }
 /*====================================
