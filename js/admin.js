@@ -918,17 +918,15 @@ async function loadNotificationCourses(){
 
     snapshot.forEach(doc=>{
 
-        const data=doc.data();
+    const data = doc.data();
 
-        notificationCourse.innerHTML+=`
-
+    notificationCourse.innerHTML += `
         <option value="${doc.id}">
-    ${data.subjectName} ${data.grade} | Khóa: ${data.name}
-</option>
+            ${(data.subjectName || data.subject)} ${data.grade} | Khóa: ${data.name}
+        </option>
+    `;
 
-        `;
-
-    });
+});
 
 }
 notificationType.addEventListener("change",loadContentList);
