@@ -845,11 +845,11 @@ async function loadCoursesForEnrollment(){
 
         const data=doc.data();
 
-        enrollmentCourse.innerHTML+=`
-            <option value="${doc.id}">
-                ${data.name}
-            </option>
-        `;
+        enrollmentCourse.innerHTML += `
+<option value="${doc.id}">
+    ${data.subjectName} | Lớp ${data.grade} | ${data.name}
+</option>
+`;
 
     });
 
