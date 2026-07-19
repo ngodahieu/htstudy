@@ -1048,7 +1048,7 @@ notificationCourse.selectedIndex
 
         }
 
-        await addDoc(collection(db,"notifications"),{
+await addDoc(collection(db,"notifications"),{
 
     type,
 
@@ -1063,6 +1063,8 @@ notificationCourse.selectedIndex
     contentId,
 
     active:true,
+
+    read:false,
 
     createdAt:serverTimestamp()
 
