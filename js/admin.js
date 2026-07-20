@@ -126,7 +126,20 @@ document.getElementById("accountList");
 
 const searchAccount =
 document.getElementById("searchAccount");
+const filterRole =
+document.getElementById("filterRole");
 
+const totalAccounts =
+document.getElementById("totalAccounts");
+
+const studentAccounts =
+document.getElementById("studentAccounts");
+
+const teacherAccounts =
+document.getElementById("teacherAccounts");
+
+const adminAccounts =
+document.getElementById("adminAccounts");
 const accountDetailModal =
 document.getElementById("accountDetailModal");
 
