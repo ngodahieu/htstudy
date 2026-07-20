@@ -266,23 +266,99 @@ Quản trị toàn bộ hệ thống H&T STUDY.
 </div>
 
 <div class="dashboard-form">
-<input
-type="text"
-id="searchAccount"
-class="search-box"
-placeholder="Tìm theo tên, email hoặc mã..."
-autocomplete="off">
-<div
-id="accountList"
-class="account-list">
 
-<p class="empty">
+    <!-- Thanh thống kê -->
 
-Đang tải danh sách...
+    <div class="account-topbar">
 
-</p>
+        <div class="account-stat">
 
-</div>
+            <h2 id="totalAccounts">0</h2>
+
+            <span>Tổng tài khoản</span>
+
+        </div>
+
+        <div class="account-stat">
+
+            <h2 id="studentAccounts">0</h2>
+
+            <span>Học sinh</span>
+
+        </div>
+
+        <div class="account-stat">
+
+            <h2 id="teacherAccounts">0</h2>
+
+            <span>Giáo viên</span>
+
+        </div>
+
+        <div class="account-stat">
+
+            <h2 id="adminAccounts">1</h2>
+
+            <span>Admin</span>
+
+        </div>
+
+    </div>
+
+    <!-- Thanh tìm kiếm -->
+
+    <div class="account-toolbar">
+
+        <input
+            type="text"
+            id="searchAccount"
+            class="search-box"
+            placeholder="🔍 Tìm theo tên, email hoặc mã..."
+            autocomplete="off">
+
+        <select id="filterRole">
+
+            <option value="all">
+
+                Tất cả
+
+            </option>
+
+            <option value="Học sinh">
+
+                Học sinh
+
+            </option>
+
+            <option value="Giáo viên">
+
+                Giáo viên
+
+            </option>
+
+            <option value="Admin">
+
+                Admin
+
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- Danh sách -->
+
+    <div
+        id="accountList"
+        class="account-list">
+
+        <p class="empty">
+
+            Đang tải danh sách...
+
+        </p>
+
+    </div>
 
 </div>
 
