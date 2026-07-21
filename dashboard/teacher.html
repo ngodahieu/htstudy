@@ -121,7 +121,8 @@ Bài kiểm tra
 </button>
 
 <button
-class="menu-item">
+class="menu-item"
+id="menuNotifications">
 
 <i class="fa-solid fa-bullhorn"></i>
 
@@ -299,6 +300,146 @@ style="display:none;">
             Tạo tài khoản
 
         </button>
+
+    </div>
+
+</div>
+    <div id="notificationPage" style="display:none;">
+
+    <div class="dashboard-header">
+
+        <h1>
+            Quản lý thông báo
+        </h1>
+
+        <p>
+            Gửi thông báo theo từng khóa học hoặc toàn bộ học sinh.
+        </p>
+
+    </div>
+
+    <div class="dashboard-form">
+
+        <div class="form-group">
+
+            <label>
+                Loại thông báo
+            </label>
+
+            <select id="notificationType">
+
+                <option value="lesson">
+                    📚 Có bài học mới
+                </option>
+
+                <option value="test">
+                    📝 Có bài kiểm tra mới
+                </option>
+
+                <option value="general">
+                    📢 Thông báo chung
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Gửi đến
+            </label>
+
+            <select id="notificationCourse">
+
+    <option value="">
+
+        -- Chọn khóa học --
+
+    </option>
+
+</select>
+
+            <small class="auto-text">
+
+                Các khóa học sẽ được tải tự động từ Firestore.
+
+            </small>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Tiêu đề
+            </label>
+
+            <input
+                id="notificationTitle"
+                type="text"
+                placeholder="Ví dụ: Chương Este đã có bài mới">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Nội dung
+            </label>
+
+            <textarea
+                id="notificationContent"
+                rows="6"
+                placeholder="Nhập nội dung thông báo..."></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+    <label>
+
+        Bài học / Bài kiểm tra
+
+    </label>
+
+    <select id="notificationContentLink">
+
+        <option value="">
+
+            -- Chọn trước loại thông báo và khóa học --
+
+        </option>
+
+    </select>
+
+    <small class="auto-text">
+
+        Danh sách sẽ tự động thay đổi theo loại thông báo và khóa học.
+
+    </small>
+
+</div>
+        <button id="createNotificationBtn">
+
+            <i class="fa-solid fa-paper-plane"></i>
+
+            Gửi thông báo
+
+        </button>
+
+    </div>
+
+    <hr>
+
+    <h2 style="margin-top:40px">
+
+        Danh sách thông báo
+
+    </h2>
+
+    <div id="notificationList">
+
+        Đang tải...
 
     </div>
 
