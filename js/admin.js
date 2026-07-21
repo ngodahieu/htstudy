@@ -126,6 +126,7 @@ document.getElementById("accountList");
 
 const searchAccount =
 document.getElementById("searchAccount");
+let allStudents = [];
 const filterRole =
 document.getElementById("filterRole");
 
@@ -1202,7 +1203,7 @@ async function loadAccounts(){
     );
 
     accountList.innerHTML="";
-
+allStudents = snapshot.docs;
     for(const userDoc of snapshot.docs){
 
         const user=userDoc.data();
@@ -1488,6 +1489,29 @@ createNotificationBtn.addEventListener(
     createNotification
 
 );
+searchAccount.addEventListener("input", () => {
+
+    const keyword = searchAccount.value.trim().toLowerCase();
+
+    const cards = document.querySelectorAll(".account-card");
+
+    cards.forEach(card => {
+
+        const text = card.innerText.toLowerCase();
+
+        if(text.includes(keyword)){
+
+            card.style.display = "";
+
+        }else{
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+});
 logoutBtn.addEventListener("click",async()=>{
 
     await signOut(auth);
