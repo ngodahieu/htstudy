@@ -771,7 +771,7 @@ courseSubject.selectedIndex
             return;
         }
 
-        await addDoc(collection(db,"courses"),{
+ await addDoc(collection(db,"courses"),{
 
     subject,
 
@@ -785,12 +785,21 @@ courseSubject.selectedIndex
 
     image,
 
+    teacherId:"",
+
+    teacherName:"",
+
+    studentCount:0,
+
+    lessonCount:0,
+
+    testCount:0,
+
     active:true,
 
     createdAt:serverTimestamp()
 
 });
-
         alert("Đã tạo khóa học.");
 
         courseName.value="";
