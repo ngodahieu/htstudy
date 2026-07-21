@@ -21,7 +21,9 @@ import {
     arrayUnion,
     updateDoc,
     writeBatch,
-    Timestamp
+    Timestamp,
+    deleteField,
+    increment
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -1605,6 +1607,75 @@ async function loadPendingStudents(){
         `;
 
     });
+
+}
+
+window.approveStudent = async function(id){
+
+    const pendingRef = doc(db,"pendingStudents",id);
+
+    const pendingSnap = await getDoc(pendingRef);
+
+    if(!pendingSnap.exists()){
+
+        alert("Không tìm thấy yêu cầu.");
+
+        return;
+
+    }
+    const data = pendingSnap.data();
+    const response = await fetch(
+
+"http://localhost:3000/createStudent",
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+name:data.name,
+
+email:data.email,
+
+password:data.memberId,
+
+memberId:data.memberId
+
+})
+
+}
+
+);
+    const result = await response.json();
+
+if(!result.success){
+
+    alert(result.message);
+
+    return;
+
+}
+    await deleteDoc(pendingRef);
+    alert("Đã duyệt tài khoản.");
+
+await loadPendingStudents();
+
+await loadDashboard();
+}
+window.rejectStudent = async function(id){
+
+    if(!confirm("Từ chối yêu cầu này?")) return;
+
+    await deleteDoc(doc(db,"pendingStudents",id));
+
+    alert("Đã từ chối.");
+
+    loadPendingStudents();
 
 }
 /*====================================
