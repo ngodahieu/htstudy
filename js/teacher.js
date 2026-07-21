@@ -358,6 +358,223 @@ async function loadNotificationCourses(){
 });
 
 }
+notificationType.addEventListener("change",loadContentList);
+
+notificationCourse.addEventListener("change",loadContentList);
+async function loadContentList(){
+
+    notificationContentLink.innerHTML="";
+
+    const courseId=
+notificationCourse.value;
+
+const courseName=
+
+notificationCourse.options[
+notificationCourse.selectedIndex
+].text;
+    if(courseId===""){
+
+        notificationContentLink.innerHTML=
+        `<option value="">Chọn khóa học trước</option>`;
+
+        return;
+
+    }
+
+    if(notificationType.value==="general"){
+
+        notificationContentLink.innerHTML=
+        `<option value="">Không cần chọn</option>`;
+
+        notificationContentLink.disabled=true;
+
+        return;
+
+    }
+
+    notificationContentLink.disabled=false;
+
+    let collectionName="lessons";
+
+    if(notificationType.value==="test"){
+
+        collectionName="tests";
+
+    }
+
+    const snapshot=
+
+    await getDocs(
+
+        collection(
+
+            db,
+
+            "courses",
+
+            courseId,
+
+            collectionName
+
+        )
+
+    );
+
+    notificationContentLink.innerHTML="";
+
+    snapshot.forEach(doc=>{
+
+        const data=doc.data();
+
+        notificationContentLink.innerHTML+=`
+
+        <option value="${doc.id}">
+
+            ${data.title}
+
+        </option>
+
+        `;
+
+    });
+
+}
+/*====================================
+        GỬI THÔNG BÁO
+====================================*/
+
+async function createNotification(){
+
+    try{
+
+        const type = notificationType.value;
+
+        const courseId = notificationCourse.value;
+const courseName =
+notificationCourse.options[
+notificationCourse.selectedIndex
+].text;
+        const title = notificationTitle.value.trim();
+
+        const content = notificationContent.value.trim();
+
+        const contentId = notificationContentLink.value;
+
+        if(title===""){
+
+            alert("Nhập tiêu đề.");
+
+            return;
+
+        }
+
+        if(content===""){
+
+            alert("Nhập nội dung.");
+
+            return;
+
+        }
+
+await addDoc(collection(db,"notifications"),{
+
+    type,
+
+    courseId,
+
+    courseName,
+
+    title,
+
+    content,
+
+    contentId,
+
+    active:true,
+
+    read:false,
+
+    createdAt:serverTimestamp()
+
+});
+
+        alert("Đã gửi thông báo.");
+
+        notificationTitle.value="";
+
+        notificationContent.value="";
+
+        await loadNotifications();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(err.message);
+
+    }
+
+}
+/*====================================
+        LOAD THÔNG BÁO
+====================================*/
+
+async function loadNotifications(){
+
+    notificationList.innerHTML="Đang tải...";
+
+    const q=query(
+
+        collection(db,"notifications"),
+
+        orderBy("createdAt","desc")
+
+    );
+
+    const snapshot=await getDocs(q);
+
+    notificationList.innerHTML="";
+
+    snapshot.forEach(docItem=>{
+
+        const data=docItem.data();
+
+        notificationList.innerHTML += `
+
+<div class="course-item">
+
+<h3>${data.title}</h3>
+
+<p>
+
+<b>${data.courseName}</b>
+
+</p>
+
+<p>
+
+${data.content}
+
+</p>
+
+<button
+onclick="deleteNotification('${docItem.id}')">
+
+Xóa
+
+</button>
+
+</div>
+
+`;
+
+    });
+
+}
+
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
@@ -369,3 +586,7 @@ logoutBtn.addEventListener("click",async()=>{
     window.location.href="../index.html";
 
 });
+createNotificationBtn.addEventListener(
+    "click",
+    createNotification
+);
