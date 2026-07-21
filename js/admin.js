@@ -1183,65 +1183,7 @@ Xóa
     });
 
 }
-async function loadPendingStudents(){
 
-    pendingPage.querySelector(".dashboard-form").innerHTML="Đang tải...";
-
-    const snapshot=await getDocs(collection(db,"pendingStudents"));
-
-    let html="";
-
-    snapshot.forEach(docItem=>{
-
-        const data=docItem.data();
-
-        html+=`
-
-        <div class="account-card">
-
-            <h3>${data.name}</h3>
-
-            <p>${data.memberId}</p>
-
-            <p>${data.email}</p>
-
-            <p>
-
-                Giáo viên tạo:
-
-                <b>${data.teacherName}</b>
-
-            </p>
-
-            <button
-            onclick="approveStudent('${docItem.id}')">
-
-                ✅ Duyệt
-
-            </button>
-
-            <button
-            onclick="rejectStudent('${docItem.id}')">
-
-                ❌ Từ chối
-
-            </button>
-
-        </div>
-
-        `;
-
-    });
-
-    if(html===""){
-
-        html="<p>Không có tài khoản chờ duyệt.</p>";
-
-    }
-
-    pendingPage.querySelector(".dashboard-form").innerHTML=html;
-
-}
 /*====================================
         XÓA THÔNG BÁO
 ====================================*/
