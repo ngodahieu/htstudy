@@ -337,6 +337,27 @@ createStudentBtn.addEventListener(
     "click",
     createStudentAccount
 );
+async function loadNotificationCourses(){
+
+    notificationCourse.innerHTML=
+    `<option value="">-- Chọn khóa học --</option>`;
+
+    const snapshot=
+    await getDocs(collection(db,"courses"));
+
+    snapshot.forEach(doc=>{
+
+    const data = doc.data();
+
+    notificationCourse.innerHTML += `
+        <option value="${doc.id}">
+            ${(data.subjectName || data.subject)} ${data.grade} | Khóa: ${data.name}
+        </option>
+    `;
+
+});
+
+}
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
