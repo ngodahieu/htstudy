@@ -45,8 +45,13 @@ document.getElementById("createStudentBtn");
 
 const menuStudents =
 document.getElementById("menuStudents");
+
 const menuHome =
 document.getElementById("menuHome");
+
+const menuNotifications =
+document.getElementById("menuNotifications");
+
 const menuItems = document.querySelectorAll(".menu-item");
 
 function setActiveMenu(activeButton){
@@ -64,9 +69,11 @@ menuHome.addEventListener("click", () => {
 
     setActiveMenu(menuHome);
 
+    hideAllPages();
+
     dashboardHeader.style.display = "block";
+
     dashboardCards.style.display = "grid";
-    studentPage.style.display = "none";
 
 });
 const dashboardHeader =
@@ -77,9 +84,42 @@ document.querySelector(".dashboard-cards");
 
 const studentPage =
 document.getElementById("studentPage");
+const notificationPage =
+document.getElementById("notificationPage");
+const notificationType =
+document.getElementById("notificationType");
+
+const notificationCourse =
+document.getElementById("notificationCourse");
+
+const notificationContentLink =
+document.getElementById("notificationContentLink");
+
+const notificationTitle =
+document.getElementById("notificationTitle");
+
+const notificationContent =
+document.getElementById("notificationContent");
+
+const createNotificationBtn =
+document.getElementById("createNotificationBtn");
+
+const notificationList =
+document.getElementById("notificationList");
 let currentTeacherId = "";
 
 let currentTeacherName = "";
+function hideAllPages(){
+
+    dashboardHeader.style.display = "none";
+
+    dashboardCards.style.display = "none";
+
+    studentPage.style.display = "none";
+
+    notificationPage.style.display = "none";
+
+}
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
@@ -217,9 +257,22 @@ menuStudents.addEventListener("click", () => {
 
     setActiveMenu(menuStudents);
 
-    dashboardHeader.style.display = "none";
-    dashboardCards.style.display = "none";
+    hideAllPages();
+
     studentPage.style.display = "block";
+
+});
+menuNotifications.addEventListener("click", async () => {
+
+    setActiveMenu(menuNotifications);
+
+    hideAllPages();
+
+    notificationPage.style.display = "block";
+
+    await loadNotificationCourses();
+
+    await loadNotifications();
 
 });
 /*====================================
