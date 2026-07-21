@@ -13,7 +13,9 @@ import {
     query,
     where,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    orderBy,
+    deleteDoc
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -574,7 +576,15 @@ Xóa
     });
 
 }
+window.deleteNotification = async function(id){
 
+    if(!confirm("Xóa thông báo?")) return;
+
+    await deleteDoc(doc(db,"notifications",id));
+
+    loadNotifications();
+
+}
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
