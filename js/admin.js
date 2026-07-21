@@ -1193,14 +1193,15 @@ async function loadAccounts(){
     accountList.innerHTML="Đang tải...";
 
     const snapshot =
-    await getDocs(
+await getDocs(
 
-        query(
-            collection(db,"users"),
-            where("role","==","Học sinh")
-        )
+    query(
+        collection(db,"users"),
+        where("role","==","Học sinh"),
+        orderBy("memberId")
+    )
 
-    );
+);
 
     accountList.innerHTML="";
 allStudents = snapshot.docs;
