@@ -1258,55 +1258,27 @@ async function loadAccounts(){
 
         }
 
-        accountList.innerHTML+=`
+        accountList.innerHTML += `
 
 <div class="account-card">
 
-<h3>
+    <div>
 
-${user.name}
+        <h3>${user.name}</h3>
 
-</h3>
+        <p>${user.memberId}</p>
 
-<p>
+    </div>
 
-${user.memberId}
+    <button
+        class="detail-account"
+        onclick="showAccountDetail('${userDoc.id}')">
 
-</p>
+        <i class="fa-solid fa-eye"></i>
 
-<p>
+        Xem chi tiết
 
-${user.email}
-
-</p>
-
-<hr>
-
-<h4>
-
-Khóa học
-
-</h4>
-
-${htmlCourses}
-
-<button
-class="detail-account"
-onclick="showAccountDetail('${userDoc.id}')">
-
-<i class="fa-solid fa-eye"></i>
-
-Xem chi tiết
-
-</button>
-
-<button
-class="delete-account"
-onclick="deleteStudent('${userDoc.id}')">
-
-🗑 Xóa tài khoản
-
-</button>
+    </button>
 
 </div>
 
@@ -1392,10 +1364,37 @@ window.showAccountDetail = async function(uid){
                 const c = courseSnap.data();
 
                 htmlCourses += `
-                    <li>
-                        📘 ${c.subjectName || c.subject} - ${c.name}
-                    </li>
-                `;
+
+<div class="course-line">
+
+<div>
+
+<b>
+
+${c.subjectName || c.subject}
+
+</b>
+
+<br>
+
+Lớp ${c.grade}
+
+<br>
+
+${c.name}
+
+</div>
+
+<button
+onclick="removeCourse('${uid}','${id}')">
+
+Xóa
+
+</button>
+
+</div>
+
+`;
             }
         }
     }
@@ -1408,26 +1407,61 @@ window.showAccountDetail = async function(uid){
 
     detailContent.innerHTML = `
 
-        <h2>${user.name}</h2>
+<img
+class="detail-avatar"
+src="${user.avatar && user.avatar.trim()!=="" ? user.avatar : "../assets/avatars/default.jpg"}">
 
-        <p><b>Mã:</b> ${user.memberId}</p>
+<div class="detail-name">
 
-        <p><b>Email:</b> ${user.email}</p>
+${user.name}
 
-        <p><b>Vai trò:</b> ${user.role}</p>
+</div>
 
-        <hr>
+<div class="detail-role">
 
-        <h3>Khóa học</h3>
+${user.memberId}
 
-        <ul>
+</div>
 
-            ${htmlCourses}
+<div class="info-grid">
 
-        </ul>
+<div class="info-item">
 
-    `;
+<label>Email</label>
 
+<span>${user.email}</span>
+
+</div>
+
+<div class="info-item">
+
+<label>Mã học sinh</label>
+
+<span>${user.memberId}</span>
+
+</div>
+
+</div>
+
+<h3>
+
+Khóa học đã cấp
+
+</h3>
+
+${htmlCourses}
+
+<button
+class="delete-btn"
+onclick="deleteStudent('${uid}')">
+
+<i class="fa-solid fa-trash"></i>
+
+Xóa tài khoản
+
+</button>
+
+`;
     accountDetailModal.style.display="flex";
 
 };
