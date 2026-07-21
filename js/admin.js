@@ -19,7 +19,9 @@ import {
     serverTimestamp,
     setDoc,
     arrayUnion,
-    updateDoc
+    updateDoc,
+    writeBatch,
+    Timestamp
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -166,6 +168,8 @@ document.getElementById("notificationPage");
 
 const pendingPage =
 document.getElementById("pendingPage");
+const pendingList =
+document.getElementById("pendingList");
 const enrollmentPage =
 document.getElementById("enrollmentPage");
 const enrollmentStudent =
@@ -497,13 +501,15 @@ menuNotifications.addEventListener("click", async ()=>{
 
 });
 
-menuPending.addEventListener("click",()=>{
+menuPending.addEventListener("click",async()=>{
 
     setActiveMenu(menuPending);
 
     hideAllPages();
 
     pendingPage.style.display="block";
+
+    await loadPendingStudents();
 
 });
 
@@ -1175,6 +1181,65 @@ Xóa
     });
 
 }
+async function loadPendingStudents(){
+
+    pendingPage.querySelector(".dashboard-form").innerHTML="Đang tải...";
+
+    const snapshot=await getDocs(collection(db,"pendingStudents"));
+
+    let html="";
+
+    snapshot.forEach(docItem=>{
+
+        const data=docItem.data();
+
+        html+=`
+
+        <div class="account-card">
+
+            <h3>${data.name}</h3>
+
+            <p>${data.memberId}</p>
+
+            <p>${data.email}</p>
+
+            <p>
+
+                Giáo viên tạo:
+
+                <b>${data.teacherName}</b>
+
+            </p>
+
+            <button
+            onclick="approveStudent('${docItem.id}')">
+
+                ✅ Duyệt
+
+            </button>
+
+            <button
+            onclick="rejectStudent('${docItem.id}')">
+
+                ❌ Từ chối
+
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+    if(html===""){
+
+        html="<p>Không có tài khoản chờ duyệt.</p>";
+
+    }
+
+    pendingPage.querySelector(".dashboard-form").innerHTML=html;
+
+}
 /*====================================
         XÓA THÔNG BÁO
 ====================================*/
@@ -1472,6 +1537,76 @@ closeDetailBtn.addEventListener("click",()=>{
     accountDetailModal.style.display="none";
 
 });
+async function loadPendingStudents(){
+
+    pendingList.innerHTML = "Đang tải...";
+
+    const snapshot =
+    await getDocs(collection(db,"pendingStudents"));
+
+    pendingList.innerHTML = "";
+
+    if(snapshot.empty){
+
+        pendingList.innerHTML = `
+        <p class="empty">
+            Không có yêu cầu nào.
+        </p>
+        `;
+
+        return;
+
+    }
+
+    snapshot.forEach(docItem=>{
+
+        const data = docItem.data();
+
+        pendingList.innerHTML += `
+
+        <div class="account-card">
+
+            <h3>${data.name}</h3>
+
+            <p>${data.memberId}</p>
+
+            <p>${data.email}</p>
+
+            <p>
+
+                <b>Giáo viên tạo:</b>
+
+                ${data.teacherName}
+
+            </p>
+
+            <div class="account-actions">
+
+                <button
+                class="edit-btn"
+                onclick="approveStudent('${docItem.id}')">
+
+                    ✔ Duyệt
+
+                </button>
+
+                <button
+                class="delete-btn"
+                onclick="rejectStudent('${docItem.id}')">
+
+                    ✖ Từ chối
+
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
