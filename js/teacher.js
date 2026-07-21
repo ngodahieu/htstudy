@@ -11,7 +11,9 @@ import {
     getDocs,
     collection,
     query,
-    where
+    where,
+    addDoc,
+    serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -75,6 +77,9 @@ document.querySelector(".dashboard-cards");
 
 const studentPage =
 document.getElementById("studentPage");
+let currentTeacherId = "";
+
+let currentTeacherName = "";
 /*====================================
         SINH MÃ HỌC SINH
 ====================================*/
@@ -168,7 +173,9 @@ onAuthStateChanged(auth, async (user)=>{
 
     const data =
     docSnap.data();
+currentTeacherId = user.uid;
 
+currentTeacherName = data.name;
     /*=========================
             KIỂM TRA QUYỀN
     =========================*/
@@ -244,55 +251,32 @@ studentIdInput.value;
 
     }
 
-    const response = await fetch(
-        "http://localhost:3000/createStudent",
-        {
+await addDoc(collection(db,"pendingStudents"),{
 
-            method:"POST",
+    name:name,
 
-            headers:{
-                "Content-Type":"application/json"
-            },
+    email:email,
 
-            body:JSON.stringify({
+    memberId:memberId,
 
-                name:name,
+    teacherId:currentTeacherId,
 
-                email:email,
+    teacherName:currentTeacherName,
 
-                password:memberId,
+    status:"pending",
 
-                memberId:memberId
+    createdAt:serverTimestamp()
 
-            })
+});
 
-        }
-    );
+alert("Đã gửi yêu cầu tạo tài khoản.\nVui lòng chờ Admin phê duyệt.");
 
-    const result = await response.json();
+studentName.value="";
 
-    if(result.success){
+studentEmail.value="";
 
-        alert(
-`Đã tạo thành công!
-
-Email: ${email}
-
-Mật khẩu: ${memberId}`
-        );
-
-        studentName.value="";
-
-        studentEmail.value="";
-
-        studentIdInput.value=
-        await generateMemberId();
-await loadDashboard();
-    }else{
-
-        alert(result.message);
-
-    }
+studentIdInput.value=
+await generateMemberId();
 
 }
 
