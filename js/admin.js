@@ -771,7 +771,7 @@ courseSubject.selectedIndex
             return;
         }
 
- await addDoc(collection(db,"courses"),{
+await addDoc(collection(db,"courses"),{
 
     subject,
 
