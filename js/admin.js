@@ -201,6 +201,20 @@ document.getElementById("createCourseBtn");
 
 const courseList =
 document.getElementById("courseList");
+const menuTeacherCourses =
+document.getElementById("menuTeacherCourses");
+
+const teacherCoursePage =
+document.getElementById("teacherCoursePage");
+
+const assignTeacher =
+document.getElementById("assignTeacher");
+
+const assignTeacherCourse =
+document.getElementById("assignTeacherCourse");
+
+const assignTeacherBtn =
+document.getElementById("assignTeacherBtn");
 /*==============================
     THÔNG BÁO
 ==============================*/
@@ -248,7 +262,9 @@ function hideAllPages(){
     accountPage.style.display="none";
 
     coursePage.style.display="none";
-
+    
+    teacherCoursePage.style.display = "none";
+    
     videoPage.style.display="none";
 
     documentPage.style.display="none";
@@ -456,6 +472,19 @@ menuCourses.addEventListener("click",async()=>{
     coursePage.style.display="block";
 
     await loadCourses();
+
+});
+menuTeacherCourses.addEventListener("click", async()=>{
+
+    setActiveMenu(menuTeacherCourses);
+
+    hideAllPages();
+
+    teacherCoursePage.style.display="block";
+
+    await loadTeachersForAssign();
+
+    await loadCoursesForTeacherAssign();
 
 });
 
@@ -760,7 +789,13 @@ courseSubject.selectedIndex
         const name = courseName.value.trim();
         const description = courseDescription.value.trim();
         const image = courseImage.value.trim();
+        const teacherId =
+courseTeacher.value;
 
+const teacherName =
+courseTeacher.options[
+courseTeacher.selectedIndex
+].text;
         if(subject===""){
             alert("Vui lòng chọn môn học.");
             return;
@@ -896,6 +931,62 @@ async function loadCoursesForEnrollment(){
     | Lớp ${data.grade || ""}
     | ${data.name}
 </option>
+`;
+
+    });
+
+}
+async function loadTeachersForAssign(){
+
+    assignTeacher.innerHTML="";
+
+    const q=query(
+
+        collection(db,"users"),
+
+        where("role","==","Giáo viên")
+
+    );
+
+    const snapshot=await getDocs(q);
+
+    snapshot.forEach(docItem=>{
+
+        const data=docItem.data();
+
+        assignTeacher.innerHTML+=`
+
+<option value="${docItem.id}">
+
+${data.name}
+
+</option>
+
+`;
+
+    });
+
+}
+async function loadCoursesForTeacherAssign(){
+
+    assignTeacherCourse.innerHTML="";
+
+    const snapshot=
+
+    await getDocs(collection(db,"courses"));
+
+    snapshot.forEach(docItem=>{
+
+        const data=docItem.data();
+
+        assignTeacherCourse.innerHTML+=`
+
+<option value="${docItem.id}">
+
+${data.subjectName} - Lớp ${data.grade} - ${data.name}
+
+</option>
+
 `;
 
     });
