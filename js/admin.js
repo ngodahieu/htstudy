@@ -195,7 +195,8 @@ document.getElementById("courseDescription");
 
 const courseImage =
 document.getElementById("courseImage");
-
+const courseTeacher =
+document.getElementById("courseTeacher");
 const createCourseBtn =
 document.getElementById("createCourseBtn");
 
@@ -386,7 +387,7 @@ teacherCreateId.value=id;
 await loadDashboard();
 
 await loadSubjects();
-
+await loadTeachers();
 hideAllPages();
 
 homePage.style.display="block";
@@ -820,9 +821,9 @@ await addDoc(collection(db,"courses"),{
 
     image,
 
-    teacherId:"",
+    teacherId,
 
-    teacherName:"",
+    teacherName,
 
     studentCount:0,
 
