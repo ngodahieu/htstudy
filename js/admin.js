@@ -207,7 +207,14 @@ document.getElementById("menuTeacherCourses");
 
 const teacherCoursePage =
 document.getElementById("teacherCoursePage");
+const lessonPage =
+document.getElementById("lessonPage");
 
+const documentManagePage =
+document.getElementById("documentManagePage");
+
+const testManagePage =
+document.getElementById("testManagePage");
 const assignTeacher =
 document.getElementById("assignTeacher");
 
@@ -263,9 +270,9 @@ function hideAllPages(){
     accountPage.style.display="none";
 
     coursePage.style.display="none";
-    
-    teacherCoursePage.style.display = "none";
-    
+
+    teacherCoursePage.style.display="none";
+
     videoPage.style.display="none";
 
     documentPage.style.display="none";
@@ -277,6 +284,12 @@ function hideAllPages(){
     pendingPage.style.display="none";
 
     enrollmentPage.style.display="none";
+
+    lessonPage.style.display="none";
+
+    documentManagePage.style.display="none";
+
+    testManagePage.style.display="none";
 
 }
 /*====================================
