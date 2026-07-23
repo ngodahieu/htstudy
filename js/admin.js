@@ -4,7 +4,6 @@ import {
     signOut
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
 import {
     doc,
     getDoc,
@@ -26,41 +25,28 @@ import {
     increment
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-/*====================================
-        LẤY CÁC THÀNH PHẦN HTML
-====================================*/
-
 const adminName =
 document.getElementById("adminName");
-
 const adminRole =
 document.getElementById("adminRole");
-
 const adminAvatar =
 document.getElementById("adminAvatar");
-
 const logoutBtn =
 document.getElementById("logoutBtn");
-
 const studentIdInput =
 document.getElementById("studentId");
 const studentName =
 document.getElementById("studentName");
-
 const studentEmail =
 document.getElementById("studentEmail");
-
 const createStudentBtn =
 document.getElementById("createStudentBtn");
 const teacherCreateId =
 document.getElementById("teacherCreateId");
-
 const teacherCreateName =
 document.getElementById("teacherCreateName");
-
 const teacherCreateEmail =
 document.getElementById("teacherCreateEmail");
-
 const createTeacherBtn =
 document.getElementById("createTeacherBtn");
 const menuStudents =
@@ -71,52 +57,36 @@ const menuHome =
 document.getElementById("menuHome");
 const menuAccounts =
 document.getElementById("menuAccounts");
-
 const menuCourses =
 document.getElementById("menuCourses");
 const menuEnrollments =
 document.getElementById("menuEnrollments");
 const menuVideos =
 document.getElementById("menuVideos");
-
 const menuDocuments =
 document.getElementById("menuDocuments");
-
 const menuTests =
 document.getElementById("menuTests");
-
 const menuNotifications =
 document.getElementById("menuNotifications");
-
 const menuPending =
 document.getElementById("menuPending");
 const menuItems = document.querySelectorAll(".menu-item");
-
 function setActiveMenu(activeButton){
-
     menuItems.forEach(item => {
-
         item.classList.remove("active");
-
     });
-
     activeButton.classList.add("active");
-
 }
 menuHome.addEventListener("click",()=>{
-
     setActiveMenu(menuHome);
-
     hideAllPages();
-
     homePage.style.display="block";
-
 });
 const homePage =
 document.getElementById("homePage");
 const dashboardHeader =
 document.querySelector("#homePage .dashboard-header");
-
 const dashboardCards =
 document.querySelector("#homePage .dashboard-cards");
 const studentPage =
@@ -127,22 +97,17 @@ const accountPage =
 document.getElementById("accountPage");
 const accountList =
 document.getElementById("accountList");
-
 const searchAccount =
 document.getElementById("searchAccount");
 let allStudents = [];
 const filterRole =
 document.getElementById("filterRole");
-
 const totalAccounts =
 document.getElementById("totalAccounts");
-
 const studentAccounts =
 document.getElementById("studentAccounts");
-
 const teacherAccounts =
 document.getElementById("teacherAccounts");
-
 const adminAccounts =
 document.getElementById("adminAccounts");
 const accountDetailModal =
@@ -603,6 +568,32 @@ async function loadSubjects(){
             `;
 
         }
+
+    });
+
+}
+async function loadTeachers(){
+
+    courseTeacher.innerHTML =
+    `<option value="">-- Chọn giáo viên --</option>`;
+
+    const q = query(
+        collection(db,"users"),
+        where("role","==","Giáo viên"),
+        orderBy("name")
+    );
+
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach(docItem=>{
+
+        const data = docItem.data();
+
+        courseTeacher.innerHTML += `
+            <option value="${docItem.id}">
+                ${data.name}
+            </option>
+        `;
 
     });
 
@@ -1691,52 +1682,31 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-
 body:JSON.stringify({
-
 name:data.name,
-
 email:data.email,
-
 password:data.memberId,
-
 memberId:data.memberId
-
 })
-
 }
-
 );
     const result = await response.json();
 
 if(!result.success){
-
     alert(result.message);
-
     return;
-
 }
     await deleteDoc(pendingRef);
     alert("Đã duyệt tài khoản.");
-
 await loadPendingStudents();
-
 await loadDashboard();
 }
 window.rejectStudent = async function(id){
-
     if(!confirm("Từ chối yêu cầu này?")) return;
-
     await deleteDoc(doc(db,"pendingStudents",id));
-
     alert("Đã từ chối.");
-
     loadPendingStudents();
-
 }
-/*====================================
-        ĐĂNG XUẤT
-====================================*/
 createCourseBtn.addEventListener(
     "click",
     createCourse
@@ -1746,39 +1716,22 @@ assignCourseBtn.addEventListener(
     assignCourse
 );
 createNotificationBtn.addEventListener(
-
     "click",
-
     createNotification
-
 );
 searchAccount.addEventListener("input", () => {
-
     const keyword = searchAccount.value.trim().toLowerCase();
-
     const cards = document.querySelectorAll(".account-card");
-
     cards.forEach(card => {
-
         const text = card.innerText.toLowerCase();
-
         if(text.includes(keyword)){
-
             card.style.display = "";
-
         }else{
-
             card.style.display = "none";
-
         }
-
     });
-
 });
 logoutBtn.addEventListener("click",async()=>{
-
     await signOut(auth);
-
     window.location.href="../index.html";
-
 });
