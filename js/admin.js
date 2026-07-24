@@ -231,8 +231,6 @@ function hideAllPages(){
     notificationPage.style.display="none";
     pendingPage.style.display="none";
     enrollmentPage.style.display="none";
-    documentManagePage.style.display="none";
-    testManagePage.style.display="none";
 }
 /*====================================
         SINH MÃ HỌC SINH
