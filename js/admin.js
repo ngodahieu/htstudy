@@ -112,24 +112,18 @@ const adminAccounts =
 document.getElementById("adminAccounts");
 const accountDetailModal =
 document.getElementById("accountDetailModal");
-
 const detailContent =
 document.getElementById("detailContent");
-
 const closeDetailBtn =
 document.getElementById("closeDetailBtn");
 const coursePage =
 document.getElementById("coursePage");
-
 const videoPage =
 document.getElementById("videoPage");
-
 const documentPage =
 document.getElementById("documentPage");
-
 const testPage =
 document.getElementById("testPage");
-
 const notificationPage =
 document.getElementById("notificationPage");
 
@@ -225,37 +219,21 @@ console.log("testPage", testPage);
 console.log("notificationPage", notificationPage);
 console.log("pendingPage", pendingPage);
 function hideAllPages(){
-
     homePage.style.display="none";
-
     studentPage.style.display="none";
-
     teacherPage.style.display="none";
-
     accountPage.style.display="none";
-
     coursePage.style.display="none";
-
     teacherCoursePage.style.display="none";
-
     videoPage.style.display="none";
-
     documentPage.style.display="none";
-
     testPage.style.display="none";
-
     notificationPage.style.display="none";
-
     pendingPage.style.display="none";
-
     enrollmentPage.style.display="none";
-
     lessonPage.style.display="none";
-
     documentManagePage.style.display="none";
-
     testManagePage.style.display="none";
-
 }
 /*====================================
         SINH MÃ HỌC SINH
