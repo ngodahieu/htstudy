@@ -861,6 +861,10 @@ async function loadCourses(){
 
         <p>Lớp : ${data.grade}</p>
 
+        <p>
+Giáo viên:
+${data.teacherName || "Chưa phân công"}
+</p>
         <p>${data.description}</p>
 
     </div>
