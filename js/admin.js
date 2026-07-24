@@ -972,6 +972,51 @@ ${data.subject} - Lớp ${data.grade} - ${data.name}
     });
 
 }
+async function assignTeacherToCourse(){
+
+    const teacherId = assignTeacher.value;
+
+    const courseId = assignTeacherCourse.value;
+
+    if(teacherId==="" || courseId===""){
+
+        alert("Vui lòng chọn giáo viên và khóa học.");
+
+        return;
+
+    }
+
+    const teacherSnap =
+    await getDoc(doc(db,"users",teacherId));
+
+    if(!teacherSnap.exists()){
+
+        alert("Không tìm thấy giáo viên.");
+
+        return;
+
+    }
+
+    const teacher =
+    teacherSnap.data();
+
+    await updateDoc(
+
+        doc(db,"courses",courseId),
+
+        {
+
+            teacherId:teacherId,
+
+            teacherName:teacher.name
+
+        }
+
+    );
+
+    alert("Đã phân công giáo viên.");
+
+}
 /*====================================
         CẤP QUYỀN KHÓA HỌC
 ====================================*/
@@ -1689,6 +1734,10 @@ createCourseBtn.addEventListener(
 assignCourseBtn.addEventListener(
     "click",
     assignCourse
+);
+assignTeacherBtn.addEventListener(
+    "click",
+    assignTeacherToCourse
 );
 createNotificationBtn.addEventListener(
     "click",
