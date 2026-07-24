@@ -963,7 +963,7 @@ async function loadCoursesForTeacherAssign(){
 
 <option value="${docItem.id}">
 
-${data.subjectName} - Lớp ${data.grade} - ${data.name}
+${data.subject} - Lớp ${data.grade} - ${data.name}
 
 </option>
 
