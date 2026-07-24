@@ -851,25 +851,39 @@ async function loadCourses(){
 
     const data = courseDoc.data();
 
-    courseList.innerHTML += `
+courseList.innerHTML += `
 
-    <div class="course-item">
+<div class="course-item">
 
-        <h3>${data.name}</h3>
+<h3>${data.name}</h3>
 
-        <p>Môn học : ${data.subjectName || data.subject}</p>
+<p>Môn học: ${data.subjectName || data.subject}</p>
 
-        <p>Lớp : ${data.grade}</p>
+<p>Lớp: ${data.grade}</p>
 
-        <p>
-Giáo viên:
+<p>Giáo viên:
 ${data.teacherName || "Chưa phân công"}
 </p>
-        <p>${data.description}</p>
 
-    </div>
+<p>${data.description}</p>
 
-    `;
+<button
+onclick="changeTeacher('${courseDoc.id}')">
+
+Đổi giáo viên
+
+</button>
+
+<button
+onclick="removeTeacher('${courseDoc.id}')">
+
+Hủy phân công
+
+</button>
+
+</div>
+
+`;
 
 });
 
@@ -1759,7 +1773,31 @@ searchAccount.addEventListener("input", () => {
         }
     });
 });
+window.changeTeacher = async function(courseId){
+
+    const teacherId =
+    prompt("Nhập ID giáo viên mới:");
+
+    if(!teacherId) return;
+
+}
 logoutBtn.addEventListener("click",async()=>{
     await signOut(auth);
     window.location.href="../index.html";
 });
+window.removeTeacher = async function(courseId){
+
+    if(!confirm("Hủy phân công giáo viên?"))
+        return;
+
+    await updateDoc(
+        doc(db,"courses",courseId),
+        {
+            teacherId:"",
+            teacherName:""
+        }
+    );
+
+    await loadCourses();
+
+}
