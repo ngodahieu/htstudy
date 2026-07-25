@@ -100,6 +100,7 @@ document.getElementById("accountList");
 const searchAccount =
 document.getElementById("searchAccount");
 let allStudents = [];
+let currentCourseId = "";
 const filterRole =
 document.getElementById("filterRole");
 const totalAccounts =
@@ -206,6 +207,17 @@ document.getElementById("createNotificationBtn");
 
 const notificationList =
 document.getElementById("notificationList");
+const changeTeacherModal =
+document.getElementById("changeTeacherModal");
+
+const changeTeacherSelect =
+document.getElementById("changeTeacherSelect");
+
+const saveTeacherBtn =
+document.getElementById("saveTeacherBtn");
+
+const cancelTeacherBtn =
+document.getElementById("cancelTeacherBtn");
 console.log("dashboardHeader", dashboardHeader);
 console.log("dashboardCards", dashboardCards);
 
@@ -1775,12 +1787,38 @@ searchAccount.addEventListener("input", () => {
 });
 window.changeTeacher = async function(courseId){
 
-    const teacherId =
-    prompt("Nhập ID giáo viên mới:");
+    currentCourseId = courseId;
 
-    if(!teacherId) return;
+    changeTeacherSelect.innerHTML = "";
+
+    const q = query(
+        collection(db,"users"),
+        where("role","==","Giáo viên"),
+        orderBy("name")
+    );
+
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach(docItem=>{
+
+        const data = docItem.data();
+
+        changeTeacherSelect.innerHTML += `
+            <option value="${docItem.id}">
+                ${data.name}
+            </option>
+        `;
+
+    });
+
+    changeTeacherModal.style.display = "flex";
 
 }
+cancelTeacherBtn.addEventListener("click",()=>{
+
+    changeTeacherModal.style.display = "none";
+
+});
 logoutBtn.addEventListener("click",async()=>{
     await signOut(auth);
     window.location.href="../index.html";
