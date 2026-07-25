@@ -653,7 +653,7 @@ async function loadMyCourses(){
 
             <p>
 
-                📚 ${course.subjectName}
+                📚 ${course.subject}
 
             </p>
 
