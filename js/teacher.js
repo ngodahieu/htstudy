@@ -86,6 +86,14 @@ document.querySelector(".dashboard-cards");
 
 const studentPage =
 document.getElementById("studentPage");
+const menuCourses =
+document.getElementById("menuCourses");
+
+const coursePage =
+document.getElementById("coursePage");
+
+const teacherCourseList =
+document.getElementById("teacherCourseList");
 const notificationPage =
 document.getElementById("notificationPage");
 const notificationType =
@@ -118,7 +126,7 @@ function hideAllPages(){
     dashboardCards.style.display = "none";
 
     studentPage.style.display = "none";
-
+    coursePage.style.display = "none";
     notificationPage.style.display = "none";
 
 }
@@ -262,6 +270,17 @@ menuStudents.addEventListener("click", () => {
     hideAllPages();
 
     studentPage.style.display = "block";
+
+});
+menuCourses.addEventListener("click", async()=>{
+
+    setActiveMenu(menuCourses);
+
+    hideAllPages();
+
+    coursePage.style.display="block";
+
+    await loadMyCourses();
 
 });
 menuNotifications.addEventListener("click", async () => {
