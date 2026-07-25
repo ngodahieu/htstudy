@@ -15,7 +15,8 @@ import {
     addDoc,
     serverTimestamp,
     orderBy,
-    deleteDoc
+    deleteDoc,
+    getCountFromServer
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*====================================
@@ -602,6 +603,77 @@ window.deleteNotification = async function(id){
     await deleteDoc(doc(db,"notifications",id));
 
     loadNotifications();
+
+}
+/*====================================
+        KHÓA HỌC CỦA TÔI
+====================================*/
+
+async function loadMyCourses(){
+
+    teacherCourseList.innerHTML = "Đang tải...";
+
+    const q = query(
+
+        collection(db,"courses"),
+
+        where("teacherId","==",currentTeacherId)
+
+    );
+
+    const snapshot = await getDocs(q);
+
+    teacherCourseList.innerHTML = "";
+
+    if(snapshot.empty){
+
+        teacherCourseList.innerHTML = `
+
+        <div class="empty">
+
+            Bạn chưa được phân công khóa học nào.
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+    snapshot.forEach(courseDoc=>{
+
+        const course = courseDoc.data();
+
+        teacherCourseList.innerHTML += `
+
+        <div class="course-item">
+
+            <h3>${course.name}</h3>
+
+            <p>
+
+                📚 ${course.subjectName}
+
+            </p>
+
+            <p>
+
+                🎓 Lớp ${course.grade}
+
+            </p>
+
+            <button>
+
+                Quản lý khóa học
+
+            </button>
+
+        </div>
+
+        `;
+
+    });
 
 }
 /*====================================
