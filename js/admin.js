@@ -1819,6 +1819,28 @@ cancelTeacherBtn.addEventListener("click",()=>{
     changeTeacherModal.style.display = "none";
 
 });
+saveTeacherBtn.addEventListener("click", async ()=>{
+
+    const teacherId =
+    changeTeacherSelect.value;
+
+    const teacherName =
+    changeTeacherSelect.options[
+        changeTeacherSelect.selectedIndex
+    ].text;
+    await updateDoc(
+    doc(db,"courses",currentCourseId),
+    {
+        teacherId: teacherId,
+        teacherName: teacherName
+    }
+);
+    changeTeacherModal.style.display = "none";
+
+await loadCourses();
+
+alert("Đã cập nhật giáo viên.");
+});
 logoutBtn.addEventListener("click",async()=>{
     await signOut(auth);
     window.location.href="../index.html";
