@@ -95,6 +95,13 @@ document.getElementById("coursePage");
 
 const teacherCourseList =
 document.getElementById("teacherCourseList");
+const courseManagePage =
+document.getElementById("courseManagePage");
+
+const manageCourseTitle =
+document.getElementById("manageCourseTitle");
+
+let currentCourseId = "";
 const notificationPage =
 document.getElementById("notificationPage");
 const notificationType =
@@ -128,6 +135,7 @@ function hideAllPages(){
 
     studentPage.style.display = "none";
     coursePage.style.display = "none";
+    courseManagePage.style.display = "none";
     notificationPage.style.display = "none";
 
 }
@@ -663,17 +671,34 @@ async function loadMyCourses(){
 
             </p>
 
-            <button>
+            <button
+onclick="openCourse('${courseDoc.id}')">
 
-                Quản lý khóa học
+Quản lý khóa học
 
-            </button>
+</button>
 
         </div>
 
         `;
 
     });
+
+}
+window.openCourse = async function(courseId){
+
+    currentCourseId = courseId;
+
+    const snap = await getDoc(doc(db,"courses",courseId));
+
+    const data = snap.data();
+
+    hideAllPages();
+
+    courseManagePage.style.display = "block";
+
+    manageCourseTitle.textContent =
+    data.name;
 
 }
 /*====================================
