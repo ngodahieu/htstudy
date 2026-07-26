@@ -101,8 +101,15 @@ document.getElementById("courseManagePage");
 
 const manageCourseTitle =
 document.getElementById("manageCourseTitle");
+
 const backToCoursesBtn =
 document.getElementById("backToCoursesBtn");
+
+const createChapterBtn =
+document.getElementById("createChapterBtn");
+
+const chapterList =
+document.getElementById("chapterList");
 let currentCourseId = "";
 const notificationPage =
 document.getElementById("notificationPage");
