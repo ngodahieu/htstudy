@@ -110,6 +110,17 @@ document.getElementById("createChapterBtn");
 
 const chapterList =
 document.getElementById("chapterList");
+const backCourseBtn =
+document.getElementById("backCourseBtn");
+backCourseBtn.addEventListener("click", async ()=>{
+
+    hideAllPages();
+
+    coursePage.style.display="block";
+
+    await loadMyCourses();
+
+});
 let currentCourseId = "";
 const notificationPage =
 document.getElementById("notificationPage");
