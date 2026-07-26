@@ -334,31 +334,14 @@ class="course-list">
 </div>
 
 </div>
-    <div id="courseManager" style="display:none;">
-
-    <button id="backCourseBtn">
-
-        ← Quay lại
-
-    </button>
-
-    <h2 id="courseManagerTitle">
-
-    </h2>
-
-    <button id="createChapterBtn">
-
-        + Tạo chương
-
-    </button>
-
-    <div id="chapterList">
-
-    </div>
-
-</div>
     <div id="courseManagePage" style="display:none;">
+        <button id="backToCoursesBtn" class="back-btn">
 
+    <i class="fa-solid fa-arrow-left"></i>
+
+    Quay lại danh sách khóa học
+
+</button>
     <div class="dashboard-header">
 
         <h1 id="manageCourseTitle">
@@ -376,7 +359,29 @@ class="course-list">
     </div>
 
     <div class="dashboard-form">
+        <div class="chapter-toolbar">
 
+    <button id="createChapterBtn" class="primary-btn">
+
+        <i class="fa-solid fa-plus"></i>
+
+        Tạo chương
+
+    </button>
+
+</div>
+
+<div id="chapterList" class="chapter-list">
+
+    <p class="empty">
+
+        Chưa có chương nào.
+
+    </p>
+
+</div>
+
+<hr style="margin:24px 0">
         <div class="manage-grid">
 
             <button class="manage-card" id="btnChapters">
