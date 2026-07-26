@@ -1929,3 +1929,200 @@ transition:.3s;
 opacity:1;
 
 }
+/*==================================
+      TEACHER COURSES
+==================================*/
+
+.course-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:25px;
+    margin-top:30px;
+}
+
+.course-item{
+
+    background:#fff;
+
+    border-radius:22px;
+
+    padding:25px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+
+    border:1px solid #eef2f7;
+
+    transition:.35s;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.course-item::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:6px;
+
+    background:linear-gradient(90deg,#2563eb,#60a5fa);
+
+}
+
+.course-item:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 20px 45px rgba(37,99,235,.18);
+
+}
+
+.course-item h3{
+
+    color:#2563eb;
+
+    margin-bottom:12px;
+
+    font-size:23px;
+
+}
+
+.course-item p{
+
+    margin:10px 0;
+
+    color:#555;
+
+}
+
+.course-item button{
+
+    margin-top:20px;
+
+    width:100%;
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:14px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.course-item button:hover{
+
+    background:#1d4ed8;
+
+}
+/*==================================
+      COURSE MANAGER
+==================================*/
+
+.manage-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:25px;
+
+}
+
+.manage-card{
+
+    background:white;
+
+    border:none;
+
+    border-radius:22px;
+
+    padding:45px 20px;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.08);
+
+    transition:.35s;
+
+}
+
+.manage-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 22px 45px rgba(37,99,235,.18);
+
+    background:#2563eb;
+
+    color:white;
+
+}
+@media(max-width:900px){
+
+.manage-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:600px){
+
+.manage-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+#backCourseBtn{
+
+padding:12px 22px;
+
+border:none;
+
+border-radius:12px;
+
+background:#2563eb;
+
+color:white;
+
+cursor:pointer;
+
+margin-bottom:25px;
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+#backCourseBtn:hover{
+
+background:#1d4ed8;
+
+}
