@@ -2126,3 +2126,134 @@ transition:.3s;
 background:#1d4ed8;
 
 }
+/*==================================
+        CHAPTER LIST
+==================================*/
+
+.course-top-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    margin:25px 0;
+
+}
+
+#createChapterBtn{
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:14px 22px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+#createChapterBtn:hover{
+
+    background:#1d4ed8;
+
+}
+
+.chapter-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    border-left:6px solid #2563eb;
+
+}
+
+.chapter-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.chapter-title{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#2563eb;
+
+}
+
+.chapter-actions{
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+.chapter-actions button{
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 16px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+}
+
+.addLesson{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.addVideo{
+
+    background:#22c55e;
+
+    color:white;
+
+}
+
+.addPdf{
+
+    background:#f59e0b;
+
+    color:white;
+
+}
+
+.addTest{
+
+    background:#ef4444;
+
+    color:white;
+
+}
