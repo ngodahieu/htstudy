@@ -95,12 +95,14 @@ document.getElementById("coursePage");
 
 const teacherCourseList =
 document.getElementById("teacherCourseList");
+
 const courseManagePage =
 document.getElementById("courseManagePage");
 
 const manageCourseTitle =
 document.getElementById("manageCourseTitle");
-
+const backToCoursesBtn =
+document.getElementById("backToCoursesBtn");
 let currentCourseId = "";
 const notificationPage =
 document.getElementById("notificationPage");
@@ -698,9 +700,18 @@ window.openCourse = async function(courseId){
     courseManagePage.style.display = "block";
 
     manageCourseTitle.textContent =
-    data.name;
+`${data.subjectName || data.subject} ${data.grade} - ${data.name}`;
 
 }
+backToCoursesBtn.addEventListener("click",async()=>{
+
+    hideAllPages();
+
+    coursePage.style.display="block";
+
+    await loadMyCourses();
+
+});
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
