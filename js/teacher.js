@@ -1482,4 +1482,85 @@ createNotificationBtn.addEventListener(
     "click",
     createNotification
 );
+uploadPdfBtn.addEventListener(
+    "click",
+    uploadPdf
+);
 let uploadedVideoLink = "";
+let uploadedPdfLink = "";
+
+const CLOUD_NAME = "xhljajy6";
+const UPLOAD_PRESET = "htstudy";
+async function uploadPdf(){
+
+    const file = pdfFile.files[0];
+
+    if(!file){
+
+        alert("Vui lòng chọn file PDF.");
+
+        return;
+
+    }
+
+    pdfResult.textContent = "Đang upload...";
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    formData.append("resource_type", "raw");
+
+    try{
+
+        const response = await fetch(
+
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`,
+
+            {
+
+                method:"POST",
+
+                body:formData
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if(data.secure_url){
+
+            uploadedPdfLink = data.secure_url;
+
+            pdfResult.innerHTML =
+
+            `<a href="${uploadedPdfLink}" target="_blank">
+
+            ✔ Upload thành công
+
+            </a>`;
+
+        }
+
+        else{
+
+            console.log(data);
+
+            alert("Upload thất bại.");
+
+        }
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert("Có lỗi khi upload.");
+
+    }
+
+}
