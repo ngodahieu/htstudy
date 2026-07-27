@@ -1517,27 +1517,17 @@ async function uploadVideo(){
 
         try{
 
-            const response = await fetch(API_URL,{
+            const formData = new FormData();
 
-                method:"POST",
+formData.append("type", "videos");
+formData.append("fileName", file.name);
+formData.append("mimeType", file.type);
+formData.append("base64", base64);
 
-                headers:{
-                    "Content-Type":"application/json"
-                },
-
-                body:JSON.stringify({
-
-                    type:"videos",
-
-                    fileName:file.name,
-
-                    mimeType:file.type,
-
-                    base64:base64
-
-                })
-
-            });
+const response = await fetch(API_URL,{
+    method:"POST",
+    body:formData
+});
 
             const result =
             await response.json();
