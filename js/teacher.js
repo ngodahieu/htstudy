@@ -138,7 +138,41 @@ document.getElementById("lessonDescription");
 
 const lessonOrder =
 document.getElementById("lessonOrder");
+const videoFile =
+document.getElementById("videoFile");
 
+const pdfFile =
+document.getElementById("pdfFile");
+
+const imageFile =
+document.getElementById("imageFile");
+
+const documentFile =
+document.getElementById("documentFile");
+
+const uploadVideoBtn =
+document.getElementById("uploadVideoBtn");
+
+const uploadPdfBtn =
+document.getElementById("uploadPdfBtn");
+
+const uploadImageBtn =
+document.getElementById("uploadImageBtn");
+
+const uploadDocumentBtn =
+document.getElementById("uploadDocumentBtn");
+
+const videoResult =
+document.getElementById("videoResult");
+
+const pdfResult =
+document.getElementById("pdfResult");
+
+const imageResult =
+document.getElementById("imageResult");
+
+const documentResult =
+document.getElementById("documentResult");
 const saveLesson =
 document.getElementById("saveLesson");
 
@@ -928,7 +962,7 @@ async function saveNewLesson(){
                 description,
 
                 order,
-
+                video: uploadedVideoLink,
                 createdAt:serverTimestamp()
 
             }
@@ -944,7 +978,11 @@ async function saveNewLesson(){
     lessonDescription.value = "";
 
     lessonOrder.value = "";
+    videoFile.value = "";
 
+videoResult.textContent = "";
+
+uploadedVideoLink = "";
     lessonModal.style.display = "none";
 
     await loadLessons();
@@ -1439,3 +1477,74 @@ createNotificationBtn.addEventListener(
     "click",
     createNotification
 );
+const API_URL =
+"https://script.google.com/macros/s/AKfycby83GUj7ZfxC5TzzGysgWfahHo7i2YzvP67WJ5T4JkzOBwxCMvVk5iiRCPA_IYF9dg/exec";
+/*====================================
+        UPLOAD VIDEO
+====================================*/
+
+let uploadedVideoLink = "";
+
+uploadVideoBtn.addEventListener("click", uploadVideo);
+
+async function uploadVideo(){
+
+    if(videoFile.files.length === 0){
+
+        alert("Vui lòng chọn video.");
+
+        return;
+
+    }
+
+    const file = videoFile.files[0];
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append("folder", "Videos");
+
+    videoResult.textContent = "Đang upload...";
+
+    try{
+
+        const response = await fetch(API_URL,{
+
+            method:"POST",
+
+            body:formData
+
+        });
+
+        const result = await response.json();
+
+        if(result.success){
+
+            uploadedVideoLink = result.url;
+
+            videoResult.innerHTML = `
+                ✅ Upload thành công
+                <br>
+                <a href="${result.url}" target="_blank">
+                    Xem video
+                </a>
+            `;
+
+        }else{
+
+            alert(result.message);
+
+        }
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(err.message);
+
+    }
+
+}
