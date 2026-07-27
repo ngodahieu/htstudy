@@ -112,6 +112,20 @@ document.getElementById("createChapterBtn");
 
 const chapterList =
 document.getElementById("chapterList");
+const chapterModal =
+document.getElementById("chapterModal");
+
+const chapterTitle =
+document.getElementById("chapterTitle");
+
+const chapterDescription =
+document.getElementById("chapterDescription");
+
+const saveChapter =
+document.getElementById("saveChapter");
+
+const cancelChapter =
+document.getElementById("cancelChapter");
 const backCourseBtn =
 document.getElementById("backCourseBtn");
 backCourseBtn.addEventListener("click", async ()=>{
@@ -721,6 +735,7 @@ window.openCourse = async function(courseId){
 
     manageCourseTitle.textContent =
 `${data.subjectName || data.subject} ${data.grade} - ${data.name}`;
+    await loadChapters();
 
 }
 backToCoursesBtn.addEventListener("click",async()=>{
@@ -732,6 +747,132 @@ backToCoursesBtn.addEventListener("click",async()=>{
     await loadMyCourses();
 
 });
+createChapterBtn.addEventListener("click",()=>{
+
+    chapterModal.style.display="flex";
+
+});
+cancelChapter.addEventListener("click",()=>{
+
+    chapterModal.style.display="none";
+
+});
+async function saveNewChapter(){
+
+    const title =
+    chapterTitle.value.trim();
+
+    const description =
+    chapterDescription.value.trim();
+
+    if(title===""){
+
+        alert("Nhập tên chương.");
+
+        return;
+
+    }
+
+    const id =
+    "chapter_"+Date.now();
+
+    await setDoc(
+
+        doc(
+            db,
+            "courses",
+            currentCourseId,
+            "chapters",
+            id
+        ),
+
+        {
+
+            title,
+
+            description,
+
+            createdAt:serverTimestamp()
+
+        }
+
+    );
+
+    chapterTitle.value="";
+
+    chapterDescription.value="";
+
+    chapterModal.style.display="none";
+
+    loadChapters();
+
+}
+saveChapter.addEventListener(
+    "click",
+    saveNewChapter
+);
+async function loadChapters(){
+
+    chapterList.innerHTML="Đang tải...";
+
+    const snapshot =
+    await getDocs(
+
+        collection(
+            db,
+            "courses",
+            currentCourseId,
+            "chapters"
+        )
+
+    );
+
+    chapterList.innerHTML="";
+
+    if(snapshot.empty){
+
+        chapterList.innerHTML=`
+
+        <p class="empty">
+
+            Chưa có chương nào.
+
+        </p>
+
+        `;
+
+        return;
+
+    }
+
+    snapshot.forEach(chapter=>{
+
+        const data =
+        chapter.data();
+
+        chapterList.innerHTML += `
+
+        <div class="chapter-card">
+
+            <h3>
+
+                ${data.title}
+
+            </h3>
+
+            <p>
+
+                ${data.description}
+
+            </p>
+
+        </div>
+
+        `;
+
+    });
+
+}
 /*====================================
         ĐĂNG XUẤT
 ====================================*/
