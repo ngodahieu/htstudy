@@ -138,8 +138,6 @@ document.getElementById("lessonDescription");
 
 const lessonOrder =
 document.getElementById("lessonOrder");
-const videoFile =
-document.getElementById("videoFile");
 
 const pdfFile =
 document.getElementById("pdfFile");
@@ -150,9 +148,6 @@ document.getElementById("imageFile");
 const documentFile =
 document.getElementById("documentFile");
 
-const uploadVideoBtn =
-document.getElementById("uploadVideoBtn");
-
 const uploadPdfBtn =
 document.getElementById("uploadPdfBtn");
 
@@ -161,10 +156,11 @@ document.getElementById("uploadImageBtn");
 
 const uploadDocumentBtn =
 document.getElementById("uploadDocumentBtn");
+const videoLink =
+document.getElementById("videoLink");
 
 const videoResult =
 document.getElementById("videoResult");
-
 const pdfResult =
 document.getElementById("pdfResult");
 
@@ -934,9 +930,11 @@ async function saveNewLesson(){
     else{
 
         const lessonId = "lesson_" + Date.now();
-        if(uploadedVideoLink===""){
+        uploadedVideoLink = videoLink.value.trim();
 
-    alert("Bạn chưa upload video.");
+if(uploadedVideoLink===""){
+
+    alert("Vui lòng nhập link YouTube.");
 
     return;
 
@@ -985,7 +983,7 @@ async function saveNewLesson(){
     lessonDescription.value = "";
 
     lessonOrder.value = "";
-    videoFile.value = "";
+    videoLink.value = "";
 
 videoResult.textContent = "";
 
@@ -1484,90 +1482,4 @@ createNotificationBtn.addEventListener(
     "click",
     createNotification
 );
-const API_URL =
-"https://script.google.com/macros/s/AKfycby83GUj7ZfxC5TzzGysgWfahHo7i2YzvP67WJ5T4JkzOBwxCMvVk5iiRCPA_IYF9dg/exec";
-/*====================================
-        UPLOAD VIDEO
-====================================*/
-
 let uploadedVideoLink = "";
-
-uploadVideoBtn.addEventListener("click", uploadVideo);
-
-async function uploadVideo(){
-
-    if(videoFile.files.length===0){
-
-        alert("Chọn video trước.");
-
-        return;
-
-    }
-
-    const file = videoFile.files[0];
-
-    videoResult.textContent="Đang upload...";
-
-    const reader = new FileReader();
-
-    reader.onload = async function(){
-
-        const base64 =
-        reader.result.split(",")[1];
-
-        try{
-
-            const formData = new FormData();
-
-formData.append("type", "videos");
-formData.append("fileName", file.name);
-formData.append("mimeType", file.type);
-formData.append("base64", base64);
-
-const response = await fetch(API_URL,{
-    method:"POST",
-    body:formData
-});
-
-            const result =
-            await response.json();
-
-            if(result.success){
-
-                uploadedVideoLink =
-                result.download;
-
-                videoResult.innerHTML=
-                `
-                ✅ Upload thành công
-                <br>
-                <a href="${result.download}" target="_blank">
-
-                Mở video
-
-                </a>
-                `;
-
-            }
-
-            else{
-
-                alert(result.message);
-
-            }
-
-        }
-
-        catch(err){
-
-            console.log(err);
-
-            alert(err);
-
-        }
-
-    }
-
-    reader.readAsDataURL(file);
-
-}
