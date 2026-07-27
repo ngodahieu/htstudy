@@ -1226,7 +1226,7 @@ backToCoursesBtn.addEventListener("click",async()=>{
     await loadMyCourses();
 
 });
-createChapterBtn.addEventListener(()=>{
+createChapterBtn.addEventListener("click",()=>{
 
     editingChapterId = "";
 
