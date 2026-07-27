@@ -939,7 +939,13 @@ if(uploadedVideoLink===""){
     return;
 
 }
+if(uploadedPdfLink===""){
 
+    alert("Vui lòng upload file PDF.");
+
+    return;
+
+}
         await setDoc(
 
             doc(
@@ -961,16 +967,13 @@ if(uploadedVideoLink===""){
             ),
 
             {
-
-                title,
-
-                description,
-
-                order,
-                video: uploadedVideoLink,
-                createdAt:serverTimestamp()
-
-            }
+    title,
+    description,
+    order,
+    video: uploadedVideoLink,
+    pdf: uploadedPdfLink,
+    createdAt: serverTimestamp()
+}
 
         );
 
@@ -988,6 +991,11 @@ if(uploadedVideoLink===""){
 videoResult.textContent = "";
 
 uploadedVideoLink = "";
+    pdfFile.value = "";
+
+pdfResult.textContent = "";
+
+uploadedPdfLink = "";
     lessonModal.style.display = "none";
 
     await loadLessons();
