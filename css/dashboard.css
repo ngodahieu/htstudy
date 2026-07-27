@@ -740,8 +740,8 @@ z-index:9998;
 
 .modal-content{
 box-shadow:0 25px 60px rgba(0,0,0,.25);
-width:420px;
-
+width:650px;
+max-width:95%;
 background:white;
 
 border-radius:18px;
@@ -1231,7 +1231,7 @@ color:white;
 }
 button{
 
-font-family:"Poppins",sans-serif;
+font-family:"Times New Roman", Times, serif;
 
 }
 
@@ -1400,23 +1400,6 @@ min-height:56px;
     gap:20px;
 
 }
-
-.course-item{
-
-    padding:20px;
-
-    border-radius:15px;
-
-    background:#fff;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-}
-
 .course-item h3{
 
     margin-bottom:5px;
@@ -2087,9 +2070,9 @@ transition:.3s;
 
 }
 
-#backCourseBtn:hover{
+#backToCoursesBtn:hover{
 
-background:#1d4ed8;
+    background:#1d4ed8;
 
 }
 /*==================================
@@ -2328,5 +2311,143 @@ background:#1d4ed8;
 #cancelChapter:hover{
 
 background:#cfcfcf;
+
+}
+/*==================================
+        LESSON MANAGER
+==================================*/
+
+.lesson-card{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    border-left:6px solid #22c55e;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    transition:.3s;
+
+}
+
+.lesson-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 18px 40px rgba(34,197,94,.18);
+
+}
+
+.lesson-card h3{
+
+    color:#16a34a;
+
+    margin-bottom:10px;
+
+}
+
+.lesson-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:20px;
+
+}
+
+.lesson-actions button{
+
+    border:none;
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+.lesson-open{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+.lesson-edit{
+
+    background:#22c55e;
+
+    color:white;
+
+}
+
+.lesson-delete{
+
+    background:#ef4444;
+
+    color:white;
+
+}
+
+#lessonTitle,
+#lessonDescription,
+#lessonOrder{
+
+    width:100%;
+
+    padding:15px;
+
+    border:2px solid #e5e7eb;
+
+    border-radius:12px;
+
+    margin-top:8px;
+
+}
+
+#saveLesson{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+#cancelLesson{
+
+    background:#ddd;
+
+}
+
+#saveLesson:hover{
+
+    background:#1d4ed8;
+
+}
+
+#cancelLesson:hover{
+
+    background:#cfcfcf;
+
+}
+@media(max-width:700px){
+
+.lesson-actions{
+
+    flex-direction:column;
+
+}
+
+.chapter-actions{
+
+    flex-direction:column;
+
+}
 
 }
