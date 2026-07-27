@@ -112,6 +112,41 @@ document.getElementById("createChapterBtn");
 
 const chapterList =
 document.getElementById("chapterList");
+const lessonPage =
+document.getElementById("lessonPage");
+
+const lessonPageTitle =
+document.getElementById("lessonPageTitle");
+
+const lessonList =
+document.getElementById("lessonList");
+
+const backToChapterBtn =
+document.getElementById("backToChapterBtn");
+
+const createLessonBtn =
+document.getElementById("createLessonBtn");
+
+const lessonModal =
+document.getElementById("lessonModal");
+
+const lessonTitle =
+document.getElementById("lessonTitle");
+
+const lessonDescription =
+document.getElementById("lessonDescription");
+
+const lessonOrder =
+document.getElementById("lessonOrder");
+
+const saveLesson =
+document.getElementById("saveLesson");
+
+const cancelLesson =
+document.getElementById("cancelLesson");
+
+let currentChapterId = "";
+let editingLessonId = "";
 const chapterModal =
 document.getElementById("chapterModal");
 
@@ -128,6 +163,7 @@ const cancelChapter =
 document.getElementById("cancelChapter");
 
 let currentCourseId = "";
+let editingChapterId = "";
 const notificationPage =
 document.getElementById("notificationPage");
 const notificationType =
@@ -163,7 +199,7 @@ function hideAllPages(){
     coursePage.style.display = "none";
     courseManagePage.style.display = "none";
     notificationPage.style.display = "none";
-
+    lessonPage.style.display = "none";
 }
 /*====================================
         SINH MÃ HỌC SINH
@@ -748,6 +784,439 @@ window.openCourse = async function(courseId){
     await loadChapters();
 
 }
+window.openChapter = async function(chapterId,title){
+
+    currentChapterId = chapterId;
+
+    hideAllPages();
+
+    lessonPage.style.display="block";
+
+    lessonPageTitle.textContent =
+    "Bài học - " + title;
+
+    await loadLessons();
+
+}
+backToChapterBtn.addEventListener("click",async()=>{
+
+    hideAllPages();
+
+    courseManagePage.style.display="block";
+
+    await loadChapters();
+
+});
+createLessonBtn.addEventListener("click",()=>{
+
+    editingLessonId = "";
+
+    lessonTitle.value = "";
+
+    lessonDescription.value = "";
+
+    lessonOrder.value = "";
+
+    lessonModal.style.display="flex";
+
+});
+cancelLesson.addEventListener("click",()=>{
+
+    lessonModal.style.display="none";
+
+});
+saveLesson.addEventListener(
+    "click",
+    saveNewLesson
+);
+async function saveNewLesson(){
+
+    const title = lessonTitle.value.trim();
+
+    const description = lessonDescription.value.trim();
+
+    const order = Number(lessonOrder.value);
+
+    if(title===""){
+
+        alert("Nhập tên bài học.");
+
+        return;
+
+    }
+
+    if(order<=0){
+
+        alert("Thứ tự không hợp lệ.");
+
+        return;
+
+    }
+
+    // ==========================
+    // ĐANG SỬA
+    // ==========================
+
+    if(editingLessonId !== ""){
+
+        await updateDoc(
+
+            doc(
+
+                db,
+
+                "courses",
+
+                currentCourseId,
+
+                "chapters",
+
+                currentChapterId,
+
+                "lessons",
+
+                editingLessonId
+
+            ),
+
+            {
+
+                title,
+
+                description,
+
+                order
+
+            }
+
+        );
+
+    }
+
+    // ==========================
+    // THÊM MỚI
+    // ==========================
+
+    else{
+
+        const lessonId = "lesson_" + Date.now();
+
+        await setDoc(
+
+            doc(
+
+                db,
+
+                "courses",
+
+                currentCourseId,
+
+                "chapters",
+
+                currentChapterId,
+
+                "lessons",
+
+                lessonId
+
+            ),
+
+            {
+
+                title,
+
+                description,
+
+                order,
+
+                createdAt:serverTimestamp()
+
+            }
+
+        );
+
+    }
+
+    editingLessonId = "";
+
+    lessonTitle.value = "";
+
+    lessonDescription.value = "";
+
+    lessonOrder.value = "";
+
+    lessonModal.style.display = "none";
+
+    await loadLessons();
+
+}
+async function loadLessons(){
+
+    lessonList.innerHTML = "Đang tải...";
+
+    const q = query(
+
+        collection(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            currentChapterId,
+
+            "lessons"
+
+        ),
+
+        orderBy("order")
+
+    );
+
+    const snapshot = await getDocs(q);
+
+    lessonList.innerHTML = "";
+
+    if(snapshot.empty){
+
+        lessonList.innerHTML = `
+
+        <p class="empty">
+
+            Chưa có bài học nào.
+
+        </p>
+
+        `;
+
+        return;
+
+    }
+
+    snapshot.forEach(lesson=>{
+
+        const data = lesson.data();
+
+        lessonList.innerHTML += `
+
+<div class="chapter-card">
+
+    <h3>
+
+        ${data.order}. ${data.title}
+
+    </h3>
+
+    <p>
+
+        ${data.description || ""}
+
+    </p>
+
+    <div class="chapter-actions">
+
+        <button
+        class="chapter-edit"
+        onclick="editLesson('${lesson.id}')">
+
+            Sửa
+
+        </button>
+
+        <button
+        class="chapter-delete"
+        onclick="deleteLesson('${lesson.id}')">
+
+            Xóa
+
+        </button>
+
+    </div>
+
+</div>
+
+`;
+
+    });
+
+}
+window.deleteLesson = async function(lessonId){
+
+    if(!confirm("Bạn có chắc muốn xóa bài học này?")){
+
+        return;
+
+    }
+
+    await deleteDoc(
+
+        doc(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            currentChapterId,
+
+            "lessons",
+
+            lessonId
+
+        )
+
+    );
+
+    await loadLessons();
+
+}
+window.editChapter = async function(chapterId){
+
+    editingChapterId = chapterId;
+
+    const snap = await getDoc(
+
+        doc(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            chapterId
+
+        )
+
+    );
+
+    if(!snap.exists()){
+
+        alert("Không tìm thấy chương.");
+
+        return;
+
+    }
+
+    const data = snap.data();
+
+    chapterTitle.value = data.title;
+
+    chapterDescription.value = data.description || "";
+
+    chapterModal.style.display = "flex";
+
+}
+window.deleteChapter = async function(chapterId){
+
+    if(!confirm("Bạn có chắc muốn xóa chương này?")){
+
+        return;
+
+    }
+
+    const lessonSnapshot = await getDocs(
+
+        collection(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            chapterId,
+
+            "lessons"
+
+        )
+
+    );
+
+    if(!lessonSnapshot.empty){
+
+        alert("Chương vẫn còn bài học.\nHãy xóa hết bài học trước.");
+
+        return;
+
+    }
+
+    await deleteDoc(
+
+        doc(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            chapterId
+
+        )
+
+    );
+
+    await loadChapters();
+
+}
+window.editLesson = async function(lessonId){
+
+    editingLessonId = lessonId;
+
+    const snap = await getDoc(
+
+        doc(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            currentChapterId,
+
+            "lessons",
+
+            lessonId
+
+        )
+
+    );
+
+    if(!snap.exists()){
+
+        alert("Không tìm thấy bài học.");
+
+        return;
+
+    }
+
+    const data = snap.data();
+
+    lessonTitle.value = data.title;
+
+    lessonDescription.value = data.description || "";
+
+    lessonOrder.value = data.order;
+
+    lessonModal.style.display = "flex";
+
+}
 backToCoursesBtn.addEventListener("click",async()=>{
 
     hideAllPages();
@@ -757,9 +1226,15 @@ backToCoursesBtn.addEventListener("click",async()=>{
     await loadMyCourses();
 
 });
-createChapterBtn.addEventListener("click",()=>{
+createChapterBtn.addEventListener(()=>{
 
-    chapterModal.style.display="flex";
+    editingChapterId = "";
+
+    chapterTitle.value = "";
+
+    chapterDescription.value = "";
+
+    chapterModal.style.display = "flex";
 
 });
 cancelChapter.addEventListener("click",()=>{
@@ -783,17 +1258,53 @@ async function saveNewChapter(){
 
     }
 
-    const id =
-    "chapter_"+Date.now();
+if(editingChapterId !== ""){
+
+    await updateDoc(
+
+        doc(
+
+            db,
+
+            "courses",
+
+            currentCourseId,
+
+            "chapters",
+
+            editingChapterId
+
+        ),
+
+        {
+
+            title,
+
+            description
+
+        }
+
+    );
+
+}
+else{
+
+    const id = "chapter_" + Date.now();
 
     await setDoc(
 
         doc(
+
             db,
+
             "courses",
+
             currentCourseId,
+
             "chapters",
+
             id
+
         ),
 
         {
@@ -808,9 +1319,12 @@ async function saveNewChapter(){
 
     );
 
+}
+
     chapterTitle.value="";
 
     chapterDescription.value="";
+    editingChapterId = "";
 
     chapterModal.style.display="none";
 
@@ -872,19 +1386,38 @@ const snapshot = await getDocs(q);
 
         <div class="chapter-card">
 
-            <h3>
+    <h3>${data.title}</h3>
 
-                ${data.title}
+    <p>${data.description}</p>
 
-            </h3>
+<div class="chapter-actions">
 
-            <p>
+    <button
+    class="chapter-edit"
+    onclick="openChapter('${chapter.id}','${data.title}')">
 
-                ${data.description}
+        Quản lý bài học
 
-            </p>
+    </button>
 
-        </div>
+    <button
+    class="chapter-edit"
+    onclick="editChapter('${chapter.id}')">
+
+        Sửa
+
+    </button>
+    <button
+class="chapter-delete"
+onclick="deleteChapter('${chapter.id}')">
+
+    Xóa
+
+</button>
+
+</div>
+
+</div>
 
         `;
 
