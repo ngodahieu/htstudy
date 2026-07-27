@@ -794,7 +794,7 @@ async function saveNewChapter(){
 
     chapterModal.style.display="none";
 
-    loadChapters();
+    await loadChapters();
 
 }
 saveChapter.addEventListener(
