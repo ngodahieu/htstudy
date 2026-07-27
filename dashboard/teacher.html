@@ -383,6 +383,65 @@ class="course-list">
     </div>
 
 </div>
+    <div id="lessonPage" style="display:none;">
+
+    <button
+        id="backToChapterBtn"
+        class="back-btn">
+
+        <i class="fa-solid fa-arrow-left"></i>
+
+        Quay lại danh sách chương
+
+    </button>
+
+    <div class="dashboard-header">
+
+        <h1 id="lessonPageTitle">
+
+            Quản lý bài học
+
+        </h1>
+
+        <p>
+
+            Tạo và quản lý các bài học thuộc chương này.
+
+        </p>
+
+    </div>
+
+    <div class="dashboard-form">
+
+        <div class="chapter-toolbar">
+
+            <button
+                id="createLessonBtn"
+                class="primary-btn">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Tạo bài học
+
+            </button>
+
+        </div>
+
+        <div
+            id="lessonList"
+            class="chapter-list">
+
+            <div class="empty">
+
+    Chưa có bài học nào.
+
+</div>
+
+        </div>
+
+    </div>
+
+</div>
     <div id="notificationPage" style="display:none;">
 
     <div class="dashboard-header">
@@ -560,6 +619,78 @@ class="course-list">
             <button id="saveChapter">
 
                 Lưu chương
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+    <div id="lessonModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2>
+
+            Tạo bài học mới
+
+        </h2>
+
+        <div class="form-group">
+
+            <label>
+
+                Tên bài học
+
+            </label>
+
+            <input
+                type="text"
+                id="lessonTitle">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Mô tả
+
+            </label>
+
+            <textarea
+                id="lessonDescription"
+                rows="4"></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                Thứ tự bài học
+
+            </label>
+
+            <input
+                type="number"
+                id="lessonOrder"
+                min="1">
+
+        </div>
+
+        <div class="modal-buttons">
+
+            <button id="cancelLesson">
+
+                Hủy
+
+            </button>
+
+            <button id="saveLesson">
+
+                Lưu bài học
 
             </button>
 
