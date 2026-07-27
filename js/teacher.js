@@ -398,8 +398,15 @@ async function loadNotificationCourses(){
     notificationCourse.innerHTML=
     `<option value="">-- Chọn khóa học --</option>`;
 
-    const snapshot=
-    await getDocs(collection(db,"courses"));
+    const q = query(
+
+    collection(db,"courses"),
+
+    where("teacherId","==",currentTeacherId)
+
+);
+
+const snapshot = await getDocs(q);
 
     snapshot.forEach(doc=>{
 
@@ -516,7 +523,13 @@ notificationCourse.selectedIndex
         const content = notificationContent.value.trim();
 
         const contentId = notificationContentLink.value;
+        if(courseId===""){
 
+    alert("Vui lòng chọn khóa học.");
+
+    return;
+
+}
         if(title===""){
 
             alert("Nhập tiêu đề.");
@@ -716,6 +729,13 @@ window.openCourse = async function(courseId){
     currentCourseId = courseId;
 
     const snap = await getDoc(doc(db,"courses",courseId));
+    if(!snap.exists()){
+
+    alert("Không tìm thấy khóa học.");
+
+    return;
+
+}
 
     const data = snap.data();
 
@@ -805,17 +825,25 @@ async function loadChapters(){
 
     chapterList.innerHTML="Đang tải...";
 
-    const snapshot =
-    await getDocs(
+    const q = query(
 
-        collection(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters"
-        )
+    collection(
 
-    );
+        db,
+
+        "courses",
+
+        currentCourseId,
+
+        "chapters"
+
+    ),
+
+    orderBy("createdAt")
+
+);
+
+const snapshot = await getDocs(q);
 
     chapterList.innerHTML="";
 
