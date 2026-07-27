@@ -934,6 +934,13 @@ async function saveNewLesson(){
     else{
 
         const lessonId = "lesson_" + Date.now();
+        if(uploadedVideoLink===""){
+
+    alert("Bạn chưa upload video.");
+
+    return;
+
+}
 
         await setDoc(
 
@@ -1489,9 +1496,9 @@ uploadVideoBtn.addEventListener("click", uploadVideo);
 
 async function uploadVideo(){
 
-    if(videoFile.files.length === 0){
+    if(videoFile.files.length===0){
 
-        alert("Vui lòng chọn video.");
+        alert("Chọn video trước.");
 
         return;
 
@@ -1499,52 +1506,78 @@ async function uploadVideo(){
 
     const file = videoFile.files[0];
 
-    const formData = new FormData();
+    videoResult.textContent="Đang upload...";
 
-    formData.append("file", file);
+    const reader = new FileReader();
 
-    formData.append("folder", "Videos");
+    reader.onload = async function(){
 
-    videoResult.textContent = "Đang upload...";
+        const base64 =
+        reader.result.split(",")[1];
 
-    try{
+        try{
 
-        const response = await fetch(API_URL,{
+            const response = await fetch(API_URL,{
 
-            method:"POST",
+                method:"POST",
 
-            body:formData
+                headers:{
+                    "Content-Type":"application/json"
+                },
 
-        });
+                body:JSON.stringify({
 
-        const result = await response.json();
+                    type:"videos",
 
-        if(result.success){
+                    fileName:file.name,
 
-            uploadedVideoLink = result.url;
+                    mimeType:file.type,
 
-            videoResult.innerHTML = `
+                    base64:base64
+
+                })
+
+            });
+
+            const result =
+            await response.json();
+
+            if(result.success){
+
+                uploadedVideoLink =
+                result.download;
+
+                videoResult.innerHTML=
+                `
                 ✅ Upload thành công
                 <br>
-                <a href="${result.url}" target="_blank">
-                    Xem video
+                <a href="${result.download}" target="_blank">
+
+                Mở video
+
                 </a>
-            `;
+                `;
 
-        }else{
+            }
 
-            alert(result.message);
+            else{
+
+                alert(result.message);
+
+            }
+
+        }
+
+        catch(err){
+
+            console.log(err);
+
+            alert(err);
 
         }
 
     }
 
-    catch(err){
-
-        console.log(err);
-
-        alert(err.message);
-
-    }
+    reader.readAsDataURL(file);
 
 }
