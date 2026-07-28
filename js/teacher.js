@@ -888,39 +888,41 @@ async function saveNewLesson(){
     // ==========================
 
     if(editingLessonId !== ""){
+        const lessonRef = doc(
+    db,
+    "courses",
+    currentCourseId,
+    "chapters",
+    currentChapterId,
+    "lessons",
+    editingLessonId
+);
 
+const snap = await getDoc(lessonRef);
+
+const oldData = snap.data();
+        const video = uploadedVideoLink || oldData.video;
+
+const pdf = uploadedPdfLink || oldData.pdf;
         await updateDoc(
 
-            doc(
+    lessonRef,
 
-                db,
+    {
 
-                "courses",
+        title,
 
-                currentCourseId,
+        description,
 
-                "chapters",
+        order,
 
-                currentChapterId,
+        video,
 
-                "lessons",
+        pdf
 
-                editingLessonId
+    }
 
-            ),
-
-            {
-
-                title,
-
-                description,
-
-                order
-
-            }
-
-        );
-
+);
     }
 
     // ==========================
@@ -1267,6 +1269,18 @@ window.editLesson = async function(lessonId){
 
     lessonModal.style.display = "flex";
 
+    videoLink.value = data.video || "";
+
+uploadedVideoLink = data.video || "";
+
+uploadedPdfLink = data.pdf || "";
+    videoResult.innerHTML = data.video
+? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>`
+: "";
+
+pdfResult.innerHTML = data.pdf
+? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>`
+: "";
 }
 backToCoursesBtn.addEventListener("click",async()=>{
 
