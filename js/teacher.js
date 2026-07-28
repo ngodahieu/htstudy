@@ -150,7 +150,8 @@ document.getElementById("documentFile");
 
 const uploadPdfBtn =
 document.getElementById("uploadPdfBtn");
-
+const changePdfBtn =
+document.getElementById("changePdfBtn");
 const uploadImageBtn =
 document.getElementById("uploadImageBtn");
 
@@ -901,6 +902,11 @@ async function saveNewLesson(){
 const snap = await getDoc(lessonRef);
 
 const oldData = snap.data();
+        if(pdfFile.files.length){
+
+    await uploadPdf();
+
+}
         const video = uploadedVideoLink || oldData.video;
 
 const pdf = uploadedPdfLink || oldData.pdf;
@@ -932,7 +938,7 @@ const pdf = uploadedPdfLink || oldData.pdf;
     else{
 
         const lessonId = "lesson_" + Date.now();
-        uploadedVideoLink = videoLink.value.trim();
+uploadedVideoLink = videoLink.value.trim();
 
 if(uploadedVideoLink===""){
 
@@ -941,9 +947,18 @@ if(uploadedVideoLink===""){
     return;
 
 }
+
+// Nếu đã chọn file nhưng chưa upload
+if(pdfFile.files.length){
+
+    await uploadPdf();
+
+}
+
+// Sau khi upload xong vẫn chưa có link
 if(uploadedPdfLink===""){
 
-    alert("Vui lòng upload file PDF.");
+    alert("Chưa có file PDF.");
 
     return;
 
@@ -1508,6 +1523,27 @@ uploadPdfBtn.addEventListener(
     "click",
     uploadPdf
 );
+changePdfBtn.addEventListener("click",()=>{
+
+    pdfFile.click();
+
+});
+pdfFile.addEventListener("change",()=>{
+
+    if(!pdfFile.files.length) return;
+
+    const file = pdfFile.files[0];
+
+    pdfResult.innerHTML = `
+        📄 Đã chọn:
+        <b>${file.name}</b>
+        <br>
+        ${(file.size/1024/1024).toFixed(2)} MB
+        <br><br>
+        Chưa upload
+    `;
+
+});
 let uploadedVideoLink = "";
 let uploadedPdfLink = "";
 
@@ -1557,14 +1593,17 @@ async function uploadPdf(){
 
             uploadedPdfLink = data.secure_url;
 
-            pdfResult.innerHTML =
+            pdfResult.innerHTML = `
+✅ Upload thành công
 
-            `<a href="${uploadedPdfLink}" target="_blank">
+<br><br>
 
-            ✔ Upload thành công
+<a href="${uploadedPdfLink}" target="_blank">
 
-            </a>`;
+📄 Xem PDF
 
+</a>
+`;
         }
 
         else{
