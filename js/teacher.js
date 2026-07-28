@@ -148,8 +148,6 @@ document.getElementById("imageFile");
 const documentFile =
 document.getElementById("documentFile");
 
-const uploadPdfBtn =
-document.getElementById("uploadPdfBtn");
 const changePdfBtn =
 document.getElementById("changePdfBtn");
 const uploadImageBtn =
@@ -1519,10 +1517,7 @@ createNotificationBtn.addEventListener(
     "click",
     createNotification
 );
-uploadPdfBtn.addEventListener(
-    "click",
-    uploadPdf
-);
+
 changePdfBtn.addEventListener("click",()=>{
 
     pdfFile.click();
@@ -1535,13 +1530,25 @@ pdfFile.addEventListener("change",()=>{
     const file = pdfFile.files[0];
 
     pdfResult.innerHTML = `
-        📄 Đã chọn:
-        <b>${file.name}</b>
-        <br>
-        ${(file.size/1024/1024).toFixed(2)} MB
-        <br><br>
-        Chưa upload
-    `;
+<div class="file-preview">
+
+📄 <b>${file.name}</b>
+
+<br>
+
+Dung lượng:
+${(file.size/1024/1024).toFixed(2)} MB
+
+<br>
+
+<span style="color:#ff9800">
+
+● Sẽ upload khi bấm Lưu
+
+</span>
+
+</div>
+`;
 
 });
 let uploadedVideoLink = "";
