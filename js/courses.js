@@ -278,7 +278,8 @@ ${owned ? "Đã được cấp":"Chưa được cấp"}
 </span>
 
 <button
-class="btn-course"
+class="btn-course enter-course"
+data-id="${course.id}"
 ${owned ? "" : "disabled"}>
 
 ${owned ? "Vào học":"Chưa mở"}
@@ -439,6 +440,18 @@ function renderNotifications(list){
     notificationList.innerHTML=html;
 
 }
+document.addEventListener("click",(e)=>{
+
+    const btn = e.target.closest(".enter-course");
+
+    if(!btn) return;
+
+    const id = btn.dataset.id;
+
+    window.location.href =
+    `lesson.html?id=${id}`;
+
+});
 function loadNotifications(){
 
     const q=query(
