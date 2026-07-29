@@ -3,7 +3,11 @@ import { db } from "./firebase.js";
 import {
 
 doc,
-getDoc
+getDoc,
+collection,
+getDocs,
+query,
+orderBy
 
 }
 
@@ -40,6 +44,61 @@ course.name;
 
 courseDescription.textContent =
 course.description || "";
+await loadChapters();
+}
+async function loadChapters(){
+
+    chapterContainer.innerHTML = "";
+
+    const chapterQuery = query(
+
+        collection(
+            db,
+            "courses",
+            courseId,
+            "chapters"
+        )
+
+    );
+
+    const chapterSnapshot =
+    await getDocs(chapterQuery);
+
+    chapterSnapshot.forEach((chapterDoc)=>{
+
+        const chapter = chapterDoc.data();
+
+        chapterContainer.innerHTML += `
+
+        <div class="chapter-box">
+
+            <div class="chapter-header">
+
+                <h2>
+
+                    ${chapter.title}
+
+                </h2>
+
+                <span>
+
+                    Đang tải bài học...
+
+                </span>
+
+            </div>
+
+            <div
+            id="chapter-${chapterDoc.id}"
+            class="lesson-list">
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
 
 }
 loadCourse();
