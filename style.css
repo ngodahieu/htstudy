@@ -4371,3 +4371,253 @@ transparent 70%);
     }
 
 }
+/*==========================================
+            CHAPTER LIST
+==========================================*/
+
+.chapter-box{
+
+    margin-bottom:40px;
+
+    border-radius:24px;
+
+    overflow:hidden;
+
+    background:linear-gradient(
+        145deg,
+        rgba(16,32,64,.92),
+        rgba(8,16,34,.92)
+    );
+
+    border:1px solid rgba(120,190,255,.15);
+
+    backdrop-filter:blur(20px);
+
+    box-shadow:
+    0 18px 40px rgba(0,0,0,.35);
+
+}
+
+/* Header chương */
+
+.chapter-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:22px 28px;
+
+    background:linear-gradient(
+        90deg,
+        rgba(20,80,170,.95),
+        rgba(38,180,255,.92)
+    );
+
+    color:#fff;
+
+}
+
+.chapter-header h2{
+
+    font-size:24px;
+
+    font-weight:700;
+
+}
+
+.chapter-header span{
+
+    font-size:14px;
+
+    opacity:.9;
+
+}
+
+/* Danh sách bài */
+
+.lesson-list{
+
+    padding:10px 0;
+
+}
+
+.lesson-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 28px;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+    transition:.35s;
+
+    cursor:pointer;
+
+    position:relative;
+
+}
+
+.lesson-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.lesson-item:hover{
+
+    background:
+    linear-gradient(
+        90deg,
+        rgba(0,170,255,.08),
+        rgba(80,210,255,.05)
+    );
+
+    transform:translateX(8px);
+
+}
+
+/* Thanh sáng bên trái */
+
+.lesson-item::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:12px;
+
+    bottom:12px;
+
+    width:5px;
+
+    border-radius:20px;
+
+    background:linear-gradient(
+        180deg,
+        #3bd0ff,
+        #0f67ff
+    );
+
+    opacity:0;
+
+    transition:.3s;
+
+}
+
+.lesson-item:hover::before{
+
+    opacity:1;
+
+}
+
+/* Tên bài */
+
+.lesson-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+.lesson-icon{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:rgba(0,170,255,.08);
+
+    color:#62d8ff;
+
+    font-size:18px;
+
+}
+
+.lesson-title{
+
+    color:#fff;
+
+    font-size:17px;
+
+    font-weight:600;
+
+}
+
+/* Thời lượng */
+
+.lesson-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+    color:#9fc3e8;
+
+    font-size:14px;
+
+}
+
+.lesson-time{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+/* Nút học */
+
+.lesson-btn{
+
+    padding:10px 22px;
+
+    border-radius:999px;
+
+    background:linear-gradient(
+        135deg,
+        #0f67df,
+        #39d2ff
+    );
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.35s;
+
+}
+
+.lesson-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+    0 0 25px rgba(0,180,255,.35);
+
+}
