@@ -582,9 +582,6 @@ if(subject && grade){
 pageDescription.textContent =
 `Các khóa học ${subjectName} lớp ${grade}.`;
 
-pageDescription.textContent =
-`Các khóa học ${subjectName} lớp ${grade}.`;
-
     subjectSection.style.display = "none";
 
     courseFilter.style.display = "none";
