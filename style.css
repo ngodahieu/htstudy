@@ -4621,3 +4621,47 @@ transparent 70%);
     0 0 25px rgba(0,180,255,.35);
 
 }
+
+/*==========================================
+        CHAPTER COLLAPSE
+==========================================*/
+
+.chapter-content{
+
+    overflow:hidden;
+
+    max-height:5000px;
+
+    transition:
+        max-height .5s ease,
+        opacity .4s ease;
+
+    opacity:1;
+
+}
+
+.chapter-box.closed .chapter-content{
+
+    max-height:0;
+
+    opacity:0;
+
+}
+
+.chapter-header{
+
+    cursor:pointer;
+
+}
+
+.chapter-header i{
+
+    transition:.35s;
+
+}
+
+.chapter-box.closed .chapter-header i{
+
+    transform:rotate(-90deg);
+
+}
