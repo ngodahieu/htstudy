@@ -184,7 +184,8 @@ document.getElementById("chapterTitle");
 
 const chapterDescription =
 document.getElementById("chapterDescription");
-
+const chapterOrder =
+document.getElementById("chapterOrder");
 const saveChapter =
 document.getElementById("saveChapter");
 
@@ -1177,6 +1178,7 @@ window.editChapter = async function(chapterId){
     chapterTitle.value = data.title;
 
     chapterDescription.value = data.description || "";
+    chapterOrder.value = data.order || 1;
 
     chapterModal.style.display = "flex";
 
@@ -1310,7 +1312,9 @@ createChapterBtn.addEventListener("click",()=>{
 
     chapterTitle.value = "";
 
-    chapterDescription.value = "";
+chapterDescription.value = "";
+
+chapterOrder.value = "";
 
     chapterModal.style.display = "flex";
 
@@ -1328,14 +1332,23 @@ async function saveNewChapter(){
     const description =
     chapterDescription.value.trim();
 
+    const order = Number(chapterOrder.value);
+
     if(title===""){
 
-        alert("Nhập tên chương.");
+    alert("Nhập tên chương.");
 
-        return;
+    return;
 
-    }
+}
 
+if(order <= 0){
+
+    alert("Thứ tự chương không hợp lệ.");
+
+    return;
+
+}
 if(editingChapterId !== ""){
 
     await updateDoc(
@@ -1358,7 +1371,9 @@ if(editingChapterId !== ""){
 
             title,
 
-            description
+            description,
+
+            order
 
         }
 
@@ -1391,6 +1406,8 @@ else{
 
             description,
 
+            order,
+
             createdAt:serverTimestamp()
 
         }
@@ -1401,7 +1418,9 @@ else{
 
     chapterTitle.value="";
 
-    chapterDescription.value="";
+chapterDescription.value="";
+
+chapterOrder.value="";
     editingChapterId = "";
 
     chapterModal.style.display="none";
@@ -1431,7 +1450,7 @@ async function loadChapters(){
 
     ),
 
-    orderBy("createdAt")
+    orderBy("order")
 
 );
 
