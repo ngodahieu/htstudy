@@ -677,18 +677,27 @@ UPLOAD TÀI NGUYÊN
 
 <div class="form-group">
 
-    <label>Link video YouTube</label>
+    <div class="form-group">
+
+    <label>Video bài học</label>
 
     <input
-        type="text"
-        id="videoLink"
-        placeholder="https://www.youtube.com/watch?v=xxxxxxxx">
+        type="file"
+        id="videoFile"
+        accept="video/*"
+        style="display:none">
 
-    <small class="auto-text">
-        Dán link video YouTube (Public hoặc Unlisted).
-    </small>
+    <button
+        type="button"
+        id="uploadVideoBtn">
 
-    <p id="videoResult"></p>
+        Chọn Video
+
+    </button>
+
+    <div id="videoResult"></div>
+
+</div>
 
 </div>
 
