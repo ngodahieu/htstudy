@@ -217,6 +217,7 @@ await getDocs(collection(db,"courses"));
 courseSnapshot.forEach(courseDoc=>{
 
     const course = courseDoc.data();
+    course.id = courseDoc.id;
 
     if(
 
