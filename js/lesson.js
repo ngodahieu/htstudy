@@ -189,12 +189,34 @@ function showLesson(lesson){
 
     lessonDescription.textContent =
     lesson.description || "";
-    const videoUrl =
-lesson.video
-? lesson.video.replace("watch?v=","embed/")
-: "";
-console.log("Video:", lesson.video);
-console.log("Embed:", videoUrl);
+    let videoUrl = "";
+
+if(lesson.video){
+
+    if(lesson.video.includes("youtu.be/")){
+
+        const id = lesson.video.split("youtu.be/")[1];
+
+        videoUrl = `https://www.youtube.com/embed/${id}`;
+
+    }
+
+    else if(lesson.video.includes("watch?v=")){
+
+        videoUrl = lesson.video.replace(
+            "watch?v=",
+            "embed/"
+        );
+
+    }
+
+    else{
+
+        videoUrl = lesson.video;
+
+    }
+
+}
     if(currentTab==="video"){
 
         lessonContent.innerHTML = `
