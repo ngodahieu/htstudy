@@ -21,8 +21,25 @@ document.getElementById("courseTitle");
 const courseDescription =
 document.getElementById("courseDescription");
 
-const chapterContainer =
-document.getElementById("chapterContainer");
+const chapterMenu =
+document.getElementById("chapterMenu");
+
+const lessonTitle =
+document.getElementById("lessonTitle");
+
+const lessonDescription =
+document.getElementById("lessonDescription");
+
+const lessonContent =
+document.getElementById("lessonContent");
+
+const tabButtons =
+document.querySelectorAll(".tab-btn");
+let chapters = [];
+
+let currentLesson = null;
+
+let currentTab = "video";
 async function loadCourse(){
 
 const snap =
@@ -48,7 +65,7 @@ await loadChapters();
 }
 async function loadChapters(){
 
-    chapterContainer.innerHTML = "";
+    chapterMenu.innerHTML = "";
 
 const chapterQuery = query(
     collection(
@@ -67,27 +84,27 @@ for (const chapterDoc of chapterSnapshot.docs) {
 
     const chapter = chapterDoc.data();
 
-    chapterContainer.innerHTML += `
+    chapterMenu.innerHTML += `
 
-        <div class="chapter-box">
+<div class="chapter-folder">
 
-            <div class="chapter-header">
+    <div class="folder-title">
 
-                <h2>${chapter.title}</h2>
+        <i class="fa-solid fa-folder-open"></i>
 
-                <span>Đang tải bài học...</span>
+        ${chapter.title}
 
-            </div>
+    </div>
 
-            <div
-                id="chapter-${chapterDoc.id}"
-                class="lesson-list">
+    <div
+        id="chapter-${chapterDoc.id}"
+        class="lesson-list">
 
-            </div>
+    </div>
 
-        </div>
+</div>
 
-    `;
+`;
 
     await loadLessons(chapterDoc.id);
 
@@ -118,62 +135,140 @@ async function loadLessons(chapterId){
     await getDocs(lessonQuery);
 
     lessonBox.innerHTML = "";
+    let firstLesson = null;
 
     lessonSnapshot.forEach((lessonDoc)=>{
 
         const lesson = lessonDoc.data();
+        lesson.id = lessonDoc.id;
+        if(firstLesson === null){
+
+    firstLesson = lesson;
+
+}
 
         lessonBox.innerHTML += `
 
-        <div class="lesson-item">
+<div
+    class="lesson-menu-item ${
+        currentLesson === null && firstLesson === lesson
+        ? "active"
+        : ""
+    }"
+    data-lesson='${JSON.stringify(lesson)}'
+    data-title="${lesson.title}"
+    data-description="${lesson.description || ""}"
+    data-video="${lesson.video || ""}"
+    data-pdf="${lesson.pdf || ""}"
+>
 
-            <div>
+    <i class="fa-regular fa-file-video"></i>
 
-                <h3>${lesson.title}</h3>
+    ${lesson.order}. ${lesson.title}
 
-                <p>${lesson.description || ""}</p>
+</div>
 
-            </div>
-
-            <button
-                class="open-lesson"
-                data-video="${lesson.video}"
-                data-pdf="${lesson.pdf}"
-            >
-
-                Mở bài học
-
-            </button>
-
-        </div>
-
-        `;
+`;
 
     });
+
+    if(currentLesson === null && firstLesson){
+
+    currentLesson = firstLesson;
+
+    showLesson(firstLesson);
+
+}
+}
+function showLesson(lesson){
+
+    currentLesson = lesson;
+
+    lessonTitle.textContent =
+    lesson.title;
+
+    lessonDescription.textContent =
+    lesson.description || "";
+    const videoUrl =
+lesson.video
+? lesson.video.replace("watch?v=","embed/")
+: "";
+
+    if(currentTab==="video"){
+
+        lessonContent.innerHTML = `
+
+<iframe
+    src="${videoUrl}"
+    width="100%"
+    height="600"
+    frameborder="0"
+    allowfullscreen>
+
+</iframe>
+
+`;
+
+    }
+
+    else{
+
+        lessonContent.innerHTML = `
+
+<iframe
+    src="${lesson.pdf}"
+    width="100%"
+    height="700">
+
+</iframe>
+
+`;
+
+    }
 
 }
 document.addEventListener("click",(e)=>{
 
-    const btn = e.target.closest(".open-lesson");
+    const item = e.target.closest(".lesson-menu-item");
 
-    if(!btn) return;
+    if(!item) return;
 
-    const video = btn.dataset.video;
+    document
+        .querySelectorAll(".lesson-menu-item")
+        .forEach(el=>{
 
-    const pdf = btn.dataset.pdf;
+            el.classList.remove("active");
 
-    if(video){
+        });
 
-        window.open(video,"_blank");
+    item.classList.add("active");
 
-    }
+    const lesson = JSON.parse(item.dataset.lesson);
 
-    if(pdf){
+    showLesson(lesson);
 
-        window.open(pdf,"_blank");
+});
+tabButtons.forEach(btn=>{
 
-    }
+    btn.addEventListener("click",()=>{
+
+        tabButtons.forEach(tab=>{
+
+            tab.classList.remove("active");
+
+        });
+
+        btn.classList.add("active");
+
+        currentTab = btn.dataset.tab;
+
+        if(currentLesson){
+
+            showLesson(currentLesson);
+
+        }
+
+    });
 
 });
 loadCourse();
-
