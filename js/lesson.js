@@ -193,7 +193,8 @@ function showLesson(lesson){
 lesson.video
 ? lesson.video.replace("watch?v=","embed/")
 : "";
-
+console.log("Video:", lesson.video);
+console.log("Embed:", videoUrl);
     if(currentTab==="video"){
 
         lessonContent.innerHTML = `
