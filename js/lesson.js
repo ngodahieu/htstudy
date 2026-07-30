@@ -50,49 +50,100 @@ async function loadChapters(){
 
     chapterContainer.innerHTML = "";
 
-    const chapterQuery = query(
-
-        collection(
-            db,
-            "courses",
-            courseId,
-            "chapters"
-        )
-
-    );
+const chapterQuery = query(
+    collection(
+        db,
+        "courses",
+        courseId,
+        "chapters"
+    ),
+    orderBy("order")
+);
 
     const chapterSnapshot =
     await getDocs(chapterQuery);
 
-    chapterSnapshot.forEach((chapterDoc)=>{
+for (const chapterDoc of chapterSnapshot.docs) {
 
-        const chapter = chapterDoc.data();
+    const chapter = chapterDoc.data();
 
-        chapterContainer.innerHTML += `
+    chapterContainer.innerHTML += `
 
         <div class="chapter-box">
 
             <div class="chapter-header">
 
-                <h2>
+                <h2>${chapter.title}</h2>
 
-                    ${chapter.title}
-
-                </h2>
-
-                <span>
-
-                    Đang tải bài học...
-
-                </span>
+                <span>Đang tải bài học...</span>
 
             </div>
 
             <div
-            id="chapter-${chapterDoc.id}"
-            class="lesson-list">
+                id="chapter-${chapterDoc.id}"
+                class="lesson-list">
 
             </div>
+
+        </div>
+
+    `;
+
+    await loadLessons(chapterDoc.id);
+
+}
+
+}
+async function loadLessons(chapterId){
+
+    const lessonBox =
+    document.getElementById(`chapter-${chapterId}`);
+
+    const lessonQuery = query(
+
+        collection(
+            db,
+            "courses",
+            courseId,
+            "chapters",
+            chapterId,
+            "lessons"
+        ),
+
+        orderBy("order")
+
+    );
+
+    const lessonSnapshot =
+    await getDocs(lessonQuery);
+
+    lessonBox.innerHTML = "";
+
+    lessonSnapshot.forEach((lessonDoc)=>{
+
+        const lesson = lessonDoc.data();
+
+        lessonBox.innerHTML += `
+
+        <div class="lesson-item">
+
+            <div>
+
+                <h3>${lesson.title}</h3>
+
+                <p>${lesson.description || ""}</p>
+
+            </div>
+
+            <button
+                class="open-lesson"
+                data-video="${lesson.video}"
+                data-pdf="${lesson.pdf}"
+            >
+
+                Mở bài học
+
+            </button>
 
         </div>
 
@@ -101,4 +152,28 @@ async function loadChapters(){
     });
 
 }
+document.addEventListener("click",(e)=>{
+
+    const btn = e.target.closest(".open-lesson");
+
+    if(!btn) return;
+
+    const video = btn.dataset.video;
+
+    const pdf = btn.dataset.pdf;
+
+    if(video){
+
+        window.open(video,"_blank");
+
+    }
+
+    if(pdf){
+
+        window.open(pdf,"_blank");
+
+    }
+
+});
 loadCourse();
+
