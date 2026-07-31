@@ -155,8 +155,12 @@ document.getElementById("uploadImageBtn");
 
 const uploadDocumentBtn =
 document.getElementById("uploadDocumentBtn");
-const videoLink =
-document.getElementById("videoLink");
+const videoFile =
+document.getElementById("videoFile");
+
+const uploadVideoBtn =
+document.getElementById("uploadVideoBtn");
+
 
 const videoResult =
 document.getElementById("videoResult");
@@ -906,6 +910,11 @@ const oldData = snap.data();
     await uploadPdf();
 
 }
+        if(videoFile.files.length){
+
+    await uploadVideo();
+
+}
         const video = uploadedVideoLink || oldData.video;
 
 const pdf = uploadedPdfLink || oldData.pdf;
@@ -937,11 +946,14 @@ const pdf = uploadedPdfLink || oldData.pdf;
     else{
 
         const lessonId = "lesson_" + Date.now();
-uploadedVideoLink = videoLink.value.trim();
+if(videoFile.files.length){
 
+    await uploadVideo();
+
+}
 if(uploadedVideoLink===""){
 
-    alert("Vui lòng nhập link YouTube.");
+    alert("Chưa upload video.");
 
     return;
 
@@ -1002,12 +1014,14 @@ if(uploadedPdfLink===""){
     lessonDescription.value = "";
 
     lessonOrder.value = "";
-    videoLink.value = "";
 
 videoResult.textContent = "";
 
 uploadedVideoLink = "";
-    pdfFile.value = "";
+
+videoFile.value = "";
+
+pdfFile.value = "";
 
 pdfResult.textContent = "";
 
@@ -1283,8 +1297,6 @@ window.editLesson = async function(lessonId){
     lessonOrder.value = data.order;
 
     lessonModal.style.display = "flex";
-
-    videoLink.value = data.video || "";
 
 uploadedVideoLink = data.video || "";
 
@@ -1570,9 +1582,33 @@ ${(file.size/1024/1024).toFixed(2)} MB
 `;
 
 });
-let uploadedVideoLink = "";
-let uploadedPdfLink = "";
+uploadVideoBtn.addEventListener(() => {
 
+    videoFile.click();
+
+});
+videoFile.addEventListener("change",()=>{
+
+    if(!videoFile.files.length) return;
+
+    const file = videoFile.files[0];
+
+    videoResult.innerHTML = `
+    <div class="file-preview">
+    🎥 <b>${file.name}</b>
+    <br>
+    Dung lượng:
+    ${(file.size/1024/1024).toFixed(2)} MB
+    <br>
+    <span style="color:#ff9800">
+    ● Sẽ upload khi bấm Lưu
+    </span>
+    </div>
+    `;
+
+});
+let uploadedPdfLink = "";
+let uploadedVideoLink = "";
 const CLOUD_NAME = "xhljajy6";
 const UPLOAD_PRESET = "htstudy";
 async function uploadPdf(){
@@ -1647,6 +1683,71 @@ async function uploadPdf(){
         console.log(err);
 
         alert("Có lỗi khi upload.");
+
+    }
+
+}
+async function uploadVideo(){
+
+    const file = videoFile.files[0];
+
+    if(!file){
+
+        alert("Vui lòng chọn video.");
+
+        return;
+
+    }
+
+    videoResult.textContent = "Đang upload...";
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    formData.append("resource_type", "video");
+
+    try{
+
+        const response = await fetch(
+
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
+            {
+                method:"POST",
+                body:formData
+            }
+
+        );
+
+        const data = await response.json();
+
+        if(data.secure_url){
+
+            uploadedVideoLink = data.secure_url;
+
+            videoResult.innerHTML = `
+            ✅ Upload thành công
+            <br><br>
+            <a href="${uploadedVideoLink}" target="_blank">
+            🎥 Xem video
+            </a>
+            `;
+
+        }else{
+
+            console.log(data);
+
+            alert("Upload video thất bại.");
+
+        }
+
+    }catch(err){
+
+        console.log(err);
+
+        alert("Có lỗi upload video.");
 
     }
 
