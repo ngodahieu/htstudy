@@ -1,1 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Kiểm tra | H&T STUDY</title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- Exam CSS -->
+    <link
+        rel="stylesheet"
+        href="../css/exam.css"
+    >
+
+</head>
+
+<body>
+
+    <!-- =========================================
+         BACKGROUND
+    ========================================== -->
+
+    <div class="page-background">
+
+        <div class="background-orb orb-1"></div>
+        <div class="background-orb orb-2"></div>
+        <div class="background-orb orb-3"></div>
+
+    </div>
+
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
+    <main class="exam-container">
+
+        <!-- =====================================
+             HEADER
+        ====================================== -->
+
+        <header class="exam-header">
+
+            <button
+                id="backBtn"
+                class="back-btn"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                <span>Quay lại</span>
+
+            </button>
+
+
+            <div class="exam-brand">
+
+                <div class="brand-icon">
+
+                    <i class="fa-solid fa-clipboard-check"></i>
+
+                </div>
+
+                <div>
+
+                    <h1>H&T STUDY</h1>
+
+                    <p>Hệ thống kiểm tra</p>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================
+             BREADCRUMB
+        ====================================== -->
+
+        <div
+            id="breadcrumb"
+            class="breadcrumb"
+        >
+
+            <span class="breadcrumb-item active">
+                <i class="fa-solid fa-house"></i>
+                Môn học
+            </span>
+
+        </div>
+
+
+        <!-- =====================================
+             PAGE TITLE
+        ====================================== -->
+
+        <section
+            id="pageHeading"
+            class="page-heading"
+        >
+
+            <div>
+
+                <span class="heading-label">
+                    KHU VỰC KIỂM TRA
+                </span>
+
+                <h2 id="pageTitle">
+                    Chọn môn học
+                </h2>
+
+                <p id="pageDescription">
+                    Chọn môn học để xem các khóa học được cấp cho bạn.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             LOADING
+        ====================================== -->
+
+        <div
+            id="loading"
+            class="loading"
+        >
+
+            <div class="loading-spinner"></div>
+
+            <p>Đang tải dữ liệu...</p>
+
+        </div>
+
+
+        <!-- =====================================
+             EMPTY
+        ====================================== -->
+
+        <div
+            id="emptyState"
+            class="empty-state hidden"
+        >
+
+            <div class="empty-icon">
+
+                <i class="fa-solid fa-folder-open"></i>
+
+            </div>
+
+            <h3 id="emptyTitle">
+                Chưa có dữ liệu
+            </h3>
+
+            <p id="emptyDescription">
+                Hiện tại chưa có nội dung để hiển thị.
+            </p>
+
+        </div>
+
+
+        <!-- =====================================
+             CONTENT
+        ====================================== -->
+
+        <section
+            id="examContent"
+            class="exam-content"
+        ></section>
+
+
+        <!-- =====================================
+             EXAM DETAIL
+        ====================================== -->
+
+        <section
+            id="examDetail"
+            class="exam-detail hidden"
+        >
+
+            <div class="detail-card">
+
+                <div class="detail-icon">
+
+                    <i class="fa-solid fa-file-circle-check"></i>
+
+                </div>
+
+
+                <div class="detail-main">
+
+                    <span
+                        id="detailExamType"
+                        class="exam-type"
+                    >
+                        Bài kiểm tra
+                    </span>
+
+                    <h2 id="detailExamTitle">
+                        Tên bài thi
+                    </h2>
+
+                    <p id="detailExamDescription">
+                        Nội dung bài thi
+                    </p>
+
+                </div>
+
+
+                <div class="detail-stats">
+
+                    <div class="detail-stat">
+
+                        <i class="fa-regular fa-clock"></i>
+
+                        <div>
+
+                            <span>Thời gian</span>
+
+                            <strong id="detailDuration">
+                                0 phút
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="detail-stat">
+
+                        <i class="fa-solid fa-list-ol"></i>
+
+                        <div>
+
+                            <span>Số câu hỏi</span>
+
+                            <strong id="detailQuestionCount">
+                                0 câu
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-info">
+
+                    <div>
+
+                        <i class="fa-solid fa-book"></i>
+
+                        <span id="detailCourse">
+                            Khóa học
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <i class="fa-solid fa-layer-group"></i>
+
+                        <span id="detailChapter">
+                            Chương
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <i class="fa-solid fa-book-open"></i>
+
+                        <span id="detailLesson">
+                            Bài học
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-actions">
+
+                    <button
+                        id="startExamBtn"
+                        class="start-exam-btn"
+                        type="button"
+                    >
+
+                        <i class="fa-solid fa-play"></i>
+
+                        Bắt đầu thi
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             EXAM SCREEN
+        ====================================== -->
+
+        <section
+            id="examScreen"
+            class="exam-screen hidden"
+        >
+
+            <div class="exam-test-header">
+
+                <div>
+
+                    <span id="testTypeLabel">
+                        Bài kiểm tra
+                    </span>
+
+                    <h2 id="testTitle">
+                        Đang tải...
+                    </h2>
+
+                </div>
+
+
+                <div class="timer-box">
+
+                    <i class="fa-regular fa-clock"></i>
+
+                    <span id="timer">
+                        00:00
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="progress-container">
+
+                <div class="progress-info">
+
+                    <span>
+                        Câu
+                        <strong id="currentQuestionNumber">
+                            1
+                        </strong>
+                        /
+                        <strong id="totalQuestions">
+                            0
+                        </strong>
+                    </span>
+
+                    <span id="answeredCount">
+                        Đã trả lời: 0
+                    </span>
+
+                </div>
+
+                <div class="progress-bar">
+
+                    <div
+                        id="progressBar"
+                        class="progress-fill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="questionContainer"
+                class="question-container"
+            ></div>
+
+
+            <div class="exam-navigation">
+
+                <button
+                    id="prevQuestionBtn"
+                    class="nav-btn secondary"
+                    type="button"
+                >
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Câu trước
+
+                </button>
+
+
+                <button
+                    id="nextQuestionBtn"
+                    class="nav-btn primary"
+                    type="button"
+                >
+
+                    Câu tiếp theo
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         CONFIRM START MODAL
+    ========================================== -->
+
+    <div
+        id="startModal"
+        class="modal hidden"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-icon">
+
+                <i class="fa-solid fa-circle-question"></i>
+
+            </div>
+
+            <h3>
+                Bắt đầu bài thi?
+            </h3>
+
+            <p>
+                Sau khi bắt đầu, thời gian làm bài sẽ được tính.
+            </p>
+
+            <div class="modal-buttons">
+
+                <button
+                    id="cancelStartBtn"
+                    class="modal-btn cancel"
+                    type="button"
+                >
+                    Hủy
+                </button>
+
+                <button
+                    id="confirmStartBtn"
+                    class="modal-btn confirm"
+                    type="button"
+                >
+                    Bắt đầu
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script
+        type="module"
+        src="../js/exam.js"
+    ></script>
+
+</body>
+
+</html>
