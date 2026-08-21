@@ -318,8 +318,6 @@ function setBreadcrumb(items) {
     });
 
 }
-
-
 /* ==================================================
    1. LOAD SUBJECTS
 ================================================== */
@@ -329,11 +327,9 @@ async function loadSubjects() {
     resetExamView();
 
     showLoading();
-
     hideEmpty();
 
-    pageTitle.textContent =
-        "Chọn môn học";
+    pageTitle.textContent = "Chọn môn học";
 
     pageDescription.textContent =
         "Chọn môn học để xem các khóa học được cấp cho bạn.";
@@ -348,14 +344,7 @@ async function loadSubjects() {
     try {
 
         /* =========================================
-           LẤY DANH SÁCH KHÓA HỌC ĐƯỢC CẤP
-           
-           Dữ liệu Firebase của bạn đang có dạng:
-
-           enrollments
-              └── UID học sinh
-                    └── courses
-                          └── 0: "ID_KHOA_HOC"
+           LẤY ENROLLMENT CỦA HỌC SINH
         ========================================= */
 
         const enrollmentRef = doc(
@@ -369,7 +358,7 @@ async function loadSubjects() {
 
 
         /* =========================================
-           KIỂM TRA ENROLLMENT
+           CHƯA CÓ ENROLLMENT
         ========================================= */
 
         if (!enrollmentSnap.exists()) {
@@ -380,7 +369,6 @@ async function loadSubjects() {
             );
 
             return;
-
         }
 
 
@@ -388,13 +376,13 @@ async function loadSubjects() {
             enrollmentSnap.data();
 
 
+        /* =========================================
+           LẤY DANH SÁCH COURSE ID
+        ========================================= */
+
         const courseIds =
             enrollmentData.courses || [];
 
-
-        /* =========================================
-           KHÔNG CÓ KHÓA HỌC
-        ========================================= */
 
         if (
             !Array.isArray(courseIds) ||
@@ -407,35 +395,30 @@ async function loadSubjects() {
             );
 
             return;
-
         }
 
 
         /* =========================================
-           LẤY THÔNG TIN TỪ COLLECTION COURSES
+           LẤY THÔNG TIN CÁC KHÓA HỌC
         ========================================= */
 
         const courses = [];
-
 
         for (const courseId of courseIds) {
 
             try {
 
-                const courseRef =
-                    doc(
-                        db,
-                        "courses",
-                        courseId
-                    );
+                const courseRef = doc(
+                    db,
+                    "courses",
+                    courseId
+                );
 
                 const courseSnap =
                     await getDoc(courseRef);
 
 
-                if (
-                    courseSnap.exists()
-                ) {
+                if (courseSnap.exists()) {
 
                     courses.push({
 
@@ -448,13 +431,11 @@ async function loadSubjects() {
                 }
 
             }
-
-            catch (courseError) {
+            catch (error) {
 
                 console.error(
-                    "Lỗi khi tải khóa học:",
-                    courseId,
-                    courseError
+                    `Không thể tải khóa học ${courseId}:`,
+                    error
                 );
 
             }
@@ -463,18 +444,17 @@ async function loadSubjects() {
 
 
         /* =========================================
-           KHÔNG TÌM THẤY COURSE NÀO
+           KHÔNG CÓ KHÓA HỌC HỢP LỆ
         ========================================= */
 
-        if (!courses.length) {
+        if (courses.length === 0) {
 
             showEmpty(
                 "Không tìm thấy khóa học",
-                "Khóa học được cấp không còn tồn tại hoặc mã khóa học không chính xác."
+                "Các khóa học được cấp không còn tồn tại."
             );
 
             return;
-
         }
 
 
@@ -506,7 +486,7 @@ async function loadSubjects() {
 
 
         /* =========================================
-           HIỂN THỊ
+           HIỂN THỊ MÔN HỌC
         ========================================= */
 
         hideLoading();
@@ -540,8 +520,15 @@ function renderSubjects(subjects) {
 
     examContent.classList.remove("hidden");
 
+    const subjectGrid =
+        document.createElement("div");
+
+    subjectGrid.className =
+        "subject-grid";
+
+
     Object.entries(subjects).forEach(
-        ([subject, courses]) => {
+        ([subject, courses], index) => {
 
             const card =
                 document.createElement("div");
@@ -549,13 +536,85 @@ function renderSubjects(subjects) {
             card.className =
                 "subject-card";
 
+
+            /* =====================================
+               ICON THEO MÔN
+            ===================================== */
+
+            let icon =
+                "fa-solid fa-book-open";
+
+
+            const subjectLower =
+                subject.toLowerCase();
+
+
+            if (
+                subjectLower.includes("hóa") ||
+                subjectLower.includes("hoa")
+            ) {
+
+                icon =
+                    "fa-solid fa-flask";
+
+            }
+            else if (
+                subjectLower.includes("toán") ||
+                subjectLower.includes("toan")
+            ) {
+
+                icon =
+                    "fa-solid fa-calculator";
+
+            }
+            else if (
+                subjectLower.includes("vật lý") ||
+                subjectLower.includes("vat ly") ||
+                subjectLower.includes("lý")
+            ) {
+
+                icon =
+                    "fa-solid fa-atom";
+
+            }
+            else if (
+                subjectLower.includes("sinh")
+            ) {
+
+                icon =
+                    "fa-solid fa-dna";
+
+            }
+            else if (
+                subjectLower.includes("anh")
+            ) {
+
+                icon =
+                    "fa-solid fa-language";
+
+            }
+            else if (
+                subjectLower.includes("văn")
+            ) {
+
+                icon =
+                    "fa-solid fa-feather";
+
+            }
+
+
+            /* =====================================
+               HTML CARD
+            ===================================== */
+
             card.innerHTML = `
 
                 <div class="subject-icon">
 
-                    <i class="fa-solid fa-book-open"></i>
+                    <i class="${icon}"></i>
 
                 </div>
+
 
                 <div class="subject-content">
 
@@ -570,17 +629,31 @@ function renderSubjects(subjects) {
 
                 </div>
 
+
                 <div class="subject-meta">
 
                     <span>
-                        ${courses.length} khóa học
+
+                        <i class="fa-solid fa-book-open"></i>
+
+                        ${courses.length}
+                        ${courses.length === 1
+                            ? "khóa học"
+                            : "khóa học"}
+
                     </span>
+
 
                     <i class="fa-solid fa-arrow-right"></i>
 
                 </div>
 
             `;
+
+
+            /* =====================================
+               CLICK → BƯỚC 2
+            ===================================== */
 
             card.addEventListener(
                 "click",
@@ -594,14 +667,16 @@ function renderSubjects(subjects) {
                 }
             );
 
-            examContent.appendChild(card);
+
+            subjectGrid.appendChild(card);
 
         }
     );
 
+
+    examContent.appendChild(subjectGrid);
+
 }
-
-
 /* ==================================================
    2. LOAD COURSES
 ================================================== */
@@ -610,11 +685,20 @@ function loadCourses(subject, courses) {
 
     hideEmpty();
 
+    /* =========================================
+       LƯU MÔN ĐANG CHỌN
+    ========================================= */
+
     pageTitle.textContent =
         subject;
 
     pageDescription.textContent =
-        "Chọn khóa học để xem các chương.";
+        "Chọn khóa học để xem các chương trong khóa học.";
+
+
+    /* =========================================
+       BREADCRUMB
+    ========================================= */
 
     setBreadcrumb([
         {
@@ -627,72 +711,231 @@ function loadCourses(subject, courses) {
         }
     ]);
 
+
+    /* =========================================
+       XÓA NỘI DUNG CŨ
+    ========================================= */
+
     examContent.innerHTML = "";
 
-    courses.forEach(course => {
+    examContent.classList.remove("hidden");
 
-        const card =
-            document.createElement("div");
 
-        card.className =
-    "subject-card";
+    /* =========================================
+       KIỂM TRA KHÓA HỌC
+    ========================================= */
 
-        card.innerHTML = `
+    if (
+        !Array.isArray(courses) ||
+        courses.length === 0
+    ) {
 
-    <div class="subject-icon">
-
-        <i class="fa-solid fa-graduation-cap"></i>
-
-    </div>
-
-    <div class="subject-content">
-
-        <h3>
-            ${escapeHTML(
-                course.name || "Khóa học"
-            )}
-        </h3>
-
-        <p>
-            ${escapeHTML(
-                course.subjectName ||
-                course.subject ||
-                ""
-            )}
-        </p>
-
-    </div>
-
-    <div class="subject-meta">
-
-        <span>
-            Lớp ${escapeHTML(
-                course.grade || "12"
-            )}
-        </span>
-
-        <i class="fa-solid fa-arrow-right"></i>
-
-    </div>
-
-`;
-
-        card.addEventListener(
-            "click",
-            () => {
-
-                loadChapters(course);
-
-            }
+        showEmpty(
+            "Chưa có khóa học",
+            "Môn học này hiện chưa có khóa học nào được cấp."
         );
 
-        examContent.appendChild(card);
+        return;
+    }
 
-    });
+
+    /* =========================================
+       SẮP XẾP KHÓA HỌC
+       
+       Ưu tiên lớp nhỏ → lớp lớn
+    ========================================= */
+
+    const sortedCourses =
+        [...courses].sort((a, b) => {
+
+            const gradeA =
+                Number(a.grade || 0);
+
+            const gradeB =
+                Number(b.grade || 0);
+
+            return gradeA - gradeB;
+
+        });
+
+
+    /* =========================================
+       GRID
+    ========================================= */
+
+    const courseGrid =
+        document.createElement("div");
+
+    courseGrid.className =
+        "subject-grid";
+
+
+    /* =========================================
+       RENDER TỪNG KHÓA HỌC
+    ========================================= */
+
+    sortedCourses.forEach(
+        (course, index) => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "subject-card";
+
+
+            /* =================================
+               TÊN KHÓA HỌC
+            ================================= */
+
+            const courseName =
+                course.name ||
+                "Khóa học";
+
+
+            /* =================================
+               MÔN
+            ================================= */
+
+            const courseSubject =
+                course.subjectName ||
+                course.subject ||
+                subject;
+
+
+            /* =================================
+               LỚP
+            ================================= */
+
+            const grade =
+                course.grade ||
+                "Chưa xác định";
+
+
+            /* =================================
+               ICON
+            ================================= */
+
+            let icon =
+                "fa-solid fa-graduation-cap";
+
+
+            const subjectLower =
+                courseSubject.toLowerCase();
+
+
+            if (
+                subjectLower.includes("hóa") ||
+                subjectLower.includes("hoa")
+            ) {
+
+                icon =
+                    "fa-solid fa-flask";
+
+            }
+            else if (
+                subjectLower.includes("toán") ||
+                subjectLower.includes("toan")
+            ) {
+
+                icon =
+                    "fa-solid fa-calculator";
+
+            }
+            else if (
+                subjectLower.includes("lý") ||
+                subjectLower.includes("ly")
+            ) {
+
+                icon =
+                    "fa-solid fa-atom";
+
+            }
+            else if (
+                subjectLower.includes("sinh")
+            ) {
+
+                icon =
+                    "fa-solid fa-dna";
+
+            }
+
+
+            /* =================================
+               HTML
+            ================================= */
+
+            card.innerHTML = `
+
+                <div class="subject-icon">
+
+                    <i class="${icon}"></i>
+
+                </div>
+
+
+                <div class="subject-content">
+
+                    <h3>
+                        ${escapeHTML(courseName)}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(courseSubject)}
+                    </p>
+
+                </div>
+
+
+                <div class="subject-meta">
+
+                    <span>
+
+                        <i class="fa-solid fa-graduation-cap"></i>
+
+                        Lớp ${escapeHTML(
+                            String(grade)
+                        )}
+
+                    </span>
+
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+            `;
+
+
+            /* =================================
+               CLICK KHÓA HỌC
+               
+               → BƯỚC 3
+            ================================= */
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    loadChapters(course);
+
+                }
+            );
+
+
+            courseGrid.appendChild(card);
+
+        }
+    );
+
+
+    /* =========================================
+       HIỂN THỊ
+    ========================================= */
+
+    examContent.appendChild(courseGrid);
 
 }
-
-
 /* ==================================================
    3. LOAD CHAPTERS
 ================================================== */
@@ -700,8 +943,12 @@ function loadCourses(subject, courses) {
 async function loadChapters(course) {
 
     currentCourse = course;
+    currentChapter = null;
+    currentLesson = null;
+    currentTest = null;
 
     showLoading();
+    hideEmpty();
 
     pageTitle.textContent =
         course.name || "Khóa học";
@@ -731,36 +978,38 @@ async function loadChapters(course) {
 
     try {
 
+        const chaptersRef = collection(
+            db,
+            "courses",
+            course.id,
+            "chapters"
+        );
+
         const snapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "courses",
-                    course.id,
-                    "chapters"
-                )
-            );
+            await getDocs(chaptersRef);
 
         const chapters = [];
 
         snapshot.forEach(chapterDoc => {
 
             chapters.push({
-
                 id: chapterDoc.id,
-
                 ...chapterDoc.data()
-
             });
 
         });
 
-        chapters.sort(
-            (a, b) =>
-                Number(a.order || 0) -
-                Number(b.order || 0)
-        );
+        /* Sắp xếp chương */
 
+        chapters.sort((a, b) => {
+
+            return Number(a.order || 0)
+                - Number(b.order || 0);
+
+        });
+
+
+        /* Không có chương */
 
         if (!chapters.length) {
 
@@ -773,6 +1022,7 @@ async function loadChapters(course) {
 
         }
 
+
         hideLoading();
 
         renderChapters(chapters);
@@ -781,18 +1031,19 @@ async function loadChapters(course) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Lỗi loadChapters:",
+            error
+        );
 
         showEmpty(
             "Không thể tải chương",
-            "Đã xảy ra lỗi khi tải dữ liệu."
+            "Đã xảy ra lỗi khi tải danh sách chương."
         );
 
     }
 
 }
-
-
 /* ==================================================
    RENDER CHAPTERS
 ================================================== */
@@ -801,19 +1052,27 @@ function renderChapters(chapters) {
 
     examContent.innerHTML = "";
 
+    examContent.classList.remove("hidden");
+
     const chapterList =
         document.createElement("div");
 
     chapterList.className =
         "chapter-list";
 
-    chapters.forEach(chapter => {
+
+    chapters.forEach((chapter, index) => {
 
         const card =
             document.createElement("div");
 
         card.className =
             "exam-chapter";
+
+        const chapterNumber =
+            chapter.order ||
+            index + 1;
+
 
         card.innerHTML = `
 
@@ -824,17 +1083,18 @@ function renderChapters(chapters) {
                     <div class="chapter-number">
 
                         ${escapeHTML(
-                            chapter.order || ""
+                            chapterNumber
                         )}
 
                     </div>
+
 
                     <div class="chapter-info">
 
                         <h3>
                             ${escapeHTML(
                                 chapter.title ||
-                                "Chương"
+                                `Chương ${chapterNumber}`
                             )}
                         </h3>
 
@@ -849,6 +1109,7 @@ function renderChapters(chapters) {
 
                 </div>
 
+
                 <div class="chapter-arrow">
 
                     <i class="fa-solid fa-arrow-right"></i>
@@ -859,6 +1120,9 @@ function renderChapters(chapters) {
 
         `;
 
+
+        /* Click chương */
+
         card.addEventListener(
             "click",
             () => {
@@ -868,9 +1132,11 @@ function renderChapters(chapters) {
             }
         );
 
+
         chapterList.appendChild(card);
 
     });
+
 
     examContent.appendChild(chapterList);
 
@@ -882,8 +1148,11 @@ function renderChapters(chapters) {
 async function loadLessons(chapter) {
 
     currentChapter = chapter;
+    currentLesson = null;
+    currentTest = null;
 
     showLoading();
+    hideEmpty();
 
     pageTitle.textContent =
         chapter.title || "Bài học";
@@ -910,21 +1179,23 @@ async function loadLessons(chapter) {
         }
     ]);
 
+
     try {
 
+        const lessonsRef = collection(
+            db,
+            "courses",
+            currentCourse.id,
+            "chapters",
+            chapter.id,
+            "lessons"
+        );
+
         const snapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "courses",
-                    currentCourse.id,
-                    "chapters",
-                    chapter.id,
-                    "lessons"
-                )
-            );
+            await getDocs(lessonsRef);
 
         const lessons = [];
+
 
         snapshot.forEach(lessonDoc => {
 
@@ -938,12 +1209,18 @@ async function loadLessons(chapter) {
 
         });
 
-        lessons.sort(
-            (a, b) =>
-                Number(a.order || 0) -
-                Number(b.order || 0)
-        );
 
+        /* Sắp xếp bài */
+
+        lessons.sort((a, b) => {
+
+            return Number(a.order || 0)
+                - Number(b.order || 0);
+
+        });
+
+
+        /* Không có bài */
 
         if (!lessons.length) {
 
@@ -956,6 +1233,7 @@ async function loadLessons(chapter) {
 
         }
 
+
         hideLoading();
 
         renderLessons(lessons);
@@ -964,24 +1242,28 @@ async function loadLessons(chapter) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Lỗi loadLessons:",
+            error
+        );
 
         showEmpty(
             "Không thể tải bài học",
-            "Đã xảy ra lỗi khi tải dữ liệu."
+            "Đã xảy ra lỗi khi tải danh sách bài học."
         );
 
     }
 
 }
-
-
 /* ==================================================
    RENDER LESSONS
 ================================================== */
+
 function renderLessons(lessons) {
 
     examContent.innerHTML = "";
+
+    examContent.classList.remove("hidden");
 
     const lessonList =
         document.createElement("div");
@@ -989,13 +1271,20 @@ function renderLessons(lessons) {
     lessonList.className =
         "exam-list";
 
-    lessons.forEach(lesson => {
+
+    lessons.forEach((lesson, index) => {
 
         const card =
             document.createElement("div");
 
         card.className =
             "exam-card";
+
+
+        const lessonNumber =
+            lesson.order ||
+            index + 1;
+
 
         card.innerHTML = `
 
@@ -1007,25 +1296,32 @@ function renderLessons(lessons) {
 
                 </div>
 
+
                 <div class="exam-card-info">
 
                     <h3>
+
                         ${escapeHTML(
                             lesson.title ||
-                            "Bài học"
+                            `Bài ${lessonNumber}`
                         )}
+
                     </h3>
 
+
                     <p>
+
                         ${escapeHTML(
                             lesson.description ||
                             "Xem các bài kiểm tra của bài học."
                         )}
+
                     </p>
 
                 </div>
 
             </div>
+
 
             <div class="exam-meta">
 
@@ -1033,12 +1329,12 @@ function renderLessons(lessons) {
 
                     <i class="fa-solid fa-book-open"></i>
 
-                    Bài
-                    ${escapeHTML(
-                        lesson.order || ""
+                    Bài ${escapeHTML(
+                        lessonNumber
                     )}
 
                 </span>
+
 
                 <span class="exam-tag">
 
@@ -1052,6 +1348,9 @@ function renderLessons(lessons) {
 
         `;
 
+
+        /* Click bài học */
+
         card.addEventListener(
             "click",
             () => {
@@ -1061,9 +1360,11 @@ function renderLessons(lessons) {
             }
         );
 
+
         lessonList.appendChild(card);
 
     });
+
 
     examContent.appendChild(lessonList);
 
@@ -1071,7 +1372,6 @@ function renderLessons(lessons) {
 /* ==================================================
    5. LOAD TESTS
 ================================================== */
-
 async function loadTests(lesson) {
 
     currentLesson = lesson;
@@ -1082,7 +1382,7 @@ async function loadTests(lesson) {
         lesson.title || "Bài kiểm tra";
 
     pageDescription.textContent =
-        "Chọn bài thi để xem thông tin trước khi bắt đầu.";
+        "Chọn bài kiểm tra để xem thông tin trước khi bắt đầu.";
 
     setBreadcrumb([
         {
@@ -1111,27 +1411,29 @@ async function loadTests(lesson) {
 
     try {
 
-        const snapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "courses",
-                    currentCourse.id,
-                    "tests"
-                )
-            );
+        /*
+         * Lấy toàn bộ bài kiểm tra
+         * của khóa học hiện tại.
+         */
+        const snapshot = await getDocs(
+            collection(
+                db,
+                "courses",
+                currentCourse.id,
+                "tests"
+            )
+        );
 
         const tests = [];
 
         snapshot.forEach(testDoc => {
 
-            const data =
-                testDoc.data();
+            const data = testDoc.data();
 
             /*
-             * Chỉ lấy bài thi thuộc bài học hiện tại.
+             * Chỉ lấy test thuộc bài học
+             * đang được chọn.
              */
-
             if (
                 data.lessonId === lesson.id
             ) {
@@ -1148,13 +1450,25 @@ async function loadTests(lesson) {
 
         });
 
+        /*
+         * Sắp xếp bài kiểm tra
+         * nếu Firebase có trường order.
+         */
+        tests.sort(
+            (a, b) =>
+                Number(a.order || 0) -
+                Number(b.order || 0)
+        );
+
         currentTests = tests;
 
-
+        /*
+         * Không có bài kiểm tra.
+         */
         if (!tests.length) {
 
             showEmpty(
-                "Chưa có bài thi",
+                "Chưa có bài kiểm tra",
                 "Bài học này hiện chưa có bài kiểm tra."
             );
 
@@ -1167,21 +1481,20 @@ async function loadTests(lesson) {
         renderTests(tests);
 
     }
-
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Lỗi khi tải bài kiểm tra:",
+            error
+        );
 
         showEmpty(
-            "Không thể tải bài thi",
+            "Không thể tải bài kiểm tra",
             "Đã xảy ra lỗi khi tải dữ liệu."
         );
 
     }
-
 }
-
-
 /* ==================================================
    RENDER TESTS
 ================================================== */
@@ -1205,6 +1518,13 @@ function renderTests(tests) {
 
         const type =
             getTestType(test.type);
+
+        const questionCount =
+            Array.isArray(test.questions)
+                ? test.questions.length
+                : Number(
+                    test.questionCount || 0
+                );
 
         card.innerHTML = `
 
@@ -1249,12 +1569,7 @@ function renderTests(tests) {
 
                     <i class="fa-solid fa-list-ol"></i>
 
-                    ${Number(
-                        test.questionCount ||
-                        (test.questions
-                            ? test.questions.length
-                            : 0)
-                    )} câu
+                    ${questionCount} câu
 
                 </span>
 
@@ -1284,7 +1599,6 @@ function renderTests(tests) {
     });
 
     examContent.appendChild(examList);
-
 }
 /* ==================================================
    TEST TYPE
