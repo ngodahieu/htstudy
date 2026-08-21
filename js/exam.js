@@ -347,63 +347,32 @@ async function loadSubjects() {
 
     try {
 
-        /*
-         * Lấy các khóa học được cấp cho học sinh.
-         *
-         * Ở đây tạm dùng studentIds chứa UID.
-         *
-         * Nếu hệ thống cấp khóa học của bạn đang
-         * dùng trường khác, chỉ cần sửa query này.
-         */
+        /* =========================================
+           LẤY DANH SÁCH KHÓA HỌC ĐƯỢC CẤP
+           
+           Dữ liệu Firebase của bạn đang có dạng:
 
-        const q = query(
-            collection(db, "courses"),
-            where("studentIds", "array-contains", currentUser.uid)
+           enrollments
+              └── UID học sinh
+                    └── courses
+                          └── 0: "ID_KHOA_HOC"
+        ========================================= */
+
+        const enrollmentRef = doc(
+            db,
+            "enrollments",
+            currentUser.uid
         );
 
-        const snapshot =
-            await getDocs(q);
-
-        const courses = [];
-
-        snapshot.forEach(courseDoc => {
-
-            courses.push({
-
-                id: courseDoc.id,
-
-                ...courseDoc.data()
-
-            });
-
-        });
+        const enrollmentSnap =
+            await getDoc(enrollmentRef);
 
 
-        /*
-         * Gom khóa học theo môn.
-         */
+        /* =========================================
+           KIỂM TRA ENROLLMENT
+        ========================================= */
 
-        const subjects = {};
-
-        courses.forEach(course => {
-
-            const subject =
-                course.subjectName ||
-                course.subject ||
-                "Khác";
-
-            if (!subjects[subject]) {
-
-                subjects[subject] = [];
-
-            }
-
-            subjects[subject].push(course);
-
-        });
-
-
-        if (!Object.keys(subjects).length) {
+        if (!enrollmentSnap.exists()) {
 
             showEmpty(
                 "Chưa có khóa học",
@@ -415,6 +384,131 @@ async function loadSubjects() {
         }
 
 
+        const enrollmentData =
+            enrollmentSnap.data();
+
+
+        const courseIds =
+            enrollmentData.courses || [];
+
+
+        /* =========================================
+           KHÔNG CÓ KHÓA HỌC
+        ========================================= */
+
+        if (
+            !Array.isArray(courseIds) ||
+            courseIds.length === 0
+        ) {
+
+            showEmpty(
+                "Chưa có khóa học",
+                "Bạn chưa được cấp khóa học nào."
+            );
+
+            return;
+
+        }
+
+
+        /* =========================================
+           LẤY THÔNG TIN TỪ COLLECTION COURSES
+        ========================================= */
+
+        const courses = [];
+
+
+        for (const courseId of courseIds) {
+
+            try {
+
+                const courseRef =
+                    doc(
+                        db,
+                        "courses",
+                        courseId
+                    );
+
+                const courseSnap =
+                    await getDoc(courseRef);
+
+
+                if (
+                    courseSnap.exists()
+                ) {
+
+                    courses.push({
+
+                        id: courseSnap.id,
+
+                        ...courseSnap.data()
+
+                    });
+
+                }
+
+            }
+
+            catch (courseError) {
+
+                console.error(
+                    "Lỗi khi tải khóa học:",
+                    courseId,
+                    courseError
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           KHÔNG TÌM THẤY COURSE NÀO
+        ========================================= */
+
+        if (!courses.length) {
+
+            showEmpty(
+                "Không tìm thấy khóa học",
+                "Khóa học được cấp không còn tồn tại hoặc mã khóa học không chính xác."
+            );
+
+            return;
+
+        }
+
+
+        /* =========================================
+           GOM KHÓA HỌC THEO MÔN
+        ========================================= */
+
+        const subjects = {};
+
+
+        courses.forEach(course => {
+
+            const subject =
+                course.subjectName ||
+                course.subject ||
+                "Khác";
+
+
+            if (!subjects[subject]) {
+
+                subjects[subject] = [];
+
+            }
+
+
+            subjects[subject].push(course);
+
+        });
+
+
+        /* =========================================
+           HIỂN THỊ
+        ========================================= */
+
         hideLoading();
 
         renderSubjects(subjects);
@@ -423,7 +517,10 @@ async function loadSubjects() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Lỗi loadSubjects:",
+            error
+        );
 
         showEmpty(
             "Không thể tải dữ liệu",
@@ -433,8 +530,6 @@ async function loadSubjects() {
     }
 
 }
-
-
 /* ==================================================
    RENDER SUBJECTS
 ================================================== */
