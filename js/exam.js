@@ -411,6 +411,8 @@ function renderSubjects(subjects) {
 
     examContent.innerHTML = "";
 
+    examContent.classList.remove("hidden");
+
     Object.entries(subjects).forEach(
         ([subject, courses]) => {
 
@@ -422,25 +424,29 @@ function renderSubjects(subjects) {
 
             card.innerHTML = `
 
-                <div class="card-icon">
+                <div class="subject-icon">
 
                     <i class="fa-solid fa-book-open"></i>
 
                 </div>
 
-                <h3>
-                    ${escapeHTML(subject)}
-                </h3>
+                <div class="subject-content">
 
-                <p>
-                    ${courses.length}
-                    khóa học được cấp
-                </p>
+                    <h3>
+                        ${escapeHTML(subject)}
+                    </h3>
 
-                <div class="card-footer">
+                    <p>
+                        ${courses.length}
+                        khóa học được cấp
+                    </p>
+
+                </div>
+
+                <div class="subject-meta">
 
                     <span>
-                        Xem khóa học
+                        ${courses.length} khóa học
                     </span>
 
                     <i class="fa-solid fa-arrow-right"></i>
@@ -453,7 +459,10 @@ function renderSubjects(subjects) {
                 "click",
                 () => {
 
-                    loadCourses(subject, courses);
+                    loadCourses(
+                        subject,
+                        courses
+                    );
 
                 }
             );
