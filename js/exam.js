@@ -852,10 +852,15 @@ async function loadLessons(chapter) {
 /* ==================================================
    RENDER LESSONS
 ================================================== */
-
 function renderLessons(lessons) {
 
     examContent.innerHTML = "";
+
+    const lessonList =
+        document.createElement("div");
+
+    lessonList.className =
+        "exam-list";
 
     lessons.forEach(lesson => {
 
@@ -863,40 +868,58 @@ function renderLessons(lessons) {
             document.createElement("div");
 
         card.className =
-            "lesson-card";
+            "exam-card";
 
         card.innerHTML = `
 
-            <div class="card-icon">
+            <div class="exam-card-left">
 
-                <i class="fa-solid fa-book-open"></i>
+                <div class="exam-card-icon">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                </div>
+
+                <div class="exam-card-info">
+
+                    <h3>
+                        ${escapeHTML(
+                            lesson.title ||
+                            "Bài học"
+                        )}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(
+                            lesson.description ||
+                            "Xem các bài kiểm tra của bài học."
+                        )}
+                    </p>
+
+                </div>
 
             </div>
 
-            <h3>
-                ${escapeHTML(
-                    lesson.title ||
-                    "Bài học"
-                )}
-            </h3>
+            <div class="exam-meta">
 
-            <p>
-                ${escapeHTML(
-                    lesson.description ||
-                    "Xem các bài kiểm tra của bài học."
-                )}
-            </p>
+                <span class="exam-tag">
 
-            <div class="card-footer">
+                    <i class="fa-solid fa-book-open"></i>
 
-                <span>
                     Bài
                     ${escapeHTML(
                         lesson.order || ""
                     )}
+
                 </span>
 
-                <i class="fa-solid fa-arrow-right"></i>
+                <span class="exam-tag">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                    Xem bài kiểm tra
+
+                </span>
 
             </div>
 
@@ -911,13 +934,13 @@ function renderLessons(lessons) {
             }
         );
 
-        examContent.appendChild(card);
+        lessonList.appendChild(card);
 
     });
 
+    examContent.appendChild(lessonList);
+
 }
-
-
 /* ==================================================
    5. LOAD TESTS
 ================================================== */
@@ -1035,10 +1058,15 @@ async function loadTests(lesson) {
 /* ==================================================
    RENDER TESTS
 ================================================== */
-
 function renderTests(tests) {
 
     examContent.innerHTML = "";
+
+    const examList =
+        document.createElement("div");
+
+    examList.className =
+        "exam-list";
 
     tests.forEach(test => {
 
@@ -1046,43 +1074,70 @@ function renderTests(tests) {
             document.createElement("div");
 
         card.className =
-            "course-card";
+            "exam-card";
 
         const type =
             getTestType(test.type);
 
         card.innerHTML = `
 
-            <div class="card-icon">
+            <div class="exam-card-left">
 
-                <i class="fa-solid fa-file-circle-check"></i>
+                <div class="exam-card-icon">
+
+                    <i class="fa-solid fa-file-circle-check"></i>
+
+                </div>
+
+                <div class="exam-card-info">
+
+                    <h3>
+                        ${escapeHTML(
+                            test.title ||
+                            "Bài kiểm tra"
+                        )}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(type)}
+                    </p>
+
+                </div>
 
             </div>
 
-            <h3>
-                ${escapeHTML(
-                    test.title ||
-                    "Bài kiểm tra"
-                )}
-            </h3>
+            <div class="exam-meta">
 
-            <p>
-                ${escapeHTML(type)}
-            </p>
+                <span class="exam-tag">
 
-            <div class="card-footer">
+                    <i class="fa-regular fa-clock"></i>
 
-                <span>
                     ${Number(
                         test.duration || 0
                     )} phút
-                    ·
-                    ${Number(
-                        test.questionCount || 0
-                    )} câu
+
                 </span>
 
-                <i class="fa-solid fa-arrow-right"></i>
+                <span class="exam-tag">
+
+                    <i class="fa-solid fa-list-ol"></i>
+
+                    ${Number(
+                        test.questionCount ||
+                        (test.questions
+                            ? test.questions.length
+                            : 0)
+                    )} câu
+
+                </span>
+
+                <span class="exam-tag">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                    Xem chi tiết
+
+                </span>
 
             </div>
 
@@ -1097,13 +1152,13 @@ function renderTests(tests) {
             }
         );
 
-        examContent.appendChild(card);
+        examList.appendChild(card);
 
     });
 
+    examContent.appendChild(examList);
+
 }
-
-
 /* ==================================================
    TEST TYPE
 ================================================== */
