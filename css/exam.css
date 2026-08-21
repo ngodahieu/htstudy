@@ -2231,6 +2231,175 @@ body::after{
 }
 
 /*==================================================
+            EXAM DETAIL INFO
+==================================================*/
+
+.detail-info{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:18px;
+
+    margin-bottom:30px;
+
+}
+
+
+/*==================================================
+            DETAIL INFO ITEM
+==================================================*/
+
+.detail-info > div{
+
+    min-height:85px;
+
+    padding:18px 16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    text-align:center;
+
+    border-radius:20px;
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(20,45,85,.55),
+            rgba(8,20,42,.55)
+        );
+
+    border:
+
+        1px solid
+        rgba(120,190,255,.12);
+
+    backdrop-filter:blur(15px);
+
+    transition:
+
+        .35s
+        cubic-bezier(.22,1,.36,1);
+
+}
+
+
+/*==================================================
+            DETAIL INFO ICON
+==================================================*/
+
+.detail-info > div i{
+
+    width:38px;
+
+    height:38px;
+
+    min-width:38px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:12px;
+
+    color:#62d8ff;
+
+    background:
+
+        rgba(0,160,255,.09);
+
+    border:
+
+        1px solid
+        rgba(100,205,255,.14);
+
+    font-size:16px;
+
+    transition:.35s;
+
+}
+
+
+/*==================================================
+            DETAIL INFO TEXT
+==================================================*/
+
+.detail-info > div span{
+
+    color:#cfe5ff;
+
+    font-size:.9rem;
+
+    font-weight:500;
+
+    line-height:1.4;
+
+}
+
+
+/*==================================================
+            DETAIL INFO HOVER
+==================================================*/
+
+.detail-info > div:hover{
+
+    transform:
+        translateY(-5px);
+
+    border-color:
+
+        rgba(70,205,255,.55);
+
+    background:
+
+        linear-gradient(
+            145deg,
+            rgba(20,70,125,.65),
+            rgba(8,25,52,.65)
+        );
+
+    box-shadow:
+
+        0 0 25px
+        rgba(0,180,255,.16);
+
+}
+
+
+.detail-info > div:hover i{
+
+    color:white;
+
+    background:
+
+        linear-gradient(
+            135deg,
+            #0f72ff,
+            #42d2ff
+        );
+
+    box-shadow:
+
+        0 0 20px
+        rgba(50,210,255,.35);
+
+    transform:
+        scale(1.08);
+
+}
+
+/*==================================================
                 SCROLLBAR
 ==================================================*/
 
