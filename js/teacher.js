@@ -2025,6 +2025,71 @@ function updateTestTotal(){
             .replace(/\.00$/, "");
 
 }
+function resetTestBuilder(){
+
+    // =========================
+    // RESET DỮ LIỆU CÂU HỎI
+    // =========================
+
+    part1QuestionData = [];
+    part2QuestionData = [];
+    part3QuestionData = [];
+
+    // =========================
+    // RESET THÔNG TIN BÀI TEST
+    // =========================
+
+    testTitle.value = "";
+
+    testDescription.value = "";
+
+    testType.value = "30p";
+
+    testCourse.value = "";
+
+    testChapter.innerHTML = `
+        <option value="">
+            -- Chọn chương --
+        </option>
+    `;
+
+    testLesson.innerHTML = `
+        <option value="">
+            -- Chọn bài học --
+        </option>
+    `;
+
+    testChapter.disabled = true;
+    testLesson.disabled = true;
+
+    // =========================
+    // RESET ĐIỂM
+    // =========================
+
+    part1Point.value = "";
+
+    part2Score1.value = "";
+    part2Score2.value = "";
+    part2Score3.value = "";
+    part2Score4.value = "";
+
+    part3Point.value = "";
+
+    // =========================
+    // RESET HIỂN THỊ CÂU HỎI
+    // =========================
+
+    renderPart1Questions();
+    renderPart2Questions();
+    renderPart3Questions();
+
+    // =========================
+    // RESET TỔNG
+    // =========================
+
+    updateTestTotal();
+
+}
 [
     part1Point,
     part2Score1,
