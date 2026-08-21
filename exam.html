@@ -49,59 +49,53 @@
          BACKGROUND
     ========================================== -->
 
-    <div class="page-background">
+<div class="space-bg"></div>
 
-        <div class="background-orb orb-1"></div>
-        <div class="background-orb orb-2"></div>
-        <div class="background-orb orb-3"></div>
-
-    </div>
+<div class="overlay"></div>
 
 
     <!-- =========================================
          MAIN
     ========================================== -->
 
-    <main class="exam-container">
+    <main class="exam-container exam-main">
 
         <!-- =====================================
              HEADER
         ====================================== -->
 
-        <header class="exam-header">
+<header class="exam-header">
 
-            <button
-                id="backBtn"
-                class="back-btn"
-                type="button"
-            >
+    <div class="exam-header-inner">
 
-                <i class="fa-solid fa-arrow-left"></i>
+        <button
+            id="backBtn"
+            class="exam-back-btn"
+            type="button"
+        >
 
-                <span>Quay lại</span>
+            <i class="fa-solid fa-arrow-left"></i>
 
-            </button>
+            <span>Quay lại</span>
+
+        </button>
 
 
-            <div class="exam-brand">
+        <div class="exam-header-title">
 
-                <div class="brand-icon">
+            <i class="fa-solid fa-clipboard-check"></i>
 
-                    <i class="fa-solid fa-clipboard-check"></i>
+            <div>
 
-                </div>
-
-                <div>
-
-                    <h1>H&T STUDY</h1>
-
-                    <p>Hệ thống kiểm tra</p>
-
-                </div>
+                <h1>H&T STUDY</h1>
 
             </div>
 
-        </header>
+        </div>
+
+    </div>
+
+</header>
 
 
         <!-- =====================================
@@ -127,24 +121,24 @@
 
         <section
             id="pageHeading"
-            class="page-heading"
+            class="exam-hero"
         >
 
-            <div>
+<div>
 
-                <span class="heading-label">
-                    KHU VỰC KIỂM TRA
-                </span>
+    <span class="eyebrow">
+        KHU VỰC KIỂM TRA
+    </span>
 
-                <h2 id="pageTitle">
-                    Chọn môn học
-                </h2>
+    <h2 id="pageTitle">
+        Chọn môn học
+    </h2>
 
-                <p id="pageDescription">
-                    Chọn môn học để xem các khóa học được cấp cho bạn.
-                </p>
+    <p id="pageDescription">
+        Chọn môn học để xem các khóa học được cấp cho bạn.
+    </p>
 
-            </div>
+</div>
 
         </section>
 
@@ -153,16 +147,16 @@
              LOADING
         ====================================== -->
 
-        <div
-            id="loading"
-            class="loading"
-        >
+<div
+    id="loading"
+    class="exam-loading"
+>
 
-            <div class="loading-spinner"></div>
+    <div class="exam-loader"></div>
 
-            <p>Đang tải dữ liệu...</p>
+    <p>Đang tải dữ liệu...</p>
 
-        </div>
+</div>
 
 
         <!-- =====================================
@@ -170,15 +164,14 @@
         ====================================== -->
 
         <div
-            id="emptyState"
-            class="empty-state hidden"
-        >
+    id="emptyState"
+    class="exam-empty hidden"
+>
+<div>
 
-            <div class="empty-icon">
+    <i class="fa-solid fa-folder-open"></i>
 
-                <i class="fa-solid fa-folder-open"></i>
-
-            </div>
+</div>
 
             <h3 id="emptyTitle">
                 Chưa có dữ liệu
@@ -205,43 +198,41 @@
              EXAM DETAIL
         ====================================== -->
 
-        <section
-            id="examDetail"
-            class="exam-detail hidden"
-        >
+<section
+    id="examDetail"
+    class="exam-detail-wrapper hidden"
+>
 
-            <div class="detail-card">
+            <div class="exam-detail-card">
 
-                <div class="detail-icon">
+<div class="exam-detail-header">
 
-                    <i class="fa-solid fa-file-circle-check"></i>
+    <div class="exam-detail-icon">
 
-                </div>
+        <i class="fa-solid fa-file-circle-check"></i>
 
+    </div>
 
-                <div class="detail-main">
+    <span
+        id="detailExamType"
+        class="exam-type"
+    >
+        Bài kiểm tra
+    </span>
 
-                    <span
-                        id="detailExamType"
-                        class="exam-type"
-                    >
-                        Bài kiểm tra
-                    </span>
+    <h2 id="detailExamTitle">
+        Tên bài thi
+    </h2>
 
-                    <h2 id="detailExamTitle">
-                        Tên bài thi
-                    </h2>
+    <p id="detailExamDescription">
+        Nội dung bài thi
+    </p>
 
-                    <p id="detailExamDescription">
-                        Nội dung bài thi
-                    </p>
+</div>
 
-                </div>
+                <div class="exam-info-grid">
 
-
-                <div class="detail-stats">
-
-                    <div class="detail-stat">
+                    <div class="exam-info-box">
 
                         <i class="fa-regular fa-clock"></i>
 
