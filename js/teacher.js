@@ -161,7 +161,9 @@ menuHome.addEventListener("click", () => {
 
 });
 const dashboardHeader =
-document.querySelector(".dashboard-header");
+document.getElementById(
+    "mainDashboardHeader"
+);
 
 const dashboardCards =
 document.querySelector(".dashboard-cards");
@@ -3664,11 +3666,14 @@ ${(file.size/1024/1024).toFixed(2)} MB
 `;
 
 });
-uploadVideoBtn.addEventListener(() => {
+uploadVideoBtn.addEventListener(
+    "click",
+    () => {
 
-    videoFile.click();
+        videoFile.click();
 
-});
+    }
+);
 videoFile.addEventListener("change",()=>{
 
     if(!videoFile.files.length) return;
