@@ -328,108 +328,216 @@
              EXAM SCREEN
         ====================================== -->
 
-        <section
-            id="examScreen"
-            class="exam-screen hidden"
+<section
+    id="examScreen"
+    class="exam-screen hidden"
+>
+
+    <!-- ==============================
+         HEADER BÀI THI
+    =============================== -->
+
+    <div class="exam-test-header">
+
+        <div class="test-info">
+
+            <span id="testTypeLabel">
+                Bài kiểm tra
+            </span>
+
+            <h2 id="testTitle">
+                Đang tải...
+            </h2>
+
+        </div>
+
+        <!-- TIMER -->
+        <div
+            id="timerBox"
+            class="timer-box"
         >
 
-            <div class="exam-test-header">
+            <i class="fa-regular fa-clock"></i>
 
-                <div>
+            <span id="timer">
+                00:00
+            </span>
 
-                    <span id="testTypeLabel">
-                        Bài kiểm tra
-                    </span>
+        </div>
 
-                    <h2 id="testTitle">
-                        Đang tải...
-                    </h2>
-
-                </div>
+    </div>
 
 
-                <div class="timer-box">
+    <!-- ==============================
+         TIẾN ĐỘ
+    =============================== -->
 
-                    <i class="fa-regular fa-clock"></i>
+    <div
+        id="progressWrapper"
+        class="progress-container"
+    >
 
-                    <span id="timer">
-                        00:00
-                    </span>
+        <div class="progress-info">
 
-                </div>
+            <span>
+                Câu
+
+                <strong id="currentQuestionNumber">
+                    1
+                </strong>
+
+                /
+
+                <strong id="totalQuestions">
+                    0
+                </strong>
+            </span>
+
+            <span id="answeredCount">
+                Đã trả lời: 0
+            </span>
+
+        </div>
+
+        <div
+            id="progressBar"
+            class="progress-bar"
+        >
+
+            <div
+                id="progressFill"
+                class="progress-fill"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==============================
+         NÚT DANH SÁCH CÂU HỎI
+    =============================== -->
+
+    <button
+        id="toggleNav"
+        type="button"
+    >
+
+        <i class="fa-solid fa-list-ol"></i>
+
+        Câu hỏi
+
+    </button>
+
+
+    <!-- ==============================
+         DANH SÁCH CÂU HỎI
+    =============================== -->
+
+    <div
+        id="questionNav"
+    >
+
+        <div class="question-nav-title">
+
+            <i class="fa-solid fa-list-check"></i>
+
+            Danh sách câu hỏi
+
+        </div>
+
+        <div
+            id="questionNavGrid"
+            class="question-nav-grid"
+        ></div>
+
+    </div>
+
+
+    <!-- ==============================
+         KHU VỰC LÀM BÀI
+    =============================== -->
+
+    <div class="exam-wrapper">
+
+        <!-- ==========================
+             TƯ LIỆU
+        =========================== -->
+
+        <div
+            id="passageBox"
+            class="passage-box hidden"
+        >
+
+            <div class="passage-title">
+
+                <i class="fa-solid fa-book-open"></i>
+
+                Tư liệu
 
             </div>
 
+            <div
+                id="passageContent"
+                class="passage-content"
+            ></div>
 
-            <div class="progress-container">
+        </div>
 
-                <div class="progress-info">
 
-                    <span>
-                        Câu
-                        <strong id="currentQuestionNumber">
-                            1
-                        </strong>
-                        /
-                        <strong id="totalQuestions">
-                            0
-                        </strong>
-                    </span>
+        <!-- ==========================
+             CÂU HỎI
+        =========================== -->
 
-                    <span id="answeredCount">
-                        Đã trả lời: 0
-                    </span>
-
-                </div>
-
-                <div class="progress-bar">
-
-                    <div
-                        id="progressBar"
-                        class="progress-fill"
-                    ></div>
-
-                </div>
-
-            </div>
-
+        <div
+            id="questionBox"
+            class="question-box"
+        >
 
             <div
                 id="questionContainer"
                 class="question-container"
             ></div>
 
+        </div>
 
-            <div class="exam-navigation">
-
-                <button
-                    id="prevQuestionBtn"
-                    class="nav-btn secondary"
-                    type="button"
-                >
-
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                    Câu trước
-
-                </button>
+    </div>
 
 
-                <button
-                    id="nextQuestionBtn"
-                    class="nav-btn primary"
-                    type="button"
-                >
+    <!-- ==============================
+         ĐIỀU HƯỚNG
+    =============================== -->
 
-                    Câu tiếp theo
+    <div class="exam-navigation">
 
-                    <i class="fa-solid fa-arrow-right"></i>
+        <button
+            id="prevQuestionBtn"
+            class="nav-btn secondary"
+            type="button"
+        >
 
-                </button>
+            <i class="fa-solid fa-arrow-left"></i>
 
-            </div>
+            Câu trước
 
-        </section>
+        </button>
+
+
+        <button
+            id="nextQuestionBtn"
+            class="nav-btn primary"
+            type="button"
+        >
+
+            Câu tiếp theo
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+        </button>
+
+    </div>
+
+</section>
 
     </main>
 
