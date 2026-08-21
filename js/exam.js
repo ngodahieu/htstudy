@@ -508,43 +508,47 @@ function loadCourses(subject, courses) {
             document.createElement("div");
 
         card.className =
-            "course-card";
+    "subject-card";
 
         card.innerHTML = `
 
-            <div class="card-icon">
+    <div class="subject-icon">
 
-                <i class="fa-solid fa-graduation-cap"></i>
+        <i class="fa-solid fa-graduation-cap"></i>
 
-            </div>
+    </div>
 
-            <h3>
-                ${escapeHTML(
-                    course.name || "Khóa học"
-                )}
-            </h3>
+    <div class="subject-content">
 
-            <p>
-                ${escapeHTML(
-                    course.subjectName ||
-                    course.subject ||
-                    ""
-                )}
-            </p>
+        <h3>
+            ${escapeHTML(
+                course.name || "Khóa học"
+            )}
+        </h3>
 
-            <div class="card-footer">
+        <p>
+            ${escapeHTML(
+                course.subjectName ||
+                course.subject ||
+                ""
+            )}
+        </p>
 
-                <span>
-                    Lớp ${escapeHTML(
-                        course.grade || ""
-                    )}
-                </span>
+    </div>
 
-                <i class="fa-solid fa-arrow-right"></i>
+    <div class="subject-meta">
 
-            </div>
+        <span>
+            Lớp ${escapeHTML(
+                course.grade || "12"
+            )}
+        </span>
 
-        `;
+        <i class="fa-solid fa-arrow-right"></i>
+
+    </div>
+
+`;
 
         card.addEventListener(
             "click",
