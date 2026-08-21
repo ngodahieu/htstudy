@@ -95,11 +95,12 @@ Khóa học của tôi
 </button>
 
 <button
-class="menu-item">
+    class="menu-item"
+    id="menuTests">
 
-<i class="fa-solid fa-file-circle-check"></i>
+    <i class="fa-solid fa-file-circle-check"></i>
 
-Bài kiểm tra
+    Bài kiểm tra
 
 </button>
 
@@ -424,6 +425,53 @@ class="course-list">
     </div>
 
 </div>
+    <!-- ==================================================
+     TEST PAGE
+================================================== -->
+
+<div id="testPage" style="display:none;">
+
+    <div class="dashboard-header">
+
+        <h1>
+            Quản lý bài kiểm tra
+        </h1>
+
+        <p>
+            Tạo và quản lý các bài kiểm tra theo từng chương và bài học.
+        </p>
+
+    </div>
+
+    <div class="dashboard-form">
+
+        <div class="chapter-toolbar">
+
+            <button
+                id="createTestBtn"
+                class="primary-btn">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Tạo bài kiểm tra
+
+            </button>
+
+        </div>
+
+        <div
+            id="testList"
+            class="chapter-list">
+
+            <p class="empty">
+                Chưa có bài kiểm tra nào.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
     <div id="notificationPage" style="display:none;">
 
     <div class="dashboard-header">
@@ -560,6 +608,434 @@ class="course-list">
     <div id="notificationList">
 
         Đang tải...
+
+    </div>
+
+</div>
+    <!-- ==================================================
+     TEST MODAL
+================================================== -->
+
+<div id="testModal" class="modal">
+
+    <div class="modal-content test-modal-content">
+
+        <h2>
+            <i class="fa-solid fa-file-circle-check"></i>
+            Tạo bài kiểm tra
+        </h2>
+
+        <!-- =========================
+             VỊ TRÍ BÀI KIỂM TRA
+        ========================== -->
+
+        <h3 class="test-section-title">
+            <i class="fa-solid fa-location-dot"></i>
+            Vị trí bài kiểm tra
+        </h3>
+
+        <div class="form-group">
+
+            <label>
+                Khóa học
+            </label>
+
+            <select id="testCourse">
+
+                <option value="">
+                    -- Chọn khóa học --
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Chương
+            </label>
+
+            <select id="testChapter" disabled>
+
+                <option value="">
+                    -- Chọn chương --
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Bài học
+            </label>
+
+            <select id="testLesson" disabled>
+
+                <option value="">
+                    -- Chọn bài học --
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- =========================
+             THÔNG TIN BÀI THI
+        ========================== -->
+
+        <h3 class="test-section-title">
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            Thông tin bài kiểm tra
+
+        </h3>
+
+        <div class="form-group">
+
+            <label>
+                Tên bài kiểm tra
+            </label>
+
+            <input
+                type="text"
+                id="testTitle"
+                placeholder="Ví dụ: Kiểm tra Este - Lần 1">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Loại bài kiểm tra
+            </label>
+
+            <select id="testType">
+
+                <option value="15p">
+                    15 phút
+                </option>
+
+                <option value="5p">
+                    5 phút
+                </option>
+
+                <option value="50p">
+                    50 phút
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Mô tả
+            </label>
+
+            <textarea
+                id="testDescription"
+                rows="3"
+                placeholder="Nhập mô tả bài kiểm tra..."></textarea>
+
+        </div>
+
+
+        <!-- =========================
+             PHẦN I
+        ========================== -->
+
+        <div class="test-builder-section">
+
+            <div class="test-builder-header">
+
+                <div>
+
+                    <h3>
+                        Phần I: Câu hỏi nhiều phương án trả lời
+                    </h3>
+
+                    <p>
+                        Mỗi câu chỉ có một đáp án đúng.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="addPart1QuestionBtn"
+                    class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Tạo câu hỏi
+
+                </button>
+
+            </div>
+
+            <div class="score-setting">
+
+                <label>
+                    Điểm mỗi câu
+                </label>
+
+                <input
+                    type="number"
+                    id="part1Point"
+                    value="0.5"
+                    min="0"
+                    step="0.1">
+
+                <span>điểm</span>
+
+            </div>
+
+            <div
+                id="part1Questions"
+                class="question-builder-list">
+
+                <div class="question-empty">
+                    Chưa có câu hỏi nào.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             PHẦN II
+        ========================== -->
+
+        <div class="test-builder-section">
+
+            <div class="test-builder-header">
+
+                <div>
+
+                    <h3>
+                        Phần II: Câu hỏi đúng - sai
+                    </h3>
+
+                    <p>
+                        Mỗi câu gồm 4 ý a, b, c, d.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="addPart2QuestionBtn"
+                    class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Tạo câu hỏi
+
+                </button>
+
+            </div>
+
+            <div class="score-setting-grid">
+
+                <div>
+
+                    <label>
+                        Đúng 1 ý
+                    </label>
+
+                    <input
+                        type="number"
+                        id="part2Score1"
+                        value="0.1"
+                        min="0"
+                        step="0.05">
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Đúng 2 ý
+                    </label>
+
+                    <input
+                        type="number"
+                        id="part2Score2"
+                        value="0.25"
+                        min="0"
+                        step="0.05">
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Đúng 3 ý
+                    </label>
+
+                    <input
+                        type="number"
+                        id="part2Score3"
+                        value="0.5"
+                        min="0"
+                        step="0.05">
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Đúng 4 ý
+                    </label>
+
+                    <input
+                        type="number"
+                        id="part2Score4"
+                        value="1"
+                        min="0"
+                        step="0.05">
+
+                </div>
+
+            </div>
+
+            <div
+                id="part2Questions"
+                class="question-builder-list">
+
+                <div class="question-empty">
+                    Chưa có câu hỏi nào.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             PHẦN III
+        ========================== -->
+
+        <div class="test-builder-section">
+
+            <div class="test-builder-header">
+
+                <div>
+
+                    <h3>
+                        Phần III: Câu hỏi trả lời ngắn
+                    </h3>
+
+                    <p>
+                        Học sinh nhập đáp án ngắn.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="addPart3QuestionBtn"
+                    class="primary-btn">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Tạo câu hỏi
+
+                </button>
+
+            </div>
+
+            <div class="score-setting">
+
+                <label>
+                    Điểm mỗi câu
+                </label>
+
+                <input
+                    type="number"
+                    id="part3Point"
+                    value="0.5"
+                    min="0"
+                    step="0.1">
+
+                <span>điểm</span>
+
+            </div>
+
+            <div
+                id="part3Questions"
+                class="question-builder-list">
+
+                <div class="question-empty">
+                    Chưa có câu hỏi nào.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             TỔNG ĐIỂM
+        ========================== -->
+
+        <div class="test-total-box">
+
+            <span>
+                Tổng số câu:
+            </span>
+
+            <strong id="testQuestionTotal">
+                0
+            </strong>
+
+            <span>
+                Tổng điểm:
+            </span>
+
+            <strong id="testTotalPoint">
+                0
+            </strong>
+
+            <span>
+                điểm
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             BUTTON
+        ========================== -->
+
+        <div class="modal-buttons">
+
+            <button
+                type="button"
+                id="cancelTest">
+
+                Hủy
+
+            </button>
+
+            <button
+                type="button"
+                id="saveTest">
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Lưu bài kiểm tra
+
+            </button>
+
+        </div>
 
     </div>
 
