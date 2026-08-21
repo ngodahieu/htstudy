@@ -674,46 +674,59 @@ function renderChapters(chapters) {
 
     examContent.innerHTML = "";
 
+    const chapterList =
+        document.createElement("div");
+
+    chapterList.className =
+        "chapter-list";
+
     chapters.forEach(chapter => {
 
         const card =
             document.createElement("div");
 
         card.className =
-            "chapter-card";
+            "exam-chapter";
 
         card.innerHTML = `
 
-            <div class="card-icon">
+            <div class="chapter-main">
 
-                <i class="fa-solid fa-layer-group"></i>
+                <div class="chapter-left">
 
-            </div>
+                    <div class="chapter-number">
 
-            <h3>
-                ${escapeHTML(
-                    chapter.title ||
-                    "Chương"
-                )}
-            </h3>
+                        ${escapeHTML(
+                            chapter.order || ""
+                        )}
 
-            <p>
-                ${escapeHTML(
-                    chapter.description ||
-                    "Xem các bài học trong chương."
-                )}
-            </p>
+                    </div>
 
-            <div class="card-footer">
+                    <div class="chapter-info">
 
-                <span>
-                    Chương
-                    ${escapeHTML(
-                        chapter.order || ""
-                    )}
-                </span>
+                        <h3>
+                            ${escapeHTML(
+                                chapter.title ||
+                                "Chương"
+                            )}
+                        </h3>
 
-                <i class="fa-solid fa-arrow-right"></i>
+                        <p>
+                            ${escapeHTML(
+                                chapter.description ||
+                                "Xem các bài học trong chương."
+                            )}
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="chapter-arrow">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
 
             </div>
 
@@ -728,13 +741,13 @@ function renderChapters(chapters) {
             }
         );
 
-        examContent.appendChild(card);
+        chapterList.appendChild(card);
 
     });
 
+    examContent.appendChild(chapterList);
+
 }
-
-
 /* ==================================================
    4. LOAD LESSONS
 ================================================== */
