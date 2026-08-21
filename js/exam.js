@@ -182,7 +182,37 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 
+// ==================================================
+// RESET GIAO DIỆN KHI MỞ TRANG
+// ==================================================
 
+function resetExamView() {
+
+    examContent.classList.remove("hidden");
+
+    examDetail.classList.add("hidden");
+
+    examScreen.classList.add("hidden");
+
+    document
+        .getElementById("pageHeading")
+        .classList.remove("hidden");
+
+    startModal.classList.add("hidden");
+
+    currentCourse = null;
+    currentChapter = null;
+    currentLesson = null;
+    currentTest = null;
+
+    currentTests = [];
+    currentQuestions = [];
+    currentQuestionIndex = 0;
+    userAnswers = {};
+
+    clearInterval(timerInterval);
+
+}
 /* ==================================================
    BACK BUTTON
 ================================================== */
@@ -295,6 +325,8 @@ function setBreadcrumb(items) {
 ================================================== */
 
 async function loadSubjects() {
+
+    resetExamView();
 
     showLoading();
 
