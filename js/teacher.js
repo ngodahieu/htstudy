@@ -56,7 +56,86 @@ document.getElementById("menuHome");
 
 const menuNotifications =
 document.getElementById("menuNotifications");
+const menuTests =
+document.getElementById("menuTests");
 
+const testPage =
+document.getElementById("testPage");
+
+const testList =
+document.getElementById("testList");
+
+const testModal =
+document.getElementById("testModal");
+
+const createTestBtn =
+document.getElementById("createTestBtn");
+
+const cancelTest =
+document.getElementById("cancelTest");
+
+const saveTest =
+document.getElementById("saveTest");
+
+const testCourse =
+document.getElementById("testCourse");
+
+const testChapter =
+document.getElementById("testChapter");
+
+const testLesson =
+document.getElementById("testLesson");
+
+const testTitle =
+document.getElementById("testTitle");
+
+const testType =
+document.getElementById("testType");
+
+const testDescription =
+document.getElementById("testDescription");
+
+const part1Point =
+document.getElementById("part1Point");
+
+const part2Score1 =
+document.getElementById("part2Score1");
+
+const part2Score2 =
+document.getElementById("part2Score2");
+
+const part2Score3 =
+document.getElementById("part2Score3");
+
+const part2Score4 =
+document.getElementById("part2Score4");
+
+const part3Point =
+document.getElementById("part3Point");
+
+const part1Questions =
+document.getElementById("part1Questions");
+
+const part2Questions =
+document.getElementById("part2Questions");
+
+const part3Questions =
+document.getElementById("part3Questions");
+
+const addPart1QuestionBtn =
+document.getElementById("addPart1QuestionBtn");
+
+const addPart2QuestionBtn =
+document.getElementById("addPart2QuestionBtn");
+
+const addPart3QuestionBtn =
+document.getElementById("addPart3QuestionBtn");
+
+const testQuestionTotal =
+document.getElementById("testQuestionTotal");
+
+const testTotalPoint =
+document.getElementById("testTotalPoint");
 const menuItems = document.querySelectorAll(".menu-item");
 
 function setActiveMenu(activeButton){
@@ -223,6 +302,15 @@ document.getElementById("notificationList");
 let currentTeacherId = "";
 
 let currentTeacherName = "";
+/* ====================================
+        TEST BUILDER
+==================================== */
+
+let part1QuestionData = [];
+let part2QuestionData = [];
+let part3QuestionData = [];
+
+let testImageCounter = 0;
 function hideAllPages(){
 
     dashboardHeader.style.display = "none";
@@ -232,8 +320,9 @@ function hideAllPages(){
     studentPage.style.display = "none";
     coursePage.style.display = "none";
     courseManagePage.style.display = "none";
-    notificationPage.style.display = "none";
     lessonPage.style.display = "none";
+    notificationPage.style.display = "none";
+    testPage.style.display = "none";
 }
 /*====================================
         SINH MÃ HỌC SINH
@@ -401,6 +490,1999 @@ menuNotifications.addEventListener("click", async () => {
     await loadNotifications();
 
 });
+// ========================================
+// MENU BÀI KIỂM TRA
+// ========================================
+
+menuTests.addEventListener("click", async () => {
+
+    setActiveMenu(menuTests);
+
+    hideAllPages();
+
+    testPage.style.display = "block";
+
+    await loadTestCourses();
+
+});
+/* ====================================
+        LOAD BÀI KIỂM TRA
+==================================== */
+
+async function loadTeacherTests(){
+
+    testList.innerHTML = "Đang tải...";
+
+    const q = query(
+        collection(db, "courses")
+    );
+
+    const snapshot =
+        await getDocs(q);
+
+    const tests = [];
+
+    for(const courseDoc of snapshot.docs){
+
+        const course =
+            courseDoc.data();
+
+        if(course.teacherId !== currentTeacherId){
+            continue;
+        }
+
+        const testSnapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "courses",
+                    courseDoc.id,
+                    "tests"
+                )
+            );
+
+        for(const testDoc of testSnapshot.docs){
+
+            const test =
+                testDoc.data();
+
+            tests.push({
+
+                id: testDoc.id,
+
+                courseId: courseDoc.id,
+
+                courseName:
+                    `${course.subjectName || course.subject || ""} ${course.grade || ""} - ${course.name || ""}`,
+
+                ...test
+
+            });
+
+        }
+
+    }
+
+    if(!tests.length){
+
+        testList.innerHTML = `
+
+            <div class="empty">
+
+                <i class="fa-solid fa-file-circle-xmark"></i>
+
+                <h3>
+                    Chưa có bài kiểm tra nào
+                </h3>
+
+                <p>
+                    Hãy bấm "Tạo bài kiểm tra" để tạo bài đầu tiên.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    testList.innerHTML = "";
+
+    for(const test of tests){
+
+        let locationText =
+            "Chưa xác định vị trí";
+
+        if(test.chapterId && test.lessonId){
+
+            try{
+
+                const chapterSnap =
+                    await getDoc(
+                        doc(
+                            db,
+                            "courses",
+                            test.courseId,
+                            "chapters",
+                            test.chapterId
+                        )
+                    );
+
+                const lessonSnap =
+                    await getDoc(
+                        doc(
+                            db,
+                            "courses",
+                            test.courseId,
+                            "chapters",
+                            test.chapterId,
+                            "lessons",
+                            test.lessonId
+                        )
+                    );
+
+                const chapter =
+                    chapterSnap.exists()
+                        ? chapterSnap.data()
+                        : {};
+
+                const lesson =
+                    lessonSnap.exists()
+                        ? lessonSnap.data()
+                        : {};
+
+                locationText = `
+                    Chương ${chapter.order || ""}
+                    ${chapter.title || ""}
+                    → Bài ${lesson.order || ""}
+                    ${lesson.title || ""}
+                `;
+
+            }
+            catch(error){
+
+                console.error(error);
+
+            }
+
+        }
+
+        testList.innerHTML += `
+
+            <div class="chapter-card test-item">
+
+                <div>
+
+                    <h3>
+
+                        <i class="fa-solid fa-file-circle-check"></i>
+
+                        ${escapeHtmlTeacher(
+                            test.title || "Bài kiểm tra"
+                        )}
+
+                    </h3>
+
+                    <p>
+
+                        📚 ${escapeHtmlTeacher(
+                            test.courseName
+                        )}
+
+                    </p>
+
+                    <p>
+
+                        📍 ${locationText}
+
+                    </p>
+
+                    <p>
+
+                        ⏱ ${Number(test.duration || 0)} phút
+
+                        &nbsp; | &nbsp;
+
+                        📝 ${Number(test.questionCount || 0)} câu
+
+                        &nbsp; | &nbsp;
+
+                        ⭐ ${Number(test.totalPoints || 0)} điểm
+
+                    </p>
+
+                </div>
+
+                <div class="chapter-actions">
+
+                    <button
+                        class="chapter-delete"
+                        onclick="deleteTeacherTest(
+                            '${test.courseId}',
+                            '${test.id}'
+                        )">
+
+                        Xóa
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+}
+function escapeHtmlTeacher(value = ""){
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+window.deleteTeacherTest =
+async function(courseId, testId){
+
+    if(
+        !confirm(
+            "Bạn có chắc muốn xóa bài kiểm tra này?"
+        )
+    ){
+
+        return;
+
+    }
+
+    try{
+
+        await deleteDoc(
+            doc(
+                db,
+                "courses",
+                courseId,
+                "tests",
+                testId
+            )
+        );
+
+        alert(
+            "Đã xóa bài kiểm tra."
+        );
+
+        await loadTeacherTests();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Không thể xóa bài kiểm tra."
+        );
+
+    }
+
+};
+createTestBtn.addEventListener(
+    "click",
+    async () => {
+
+        resetTestBuilder();
+
+        await loadTestCourses();
+
+        testModal.style.display = "flex";
+
+    }
+);
+cancelTest.addEventListener(
+    "click",
+    () => {
+
+        testModal.style.display = "none";
+
+    }
+);
+async function loadTestCourses(){
+
+    testCourse.innerHTML = `
+
+        <option value="">
+            -- Chọn khóa học --
+        </option>
+
+    `;
+
+    const q = query(
+        collection(db, "courses"),
+        where(
+            "teacherId",
+            "==",
+            currentTeacherId
+        )
+    );
+
+    const snapshot =
+        await getDocs(q);
+
+    snapshot.forEach(courseDoc => {
+
+        const data =
+            courseDoc.data();
+
+        testCourse.innerHTML += `
+
+            <option value="${courseDoc.id}">
+
+                ${escapeHtmlTeacher(
+                    data.subjectName ||
+                    data.subject ||
+                    ""
+                )}
+                ${escapeHtmlTeacher(
+                    data.grade || ""
+                )}
+                -
+                ${escapeHtmlTeacher(
+                    data.name || ""
+                )}
+
+            </option>
+
+        `;
+
+    });
+
+}
+testCourse.addEventListener(
+    "change",
+    async () => {
+
+        const courseId =
+            testCourse.value;
+
+        testChapter.innerHTML = `
+
+            <option value="">
+                -- Chọn chương --
+            </option>
+
+        `;
+
+        testLesson.innerHTML = `
+
+            <option value="">
+                -- Chọn bài học --
+            </option>
+
+        `;
+
+        testChapter.disabled = true;
+
+        testLesson.disabled = true;
+
+        if(!courseId){
+
+            return;
+
+        }
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "courses",
+                    courseId,
+                    "chapters"
+                )
+            );
+
+        const chapters = [];
+
+        snapshot.forEach(chapterDoc => {
+
+            chapters.push({
+
+                id: chapterDoc.id,
+
+                ...chapterDoc.data()
+
+            });
+
+        });
+
+        chapters.sort(
+            (a,b) =>
+                Number(a.order || 0) -
+                Number(b.order || 0)
+        );
+
+        chapters.forEach(chapter => {
+
+            testChapter.innerHTML += `
+
+                <option value="${chapter.id}">
+
+                    Chương
+                    ${escapeHtmlTeacher(
+                        chapter.order || ""
+                    )}
+
+                    -
+                    ${escapeHtmlTeacher(
+                        chapter.title || ""
+                    )}
+
+                </option>
+
+            `;
+
+        });
+
+        testChapter.disabled =
+            chapters.length === 0;
+
+    }
+);
+testChapter.addEventListener(
+    "change",
+    async () => {
+
+        const courseId =
+            testCourse.value;
+
+        const chapterId =
+            testChapter.value;
+
+        testLesson.innerHTML = `
+
+            <option value="">
+                -- Chọn bài học --
+            </option>
+
+        `;
+
+        testLesson.disabled = true;
+
+        if(!courseId || !chapterId){
+
+            return;
+
+        }
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "courses",
+                    courseId,
+                    "chapters",
+                    chapterId,
+                    "lessons"
+                )
+            );
+
+        const lessons = [];
+
+        snapshot.forEach(lessonDoc => {
+
+            lessons.push({
+
+                id: lessonDoc.id,
+
+                ...lessonDoc.data()
+
+            });
+
+        });
+
+        lessons.sort(
+            (a,b) =>
+                Number(a.order || 0) -
+                Number(b.order || 0)
+        );
+
+        lessons.forEach(lesson => {
+
+            testLesson.innerHTML += `
+
+                <option value="${lesson.id}">
+
+                    Bài
+                    ${escapeHtmlTeacher(
+                        lesson.order || ""
+                    )}
+
+                    -
+                    ${escapeHtmlTeacher(
+                        lesson.title || ""
+                    )}
+
+                </option>
+
+            `;
+
+        });
+
+        testLesson.disabled =
+            lessons.length === 0;
+
+    }
+);
+addPart1QuestionBtn.addEventListener(
+    "click",
+    () => {
+
+        const index =
+            part1QuestionData.length;
+
+        part1QuestionData.push({
+
+            question: "",
+
+            image: "",
+
+            options: [
+                "",
+                "",
+                "",
+                ""
+            ],
+
+            correctAnswer: 0
+
+        });
+
+        renderPart1Questions();
+
+        updateTestTotal();
+
+    }
+);
+function renderPart1Questions(){
+
+    if(!part1QuestionData.length){
+
+        part1Questions.innerHTML = `
+
+            <div class="question-empty">
+
+                Chưa có câu hỏi nào.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    part1Questions.innerHTML = "";
+
+    part1QuestionData.forEach(
+        (question, index) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "teacher-question";
+
+            box.innerHTML = `
+
+                <div class="question-builder-top">
+
+                    <h4>
+
+                        Câu ${index + 1}
+
+                    </h4>
+
+                    <button
+                        type="button"
+                        class="remove-question"
+                        data-index="${index}">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nội dung câu hỏi
+                    </label>
+
+                    <textarea
+                        class="part1-question"
+                        data-index="${index}"
+                        rows="4"
+                        placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(
+                            question.question
+                        )}</textarea>
+
+                </div>
+
+
+                <div class="question-image-box">
+
+                    <label>
+                        Hình ảnh câu hỏi
+                        <small>(không bắt buộc)</small>
+                    </label>
+
+                    <input
+                        type="file"
+                        class="part1-image"
+                        data-index="${index}"
+                        accept="image/*">
+
+                    <div class="image-preview">
+
+                        ${
+                            question.image
+                            ? `
+                                <img
+                                    src="${question.image}"
+                                    class="question-image-preview">
+                              `
+                            : `
+                                <span>
+                                    Chưa có hình ảnh
+                                </span>
+                              `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="options-builder">
+
+                    ${question.options.map(
+                        (option, optionIndex) => `
+
+                            <div class="option-row">
+
+                                <input
+                                    type="radio"
+                                    name="part1Correct${index}"
+                                    value="${optionIndex}"
+                                    ${
+                                        Number(
+                                            question.correctAnswer
+                                        ) === optionIndex
+                                            ? "checked"
+                                            : ""
+                                    }>
+
+                                <input
+                                    type="text"
+                                    class="part1-option"
+                                    data-index="${index}"
+                                    data-option="${optionIndex}"
+                                    value="${escapeHtmlTeacher(
+                                        option
+                                    )}"
+                                    placeholder="Đáp án ${
+                                        String.fromCharCode(
+                                            65 + optionIndex
+                                        )
+                                    }">
+
+                            </div>
+
+                        `
+                    ).join("")}
+
+                </div>
+
+                <small class="auto-text">
+
+                    Chọn ● để đánh dấu đáp án đúng.
+
+                </small>
+
+            `;
+
+            part1Questions.appendChild(box);
+
+        }
+    );
+
+
+    part1Questions
+        .querySelectorAll(".part1-question")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    part1QuestionData[index].question =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part1Questions
+        .querySelectorAll(".part1-option")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const optionIndex =
+                        Number(
+                            event.target.dataset.option
+                        );
+
+                    part1QuestionData[index]
+                        .options[optionIndex] =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part1Questions
+        .querySelectorAll(
+            'input[type="radio"]'
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                "change",
+                event => {
+
+                    const box =
+                        event.target.closest(
+                            ".teacher-question"
+                        );
+
+                    const index =
+                        Number(
+                            box.querySelector(
+                                ".part1-question"
+                            ).dataset.index
+                        );
+
+                    part1QuestionData[index]
+                        .correctAnswer =
+                        Number(
+                            event.target.value
+                        );
+
+                }
+            );
+
+        });
+
+
+    part1Questions
+        .querySelectorAll(".remove-question")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset.index
+                        );
+
+                    part1QuestionData.splice(
+                        index,
+                        1
+                    );
+
+                    renderPart1Questions();
+
+                    updateTestTotal();
+
+                }
+            );
+
+        });
+
+
+    part1Questions
+        .querySelectorAll(".part1-image")
+        .forEach(input => {
+
+            input.addEventListener(
+                "change",
+                async event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const file =
+                        event.target.files[0];
+
+                    if(!file){
+
+                        return;
+
+                    }
+
+                    const url =
+                        await uploadTestImage(file);
+
+                    if(url){
+
+                        part1QuestionData[index]
+                            .image = url;
+
+                        renderPart1Questions();
+
+                    }
+
+                }
+            );
+
+        });
+
+}
+addPart2QuestionBtn.addEventListener(
+    "click",
+    () => {
+
+        part2QuestionData.push({
+
+            question: "",
+
+            image: "",
+
+            statements: [
+                "",
+                "",
+                "",
+                ""
+            ],
+
+            answers: [
+                true,
+                false,
+                false,
+                false
+            ]
+
+        });
+
+        renderPart2Questions();
+
+        updateTestTotal();
+
+    }
+);
+function renderPart2Questions(){
+
+    if(!part2QuestionData.length){
+
+        part2Questions.innerHTML = `
+
+            <div class="question-empty">
+
+                Chưa có câu hỏi nào.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    part2Questions.innerHTML = "";
+
+    part2QuestionData.forEach(
+        (question, index) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "teacher-question";
+
+            box.innerHTML = `
+
+                <div class="question-builder-top">
+
+                    <h4>
+                        Câu ${index + 1}
+                    </h4>
+
+                    <button
+                        type="button"
+                        class="remove-question"
+                        data-index="${index}">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nội dung câu hỏi
+                    </label>
+
+                    <textarea
+                        class="part2-question"
+                        data-index="${index}"
+                        rows="4"
+                        placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(
+                            question.question
+                        )}</textarea>
+
+                </div>
+
+
+                <div class="question-image-box">
+
+                    <label>
+                        Hình ảnh câu hỏi
+                        <small>(không bắt buộc)</small>
+                    </label>
+
+                    <input
+                        type="file"
+                        class="part2-image"
+                        data-index="${index}"
+                        accept="image/*">
+
+                    <div class="image-preview">
+
+                        ${
+                            question.image
+                            ? `
+                                <img
+                                    src="${question.image}"
+                                    class="question-image-preview">
+                              `
+                            : `
+                                <span>
+                                    Chưa có hình ảnh
+                                </span>
+                              `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="true-false-builder">
+
+                    ${question.statements.map(
+                        (statement, statementIndex) => `
+
+                            <div class="tf-row">
+
+                                <div class="tf-label">
+
+                                    ${String.fromCharCode(
+                                        97 + statementIndex
+                                    )}.
+
+                                </div>
+
+                                <input
+                                    type="text"
+                                    class="part2-statement"
+                                    data-index="${index}"
+                                    data-statement="${statementIndex}"
+                                    value="${escapeHtmlTeacher(
+                                        statement
+                                    )}"
+                                    placeholder="Nhập ý ${String.fromCharCode(
+                                        97 + statementIndex
+                                    )}...">
+
+                                <select
+                                    class="part2-answer"
+                                    data-index="${index}"
+                                    data-statement="${statementIndex}">
+
+                                    <option
+                                        value="true"
+                                        ${
+                                            question.answers[
+                                                statementIndex
+                                            ] === true
+                                                ? "selected"
+                                                : ""
+                                        }>
+
+                                        Đúng
+
+                                    </option>
+
+                                    <option
+                                        value="false"
+                                        ${
+                                            question.answers[
+                                                statementIndex
+                                            ] === false
+                                                ? "selected"
+                                                : ""
+                                        }>
+
+                                        Sai
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        `
+                    ).join("")}
+
+                </div>
+
+            `;
+
+            part2Questions.appendChild(box);
+
+        }
+    );
+
+
+    part2Questions
+        .querySelectorAll(".part2-question")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    part2QuestionData[index]
+                        .question =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part2Questions
+        .querySelectorAll(".part2-statement")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const statementIndex =
+                        Number(
+                            event.target.dataset.statement
+                        );
+
+                    part2QuestionData[index]
+                        .statements[
+                            statementIndex
+                        ] =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part2Questions
+        .querySelectorAll(".part2-answer")
+        .forEach(select => {
+
+            select.addEventListener(
+                "change",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const statementIndex =
+                        Number(
+                            event.target.dataset.statement
+                        );
+
+                    part2QuestionData[index]
+                        .answers[
+                            statementIndex
+                        ] =
+                        event.target.value === "true";
+
+                }
+            );
+
+        });
+
+
+    part2Questions
+        .querySelectorAll(".remove-question")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset.index
+                        );
+
+                    part2QuestionData.splice(
+                        index,
+                        1
+                    );
+
+                    renderPart2Questions();
+
+                    updateTestTotal();
+
+                }
+            );
+
+        });
+
+
+    part2Questions
+        .querySelectorAll(".part2-image")
+        .forEach(input => {
+
+            input.addEventListener(
+                "change",
+                async event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const file =
+                        event.target.files[0];
+
+                    if(!file){
+
+                        return;
+
+                    }
+
+                    const url =
+                        await uploadTestImage(file);
+
+                    if(url){
+
+                        part2QuestionData[index]
+                            .image = url;
+
+                        renderPart2Questions();
+
+                    }
+
+                }
+            );
+
+        });
+
+}
+addPart3QuestionBtn.addEventListener(
+    "click",
+    () => {
+
+        part3QuestionData.push({
+
+            question: "",
+
+            image: "",
+
+            answer: ""
+
+        });
+
+        renderPart3Questions();
+
+        updateTestTotal();
+
+    }
+);
+function renderPart3Questions(){
+
+    if(!part3QuestionData.length){
+
+        part3Questions.innerHTML = `
+
+            <div class="question-empty">
+
+                Chưa có câu hỏi nào.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    part3Questions.innerHTML = "";
+
+    part3QuestionData.forEach(
+        (question, index) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "teacher-question";
+
+            box.innerHTML = `
+
+                <div class="question-builder-top">
+
+                    <h4>
+                        Câu ${index + 1}
+                    </h4>
+
+                    <button
+                        type="button"
+                        class="remove-question"
+                        data-index="${index}">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nội dung câu hỏi
+                    </label>
+
+                    <textarea
+                        class="part3-question"
+                        data-index="${index}"
+                        rows="4"
+                        placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(
+                            question.question
+                        )}</textarea>
+
+                </div>
+
+
+                <div class="question-image-box">
+
+                    <label>
+                        Hình ảnh câu hỏi
+                        <small>(không bắt buộc)</small>
+                    </label>
+
+                    <input
+                        type="file"
+                        class="part3-image"
+                        data-index="${index}"
+                        accept="image/*">
+
+                    <div class="image-preview">
+
+                        ${
+                            question.image
+                            ? `
+                                <img
+                                    src="${question.image}"
+                                    class="question-image-preview">
+                              `
+                            : `
+                                <span>
+                                    Chưa có hình ảnh
+                                </span>
+                              `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Đáp án đúng
+                    </label>
+
+                    <input
+                        type="text"
+                        class="part3-answer"
+                        data-index="${index}"
+                        value="${escapeHtmlTeacher(
+                            question.answer
+                        )}"
+                        placeholder="Ví dụ: 0,25">
+
+                </div>
+
+            `;
+
+            part3Questions.appendChild(box);
+
+        }
+    );
+
+
+    part3Questions
+        .querySelectorAll(".part3-question")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    part3QuestionData[index]
+                        .question =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part3Questions
+        .querySelectorAll(".part3-answer")
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    part3QuestionData[index]
+                        .answer =
+                        event.target.value;
+
+                }
+            );
+
+        });
+
+
+    part3Questions
+        .querySelectorAll(".remove-question")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const index =
+                        Number(
+                            button.dataset.index
+                        );
+
+                    part3QuestionData.splice(
+                        index,
+                        1
+                    );
+
+                    renderPart3Questions();
+
+                    updateTestTotal();
+
+                }
+            );
+
+        });
+
+
+    part3Questions
+        .querySelectorAll(".part3-image")
+        .forEach(input => {
+
+            input.addEventListener(
+                "change",
+                async event => {
+
+                    const index =
+                        Number(
+                            event.target.dataset.index
+                        );
+
+                    const file =
+                        event.target.files[0];
+
+                    if(!file){
+
+                        return;
+
+                    }
+
+                    const url =
+                        await uploadTestImage(file);
+
+                    if(url){
+
+                        part3QuestionData[index]
+                            .image = url;
+
+                        renderPart3Questions();
+
+                    }
+
+                }
+            );
+
+        });
+
+}
+function updateTestTotal(){
+
+    const count1 =
+        part1QuestionData.length;
+
+    const count2 =
+        part2QuestionData.length;
+
+    const count3 =
+        part3QuestionData.length;
+
+
+    const point1 =
+        Number(part1Point.value) || 0;
+
+
+    const score2Max =
+        Number(part2Score4.value) || 0;
+
+
+    const point3 =
+        Number(part3Point.value) || 0;
+
+
+    const totalQuestions =
+        count1 +
+        count2 +
+        count3;
+
+
+    const totalPoint =
+        (count1 * point1) +
+        (count2 * score2Max) +
+        (count3 * point3);
+
+
+    testQuestionTotal.textContent =
+        totalQuestions;
+
+
+    testTotalPoint.textContent =
+        totalPoint
+            .toFixed(2)
+            .replace(/\.00$/, "");
+
+}
+[
+    part1Point,
+    part2Score1,
+    part2Score2,
+    part2Score3,
+    part2Score4,
+    part3Point
+].forEach(input => {
+
+    input.addEventListener(
+        "input",
+        updateTestTotal
+    );
+
+});
+async function uploadTestImage(file){
+
+    if(!file){
+
+        return "";
+
+    }
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "file",
+        file
+    );
+
+    formData.append(
+        "upload_preset",
+        UPLOAD_PRESET
+    );
+
+    formData.append(
+        "resource_type",
+        "image"
+    );
+
+    try{
+
+        const response =
+            await fetch(
+                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(data.secure_url){
+
+            return data.secure_url;
+
+        }
+
+        alert(
+            "Upload hình ảnh thất bại."
+        );
+
+        return "";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Có lỗi khi upload hình ảnh."
+        );
+
+        return "";
+
+    }
+
+}
+saveTest.addEventListener(
+    "click",
+    saveNewTest
+);
+async function saveNewTest(){
+
+    try{
+
+        const courseId =
+            testCourse.value;
+
+        const chapterId =
+            testChapter.value;
+
+        const lessonId =
+            testLesson.value;
+
+        const title =
+            testTitle.value.trim();
+
+        const description =
+            testDescription.value.trim();
+
+        const duration =
+            Number(
+                testType.value.replace("p","")
+            );
+
+
+        /* =========================
+           KIỂM TRA
+        ========================== */
+
+        if(!courseId){
+
+            alert(
+                "Vui lòng chọn khóa học."
+            );
+
+            return;
+
+        }
+
+        if(!chapterId){
+
+            alert(
+                "Vui lòng chọn chương."
+            );
+
+            return;
+
+        }
+
+        if(!lessonId){
+
+            alert(
+                "Vui lòng chọn bài học."
+            );
+
+            return;
+
+        }
+
+        if(!title){
+
+            alert(
+                "Vui lòng nhập tên bài kiểm tra."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            !part1QuestionData.length &&
+            !part2QuestionData.length &&
+            !part3QuestionData.length
+        ){
+
+            alert(
+                "Bài kiểm tra chưa có câu hỏi."
+            );
+
+            return;
+
+        }
+
+
+        /* =========================
+           VALIDATE PHẦN I
+        ========================== */
+
+        for(
+            let i = 0;
+            i < part1QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part1QuestionData[i];
+
+            if(!q.question.trim()){
+
+                alert(
+                    `Phần I - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+            if(
+                q.options.some(
+                    option =>
+                        !option.trim()
+                )
+            ){
+
+                alert(
+                    `Phần I - Câu ${i + 1} chưa nhập đủ 4 đáp án.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+           VALIDATE PHẦN II
+        ========================== */
+
+        for(
+            let i = 0;
+            i < part2QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part2QuestionData[i];
+
+            if(!q.question.trim()){
+
+                alert(
+                    `Phần II - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+            if(
+                q.statements.some(
+                    statement =>
+                        !statement.trim()
+                )
+            ){
+
+                alert(
+                    `Phần II - Câu ${i + 1} chưa nhập đủ 4 ý.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+           VALIDATE PHẦN III
+        ========================== */
+
+        for(
+            let i = 0;
+            i < part3QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part3QuestionData[i];
+
+            if(!q.question.trim()){
+
+                alert(
+                    `Phần III - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+            if(!q.answer.trim()){
+
+                alert(
+                    `Phần III - Câu ${i + 1} chưa có đáp án.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+           TỔNG ĐIỂM
+        ========================== */
+
+        const totalPoints =
+            (
+                part1QuestionData.length *
+                Number(part1Point.value || 0)
+            )
+            +
+            (
+                part2QuestionData.length *
+                Number(part2Score4.value || 0)
+            )
+            +
+            (
+                part3QuestionData.length *
+                Number(part3Point.value || 0)
+            );
+
+
+        /* =========================
+           TỔNG SỐ CÂU
+        ========================== */
+
+        const questionCount =
+            part1QuestionData.length +
+            part2QuestionData.length +
+            part3QuestionData.length;
+
+
+        /* =========================
+           TẠO DOCUMENT
+        ========================== */
+
+        const testData = {
+
+            title,
+
+            description,
+
+            type:
+                testType.value,
+
+            duration,
+
+            courseId,
+
+            chapterId,
+
+            lessonId,
+
+            teacherId:
+                currentTeacherId,
+
+            teacherName:
+                currentTeacherName,
+
+
+            part1: {
+
+                points:
+                    Number(
+                        part1Point.value || 0
+                    ),
+
+                questions:
+                    part1QuestionData
+
+            },
+
+
+            part2: {
+
+                scores: {
+
+                    one:
+                        Number(
+                            part2Score1.value || 0
+                        ),
+
+                    two:
+                        Number(
+                            part2Score2.value || 0
+                        ),
+
+                    three:
+                        Number(
+                            part2Score3.value || 0
+                        ),
+
+                    four:
+                        Number(
+                            part2Score4.value || 0
+                        )
+
+                },
+
+                questions:
+                    part2QuestionData
+
+            },
+
+
+            part3: {
+
+                points:
+                    Number(
+                        part3Point.value || 0
+                    ),
+
+                questions:
+                    part3QuestionData
+
+            },
+
+
+            questionCount,
+
+            totalPoints,
+
+            createdAt:
+                serverTimestamp()
+
+        };
+
+
+        /* =========================
+           LƯU FIRESTORE
+        ========================== */
+
+        await addDoc(
+
+            collection(
+                db,
+                "courses",
+                courseId,
+                "tests"
+            ),
+
+            testData
+
+        );
+
+
+        alert(
+            "Đã tạo bài kiểm tra thành công."
+        );
+
+
+        testModal.style.display =
+            "none";
+
+
+        resetTestBuilder();
+
+
+        await loadTeacherTests();
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Không thể tạo bài kiểm tra: " +
+            error.message
+        );
+
+    }
+
+}
 /*====================================
         TẠO HỌC SINH
 ====================================*/
