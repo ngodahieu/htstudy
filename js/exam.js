@@ -2507,18 +2507,167 @@ nextQuestionBtn.addEventListener(
 
     }
 );
-
-
 /* ==================================================
-   FINISH
+   FINISH EXAM
 ================================================== */
 
 function finishExam() {
 
     clearInterval(timerInterval);
 
+    if (!currentQuestions.length) {
+
+        alert("Bài thi không có câu hỏi.");
+
+        return;
+
+    }
+
+    /* =========================================
+       TÍNH ĐIỂM
+    ========================================= */
+
+    let correctCount = 0;
+
+    let answered = 0;
+
+    currentQuestions.forEach(question => {
+
+        const questionId =
+            question.id;
+
+        const userAnswer =
+            userAnswers[questionId];
+
+        /* Đã trả lời */
+
+        if (userAnswer !== undefined) {
+
+            answered++;
+
+        }
+
+        /* Đáp án đúng */
+
+        const correctAnswer =
+            Number(question.correctAnswer);
+
+        /* So sánh */
+
+        if (
+            userAnswer !== undefined &&
+            userAnswer === correctAnswer
+        ) {
+
+            correctCount++;
+
+        }
+
+    });
+
+
+    /* =========================================
+       TỔNG SỐ CÂU
+    ========================================= */
+
+    const total =
+        currentQuestions.length;
+
+
+    /* =========================================
+       TÍNH ĐIỂM THANG 10
+    ========================================= */
+
+    const score =
+        total > 0
+            ? (correctCount / total) * 10
+            : 0;
+
+
+    /* Làm tròn 2 chữ số */
+
+    const finalScore =
+        Math.round(score * 100) / 100;
+
+
+    /* =========================================
+       LƯU KẾT QUẢ TẠM THỜI
+       
+       BƯỚC 7 SẼ DÙNG
+    ========================================= */
+
+    const examResult = {
+
+        testId:
+            currentTest.id,
+
+        testTitle:
+            currentTest.title || "Bài kiểm tra",
+
+        totalQuestions:
+            total,
+
+        answeredCount:
+            answered,
+
+        correctCount:
+            correctCount,
+
+        wrongCount:
+            answered - correctCount,
+
+        unansweredCount:
+            total - answered,
+
+        score:
+            finalScore,
+
+        duration:
+            Number(currentTest.duration || 0),
+
+        courseId:
+            currentCourse?.id || null,
+
+        chapterId:
+            currentChapter?.id || null,
+
+        lessonId:
+            currentLesson?.id || null,
+
+        completedAt:
+            new Date()
+
+    };
+
+
+    /* =========================================
+       LƯU KẾT QUẢ VÀO STATE
+    ========================================= */
+
+    window.currentExamResult =
+        examResult;
+
+
+    /* =========================================
+       THÔNG BÁO
+    ========================================= */
+
+    console.log(
+        "KẾT QUẢ BÀI THI:",
+        examResult
+    );
+
+
+    /* =========================================
+       TẠM THỜI HIỂN THỊ KẾT QUẢ
+       
+       BƯỚC 7 SẼ THAY PHẦN NÀY
+    ========================================= */
+
     alert(
-        "Bài thi đã kết thúc."
+        `Đã nộp bài!\n\n` +
+        `Đúng: ${correctCount}/${total}\n` +
+        `Điểm: ${finalScore}/10`
     );
 
 }
