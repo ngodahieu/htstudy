@@ -1,1178 +1,1472 @@
-/* =========================================================
-   H&T STUDY - EXAM.JS
-========================================================= */
+/*==================================================
+        H&T STUDY - EXAM.JS
+        Trang kiểm tra
+==================================================*/
+
+import { auth, db } from "./firebase.js";
 
 import {
-    auth,
-    db
-} from "../firebase.js";
-
-import {
-    onAuthStateChanged
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
+    collection,
     doc,
     getDoc,
-    collection,
-    getDocs
+    getDocs,
+    query,
+    orderBy,
+    onSnapshot,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-/* =========================================================
-   DOM
-========================================================= */
+/*==================================================
+        BIẾN TOÀN CỤC
+==================================================*/
 
-const examListSection =
-    document.getElementById("examListSection");
+let currentUser = null;
+let currentRole = "";
 
-const examDetailSection =
-    document.getElementById("examDetailSection");
 
-const examGrid =
-    document.getElementById("examGrid");
+/*==================================================
+        DOM - NOTIFICATION
+==================================================*/
 
-const examCount =
-    document.getElementById("examCount");
+const notificationBtn =
+    document.querySelector(".notification-btn");
 
-const loadingState =
-    document.getElementById("loadingState");
+const notificationPanel =
+    document.getElementById("notificationPanel");
 
-const emptyState =
-    document.getElementById("emptyState");
+const closeNotification =
+    document.getElementById("closeNotification");
 
-const errorState =
-    document.getElementById("errorState");
+const notificationBadge =
+    document.getElementById("notificationBadge");
 
-const errorMessage =
-    document.getElementById("errorMessage");
+const notificationList =
+    document.getElementById("notificationList");
 
-const retryBtn =
-    document.getElementById("retryBtn");
 
-const backBtn =
-    document.getElementById("backBtn");
+/*==================================================
+        DOM - USER MENU
+==================================================*/
+
+const avatar =
+    document.querySelector(".avatar");
+
+const userMenu =
+    document.getElementById("userMenu");
+
+const userBox =
+    document.getElementById("userBox");
 
 const userName =
     document.getElementById("userName");
 
+const userStudentId =
+    document.getElementById("userStudentId");
+
+const userRole =
+    document.getElementById("userRole");
+
 const userAvatar =
     document.getElementById("userAvatar");
 
+const logoutBtn =
+    document.getElementById("logoutBtn");
 
-/* DETAIL */
+const myCoursesBtn =
+    document.getElementById("myCoursesBtn");
 
-const detailTitle =
-    document.getElementById("detailTitle");
+const manageBtn =
+    document.getElementById("manageBtn");
 
-const detailType =
-    document.getElementById("detailType");
-
-const detailTeacher =
-    document.getElementById("detailTeacher");
-
-const detailQuestionCount =
-    document.getElementById("detailQuestionCount");
-
-const detailTotalPoints =
-    document.getElementById("detailTotalPoints");
-
-const detailDuration =
-    document.getElementById("detailDuration");
-
-const detailDescription =
-    document.getElementById("detailDescription");
-
-const detailCourse =
-    document.getElementById("detailCourse");
-
-const detailLesson =
-    document.getElementById("detailLesson");
-
-const startExamBtn =
-    document.getElementById("startExamBtn");
+const userGuide =
+    document.getElementById("userGuide");
 
 
-/* =========================================================
-   STATE
-========================================================= */
+/*==================================================
+        DOM - EXAM
+==================================================*/
 
-let currentUser = null;
+const examList =
+    document.getElementById("examList");
 
-let allExams = [];
+const examEmpty =
+    document.getElementById("examEmpty");
 
-let currentExam = null;
+const examSearch =
+    document.getElementById("examSearch");
+
+const examFilterBtns =
+    document.querySelectorAll(".exam-filter-btn");
 
 
-/* =========================================================
-   AUTH
-========================================================= */
+/*==================================================
+        NOTIFICATION PANEL
+==================================================*/
 
-onAuthStateChanged(auth, async (user) => {
+if (notificationBtn && notificationPanel) {
 
-    if (!user) {
+    notificationBtn.addEventListener("click", (e) => {
 
-        window.location.href = "index.html";
+        e.stopPropagation();
 
-        return;
+        if (!auth.currentUser) {
+
+            alert("Bạn cần đăng nhập để xem thông báo.");
+
+            return;
+        }
+
+        notificationPanel.classList.toggle("active");
+
+        if (
+            notificationPanel.classList.contains("active")
+        ) {
+
+            markAllNotificationsAsRead();
+
+        }
+
+    });
+
+}
+
+
+if (closeNotification && notificationPanel) {
+
+    closeNotification.addEventListener("click", () => {
+
+        notificationPanel.classList.remove("active");
+
+    });
+
+}
+
+
+/*==================================================
+        CLICK RA NGOÀI
+==================================================*/
+
+document.addEventListener("click", (e) => {
+
+    if (
+        notificationPanel &&
+        notificationBtn &&
+        !notificationPanel.contains(e.target) &&
+        !notificationBtn.contains(e.target)
+    ) {
+
+        notificationPanel.classList.remove("active");
+
     }
-
-    currentUser = user;
-
-    await loadUserInfo();
-
-    await loadExams();
-
-    checkUrlForExam();
 
 });
 
 
-/* =========================================================
-   LOAD USER
-========================================================= */
+/*==================================================
+        USER MENU
+==================================================*/
 
-async function loadUserInfo() {
+if (avatar && userMenu) {
+
+    avatar.addEventListener("click", (e) => {
+
+        e.stopPropagation();
+
+        userMenu.classList.toggle("active");
+
+    });
+
+}
+
+
+document.addEventListener("click", (e) => {
+
+    if (
+        userMenu &&
+        avatar &&
+        !userMenu.contains(e.target) &&
+        !avatar.contains(e.target)
+    ) {
+
+        userMenu.classList.remove("active");
+
+    }
+
+});
+
+
+/*==================================================
+        LOAD USER
+==================================================*/
+
+async function loadUser(uid) {
 
     try {
 
         const userRef =
-            doc(db, "users", currentUser.uid);
+            doc(db, "users", uid);
 
         const userSnap =
             await getDoc(userRef);
 
+
+        /*------------------------------------------
+                USER KHÔNG TỒN TẠI
+        ------------------------------------------*/
+
         if (!userSnap.exists()) {
 
-            userName.textContent =
-                "Học sinh";
+            await signOut(auth);
 
             return;
         }
 
-        const data =
+
+        const user =
             userSnap.data();
 
-        userName.textContent =
-            data.name || "Học sinh";
 
-        if (data.avatar) {
+        currentUser =
+            auth.currentUser;
 
-            userAvatar.src =
-                data.avatar;
+
+        currentRole =
+            user.role || "";
+
+
+        /*------------------------------------------
+                HIỂN THỊ USER BOX
+        ------------------------------------------*/
+
+        if (userBox) {
+
+            userBox.style.display = "block";
+
         }
 
-    } catch (error) {
+
+        const userMenuList =
+            document.getElementById("userMenuList");
+
+        if (userMenuList) {
+
+            userMenuList.style.display = "block";
+
+        }
+
+
+        /*------------------------------------------
+                AVATAR
+        ------------------------------------------*/
+
+        const avatarUrl =
+            user.avatar &&
+            user.avatar.trim() !== ""
+
+                ? user.avatar
+
+                : "assets/avatars/default.jpg";
+
+
+        const headerAvatar =
+            document.querySelector(".avatar img");
+
+
+        if (headerAvatar) {
+
+            headerAvatar.src =
+                avatarUrl;
+
+        }
+
+
+        if (userAvatar) {
+
+            userAvatar.src =
+                avatarUrl;
+
+        }
+
+
+        /*------------------------------------------
+                THÔNG TIN
+        ------------------------------------------*/
+
+        if (userName) {
+
+            userName.textContent =
+                user.name || "Người dùng";
+
+        }
+
+
+        if (userStudentId) {
+
+            userStudentId.textContent =
+                user.memberId || "";
+
+        }
+
+
+        if (userRole) {
+
+            userRole.textContent =
+                user.role || "";
+
+        }
+
+
+        /*------------------------------------------
+                PHÂN QUYỀN
+        ------------------------------------------*/
+
+        if (myCoursesBtn) {
+
+            myCoursesBtn.style.display =
+                "none";
+
+        }
+
+
+        if (manageBtn) {
+
+            manageBtn.style.display =
+                "none";
+
+        }
+
+
+        if (user.role === "Học sinh") {
+
+            if (myCoursesBtn) {
+
+                myCoursesBtn.style.display =
+                    "flex";
+
+            }
+
+        }
+
+
+        else if (
+            user.role === "Giáo viên"
+        ) {
+
+            if (manageBtn) {
+
+                manageBtn.style.display =
+                    "flex";
+
+            }
+
+        }
+
+
+        else if (
+            user.role === "Admin"
+        ) {
+
+            if (manageBtn) {
+
+                manageBtn.style.display =
+                    "flex";
+
+            }
+
+        }
+
+    }
+
+    catch (error) {
 
         console.error(
-            "Lỗi tải thông tin user:",
+            "Lỗi loadUser:",
             error
         );
 
-        userName.textContent =
-            "Học sinh";
     }
+
 }
 
 
-/* =========================================================
-   LOAD EXAMS
-========================================================= */
+/*==================================================
+        ĐĂNG XUẤT
+==================================================*/
 
-async function loadExams() {
+if (logoutBtn) {
 
-    showLoading();
-
-    try {
-
-        /*
-         * enrollments/{uid}
-         *
-         * courses:
-         * {
-         *    courseId: "..."
-         * }
-         */
-
-        const enrollmentRef =
-            doc(
-                db,
-                "enrollments",
-                currentUser.uid
-            );
-
-        const enrollmentSnap =
-            await getDoc(enrollmentRef);
-
-
-        if (!enrollmentSnap.exists()) {
-
-            showEmpty();
-
-            return;
-        }
-
-
-        const enrollmentData =
-            enrollmentSnap.data();
-
-        const enrolledCourses =
-            enrollmentData.courses || {};
-
-
-        const courseIds =
-            Object.keys(enrolledCourses);
-
-
-        if (courseIds.length === 0) {
-
-            showEmpty();
-
-            return;
-        }
-
-
-        const exams = [];
-
-
-        /*
-         * Lấy từng khóa học
-         */
-
-        for (const courseId of courseIds) {
+    logoutBtn.addEventListener(
+        "click",
+        async () => {
 
             try {
 
-                const courseRef =
-                    doc(
-                        db,
-                        "courses",
-                        courseId
-                    );
+                await signOut(auth);
 
-                const courseSnap =
-                    await getDoc(courseRef);
+                window.location.href =
+                    "index.html";
 
+            }
 
-                if (!courseSnap.exists()) {
-
-                    continue;
-                }
-
-
-                const courseData =
-                    courseSnap.data();
-
-
-                /*
-                 * courses/{courseId}/tests
-                 */
-
-                const testsRef =
-                    collection(
-                        db,
-                        "courses",
-                        courseId,
-                        "tests"
-                    );
-
-                const testsSnap =
-                    await getDocs(testsRef);
-
-
-                testsSnap.forEach((testDoc) => {
-
-                    const testData =
-                        testDoc.data();
-
-
-                    /*
-                     * Chỉ lấy bài đang active
-                     */
-
-                    if (
-                        testData.active === false
-                    ) {
-
-                        return;
-                    }
-
-
-                    exams.push({
-
-                        id: testDoc.id,
-
-                        courseId,
-
-                        courseName:
-                            buildCourseName(courseData),
-
-                        courseData,
-
-                        ...testData
-
-                    });
-
-                });
-
-            } catch (courseError) {
+            catch (error) {
 
                 console.error(
-                    `Không thể tải course ${courseId}:`,
-                    courseError
+                    "Lỗi đăng xuất:",
+                    error
                 );
+
+                alert(
+                    "Không thể đăng xuất. Vui lòng thử lại."
+                );
+
             }
+
         }
+    );
 
-
-        /*
-         * Sắp xếp bài kiểm tra
-         */
-
-        exams.sort((a, b) => {
-
-            const timeA =
-                getDateValue(a.createdAt);
-
-            const timeB =
-                getDateValue(b.createdAt);
-
-            return timeB - timeA;
-
-        });
-
-
-        allExams = exams;
-
-
-        if (allExams.length === 0) {
-
-            showEmpty();
-
-            return;
-        }
-
-
-        renderExams();
-
-    } catch (error) {
-
-        console.error(
-            "Lỗi load exams:",
-            error
-        );
-
-        showError(
-            getErrorMessage(error)
-        );
-    }
 }
 
 
-/* =========================================================
-   BUILD COURSE NAME
-========================================================= */
+/*==================================================
+        KHÓA HỌC CỦA TÔI
+==================================================*/
 
-function buildCourseName(courseData) {
+if (myCoursesBtn) {
 
-    const subject =
-        courseData.subjectName ||
-        courseData.subject ||
-        "";
-
-    const grade =
-        courseData.grade ||
-        "";
-
-    const name =
-        courseData.name ||
-        "";
-
-    const parts = [];
-
-
-    if (subject) {
-
-        parts.push(subject);
-    }
-
-    if (grade) {
-
-        parts.push(grade);
-    }
-
-    if (name) {
-
-        parts.push(
-            `- ${name}`
-        );
-    }
-
-
-    return parts.join(" ");
-}
-
-
-/* =========================================================
-   RENDER EXAMS
-========================================================= */
-
-function renderExams() {
-
-    hideAllStates();
-
-    examGrid.innerHTML = "";
-
-
-    examCount.textContent =
-        `${allExams.length} bài`;
-
-
-    allExams.forEach((exam, index) => {
-
-        const card =
-            createExamCard(
-                exam,
-                index
-            );
-
-        examGrid.appendChild(card);
-
-    });
-
-
-    examGrid.style.display =
-        "grid";
-}
-
-
-/* =========================================================
-   CREATE EXAM CARD
-========================================================= */
-
-function createExamCard(
-    exam,
-    index
-) {
-
-    const card =
-        document.createElement("article");
-
-    card.className =
-        "exam-card";
-
-    card.style.animationDelay =
-        `${index * 0.05}s`;
-
-
-    const title =
-        exam.title ||
-        "Bài kiểm tra";
-
-    const type =
-        exam.type ||
-        "Kiểm tra";
-
-    const questionCount =
-        exam.questionCount ??
-        countQuestions(exam);
-
-    const totalPoints =
-        exam.totalPoints ??
-        calculateTotalPoints(exam);
-
-    const duration =
-        exam.duration ??
-        getDurationFromType(type);
-
-    const description =
-        exam.description ||
-        "Kiểm tra kiến thức và mức độ nắm bài.";
-
-
-    card.innerHTML = `
-
-        <div class="card-top">
-
-            <span class="exam-type">
-
-                <i class="fa-solid fa-file-pen"></i>
-
-                ${escapeHTML(type)}
-
-            </span>
-
-            <span class="exam-status">
-                Đang mở
-            </span>
-
-        </div>
-
-
-        <h3>
-            ${escapeHTML(title)}
-        </h3>
-
-
-        <p class="exam-card-description">
-            ${escapeHTML(description)}
-        </p>
-
-
-        <div class="exam-meta">
-
-            <div class="meta-item">
-
-                <i class="fa-solid fa-list-ol"></i>
-
-                <span>
-
-                    Câu hỏi
-
-                    <strong>
-                        ${questionCount}
-                    </strong>
-
-                </span>
-
-            </div>
-
-
-            <div class="meta-item">
-
-                <i class="fa-solid fa-star"></i>
-
-                <span>
-
-                    Tổng điểm
-
-                    <strong>
-                        ${totalPoints}
-                    </strong>
-
-                </span>
-
-            </div>
-
-
-            <div class="meta-item">
-
-                <i class="fa-solid fa-clock"></i>
-
-                <span>
-
-                    Thời gian
-
-                    <strong>
-                        ${duration ? duration + " phút" : "—"}
-                    </strong>
-
-                </span>
-
-            </div>
-
-
-            <div class="meta-item">
-
-                <i class="fa-solid fa-user-tie"></i>
-
-                <span>
-
-                    Giáo viên
-
-                    <strong>
-                        ${escapeHTML(
-                            exam.teacherName || "—"
-                        )}
-                    </strong>
-
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="exam-course">
-
-            <i class="fa-solid fa-book-open"></i>
-
-            <span>
-                ${escapeHTML(
-                    exam.courseName || "Khóa học"
-                )}
-            </span>
-
-        </div>
-
-
-        <button
-            class="detail-btn"
-            data-test-id="${escapeHTML(exam.id)}"
-            data-course-id="${escapeHTML(exam.courseId)}"
-        >
-
-            <i class="fa-solid fa-arrow-right"></i>
-
-            Xem chi tiết
-
-        </button>
-
-    `;
-
-
-    const button =
-        card.querySelector(".detail-btn");
-
-
-    button.addEventListener(
+    myCoursesBtn.addEventListener(
         "click",
         () => {
 
-            openExamDetail(exam);
+            window.location.href =
+                "my-courses.html";
 
         }
     );
 
-
-    return card;
 }
 
 
-/* =========================================================
-   OPEN DETAIL
-========================================================= */
+/*==================================================
+        QUẢN LÝ
+==================================================*/
 
-function openExamDetail(exam) {
+if (manageBtn) {
 
-    currentExam = exam;
+    manageBtn.addEventListener(
+        "click",
+        () => {
 
+            if (
+                currentRole === "Admin"
+            ) {
 
-    /*
-     * Cập nhật URL
-     */
+                window.location.href =
+                    "dashboard/admin.html";
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+            }
 
-    params.set(
-        "courseId",
-        exam.courseId
+            else if (
+                currentRole === "Giáo viên"
+            ) {
+
+                window.location.href =
+                    "dashboard/teacher.html";
+
+            }
+
+        }
     );
 
-    params.set(
-        "testId",
-        exam.id
-    );
-
-
-    window.history.pushState(
-        {},
-        "",
-        `${window.location.pathname}?${params.toString()}`
-    );
-
-
-    /*
-     * Hiển thị dữ liệu
-     */
-
-    detailTitle.textContent =
-        exam.title ||
-        "Bài kiểm tra";
-
-    detailType.textContent =
-        exam.type ||
-        "BÀI KIỂM TRA";
-
-
-    detailTeacher.textContent =
-        exam.teacherName ||
-        "Chưa cập nhật";
-
-
-    detailQuestionCount.textContent =
-        exam.questionCount ??
-        countQuestions(exam);
-
-
-    detailTotalPoints.textContent =
-        exam.totalPoints ??
-        calculateTotalPoints(exam);
-
-
-    const duration =
-        exam.duration ??
-        getDurationFromType(
-            exam.type
-        );
-
-
-    detailDuration.textContent =
-        duration
-            ? `${duration} phút`
-            : "Chưa cập nhật";
-
-
-    detailDescription.textContent =
-        exam.description ||
-        "Bài kiểm tra kiến thức."
-
-
-    detailCourse.textContent =
-        exam.courseName ||
-        "Chưa xác định";
-
-
-    /*
-     * chapterId và lessonId hiện tại
-     * đang có trong dữ liệu Firestore.
-     *
-     * Chưa cần query lesson ở bước này.
-     */
-
-    if (exam.lessonId) {
-
-        detailLesson.textContent =
-            `Bài học (${exam.lessonId})`;
-
-    } else if (exam.chapterId) {
-
-        detailLesson.textContent =
-            `Chương (${exam.chapterId})`;
-
-    } else {
-
-        detailLesson.textContent =
-            "Chưa xác định";
-    }
-
-
-    /*
-     * Chưa cho bắt đầu làm bài
-     */
-
-    startExamBtn.disabled = true;
-
-
-    /*
-     * Chuyển giao diện
-     */
-
-    examListSection.style.display =
-        "none";
-
-    examDetailSection.style.display =
-        "block";
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
 
 
-/* =========================================================
-   CHECK URL
-========================================================= */
+/*==================================================
+        HƯỚNG DẪN
+==================================================*/
 
-function checkUrlForExam() {
+if (userGuide) {
 
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+    userGuide.addEventListener(
+        "click",
+        () => {
 
+            alert(
+                "Chức năng hướng dẫn đang được cập nhật."
+            );
 
-    const testId =
-        params.get("testId");
-
-    const courseId =
-        params.get("courseId");
-
-
-    if (!testId || !courseId) {
-
-        return;
-    }
-
-
-    const exam =
-        allExams.find(
-            item =>
-                item.id === testId &&
-                item.courseId === courseId
-        );
-
-
-    if (!exam) {
-
-        return;
-    }
-
-
-    openExamDetail(
-        exam
+        }
     );
+
 }
 
 
-/* =========================================================
-   BACK
-========================================================= */
+/*==================================================
+        NOTIFICATION BADGE
+==================================================*/
 
-backBtn.addEventListener(
-    "click",
-    () => {
+function showNotificationBadge(number) {
 
-        currentExam = null;
+    if (!notificationBadge) return;
 
 
-        const cleanUrl =
-            window.location.pathname;
+    if (number <= 0) {
 
-        window.history.pushState(
-            {},
-            "",
-            cleanUrl
-        );
-
-
-        examDetailSection.style.display =
+        notificationBadge.style.display =
             "none";
 
-        examListSection.style.display =
-            "block";
+        return;
+
+    }
 
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+    notificationBadge.style.display =
+        "flex";
+
+    notificationBadge.textContent =
+        number > 99
+            ? "99+"
+            : number;
+
+}
+
+
+/*==================================================
+        FORMAT TIME
+==================================================*/
+
+function formatTime(timestamp) {
+
+    if (!timestamp) {
+
+        return "Vừa xong";
+
+    }
+
+
+    let date;
+
+
+    try {
+
+        date =
+            timestamp.toDate();
+
+    }
+
+    catch {
+
+        date =
+            new Date(timestamp);
+
+    }
+
+
+    const now =
+        new Date();
+
+
+    const diff =
+        Math.floor(
+            (now - date) / 1000
+        );
+
+
+    if (diff < 60) {
+
+        return "Vừa xong";
+
+    }
+
+
+    if (diff < 3600) {
+
+        return (
+            Math.floor(diff / 60)
+            + " phút trước"
+        );
+
+    }
+
+
+    if (diff < 86400) {
+
+        return (
+            Math.floor(diff / 3600)
+            + " giờ trước"
+        );
+
+    }
+
+
+    if (diff < 172800) {
+
+        return "Hôm qua";
+
+    }
+
+
+    if (diff < 604800) {
+
+        return (
+            Math.floor(diff / 86400)
+            + " ngày trước"
+        );
+
+    }
+
+
+    return date.toLocaleDateString(
+        "vi-VN"
+    );
+
+}
+
+
+/*==================================================
+        RENDER NOTIFICATIONS
+==================================================*/
+
+function renderNotifications(list) {
+
+    if (!notificationList) return;
+
+
+    if (list.length === 0) {
+
+        notificationList.innerHTML = `
+
+            <div class="notification-empty">
+
+                <i class="fa-regular fa-bell-slash"></i>
+
+                <p>
+                    Chưa có thông báo nào.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    list.forEach(item => {
+
+        let icon =
+            "fa-solid fa-bullhorn";
+
+
+        switch (item.type) {
+
+            case "lesson":
+
+                icon =
+                    "fa-solid fa-book-open";
+
+                break;
+
+
+            case "test":
+
+                icon =
+                    "fa-solid fa-file-pen";
+
+                break;
+
+
+            case "general":
+
+                icon =
+                    "fa-solid fa-bullhorn";
+
+                break;
+
+        }
+
+
+        html += `
+
+            <div
+                class="notification-item
+                ${item.read ? "" : "unread"}"
+            >
+
+                <div class="notification-icon">
+
+                    <i class="${icon}"></i>
+
+                </div>
+
+
+                <div class="notification-content">
+
+                    <h4>
+                        ${item.title || "Thông báo"}
+                    </h4>
+
+                    <p>
+                        ${item.content || ""}
+                    </p>
+
+                    <span>
+                        ${formatTime(item.createdAt)}
+                    </span>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    notificationList.innerHTML =
+        html;
+
+}
+
+
+/*==================================================
+        LOAD NOTIFICATIONS
+==================================================*/
+
+function loadNotifications() {
+
+    try {
+
+        const notificationQuery =
+            query(
+                collection(
+                    db,
+                    "notifications"
+                ),
+                orderBy(
+                    "createdAt",
+                    "desc"
+                )
+            );
+
+
+        onSnapshot(
+            notificationQuery,
+            (snapshot) => {
+
+                const notifications = [];
+
+                let unreadCount = 0;
+
+
+                snapshot.forEach(
+                    notificationDoc => {
+
+                        const data =
+                            notificationDoc.data();
+
+
+                        notifications.push({
+                            id: notificationDoc.id,
+                            ...data
+                        });
+
+
+                        if (!data.read) {
+
+                            unreadCount++;
+
+                        }
+
+                    }
+                );
+
+
+                renderNotifications(
+                    notifications
+                );
+
+
+                showNotificationBadge(
+                    unreadCount
+                );
+
+            },
+
+            error => {
+
+                console.error(
+                    "Lỗi notification:",
+                    error
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể load notification:",
+            error
+        );
+
+    }
+
+}
+
+
+/*==================================================
+        MARK NOTIFICATIONS AS READ
+==================================================*/
+
+async function markAllNotificationsAsRead() {
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(
+                    db,
+                    "notifications"
+                )
+            );
+
+
+        const promises = [];
+
+
+        snapshot.forEach(
+            notificationDoc => {
+
+                const data =
+                    notificationDoc.data();
+
+
+                if (!data.read) {
+
+                    promises.push(
+                        updateDoc(
+                            doc(
+                                db,
+                                "notifications",
+                                notificationDoc.id
+                            ),
+                            {
+                                read: true
+                            }
+                        )
+                    );
+
+                }
+
+            }
+        );
+
+
+        await Promise.all(
+            promises
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Lỗi đánh dấu thông báo:",
+            error
+        );
+
+    }
+
+}
+
+
+/*==================================================
+        EXAM DATA
+==================================================*/
+
+let allExams = [];
+
+
+/*==================================================
+        LOAD EXAMS
+==================================================*/
+
+async function loadExams() {
+
+    if (!examList) return;
+
+
+    try {
+
+        examList.innerHTML = `
+
+            <div class="exam-loading">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <p>
+                    Đang tải bài kiểm tra...
+                </p>
+
+            </div>
+
+        `;
+
+
+        const examQuery =
+            query(
+                collection(
+                    db,
+                    "tests"
+                ),
+                orderBy(
+                    "createdAt",
+                    "desc"
+                )
+            );
+
+
+        const snapshot =
+            await getDocs(
+                examQuery
+            );
+
+
+        allExams = [];
+
+
+        snapshot.forEach(
+            examDoc => {
+
+                allExams.push({
+
+                    id: examDoc.id,
+
+                    ...examDoc.data()
+
+                });
+
+            }
+        );
+
+
+        renderExams(
+            allExams
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Lỗi tải bài kiểm tra:",
+            error
+        );
+
+
+        examList.innerHTML = `
+
+            <div class="exam-empty">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <p>
+                    Không thể tải danh sách bài kiểm tra.
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/*==================================================
+        RENDER EXAMS
+==================================================*/
+
+function renderExams(exams) {
+
+    if (!examList) return;
+
+
+    if (exams.length === 0) {
+
+        examList.innerHTML = `
+
+            <div class="exam-empty">
+
+                <i class="fa-regular fa-file-lines"></i>
+
+                <h3>
+                    Chưa có bài kiểm tra
+                </h3>
+
+                <p>
+                    Hiện tại chưa có bài kiểm tra nào được mở.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    exams.forEach(exam => {
+
+        const title =
+            exam.title ||
+            exam.name ||
+            "Bài kiểm tra";
+
+
+        const description =
+            exam.description ||
+            "Bài kiểm tra trên H&T STUDY";
+
+
+        const subject =
+            exam.subjectName ||
+            exam.subject ||
+            "";
+
+
+        const grade =
+            exam.grade ||
+            "";
+
+
+        const duration =
+            exam.duration ||
+            exam.time ||
+            0;
+
+
+        const questionCount =
+            exam.questionCount ||
+            exam.questionsCount ||
+            (
+                Array.isArray(exam.questions)
+                    ? exam.questions.length
+                    : 0
+            );
+
+
+        const status =
+            exam.status ||
+            "open";
+
+
+        html += `
+
+            <div
+                class="exam-card"
+                data-id="${exam.id}"
+                data-subject="${subject}"
+                data-grade="${grade}"
+                data-status="${status}"
+            >
+
+                <div class="exam-card-icon">
+
+                    <i class="fa-solid fa-file-pen"></i>
+
+                </div>
+
+
+                <div class="exam-card-content">
+
+                    <h3>
+                        ${title}
+                    </h3>
+
+                    <p>
+                        ${description}
+                    </p>
+
+
+                    <div class="exam-info">
+
+                        ${
+                            subject
+                                ? `
+                                <span>
+                                    <i class="fa-solid fa-book"></i>
+                                    ${subject}
+                                </span>
+                                `
+                                : ""
+                        }
+
+
+                        ${
+                            grade
+                                ? `
+                                <span>
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    Lớp ${grade}
+                                </span>
+                                `
+                                : ""
+                        }
+
+
+                        ${
+                            duration
+                                ? `
+                                <span>
+                                    <i class="fa-regular fa-clock"></i>
+                                    ${duration} phút
+                                </span>
+                                `
+                                : ""
+                        }
+
+
+                        ${
+                            questionCount
+                                ? `
+                                <span>
+                                    <i class="fa-solid fa-list-ol"></i>
+                                    ${questionCount} câu
+                                </span>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+
+                    <button
+                        class="exam-start-btn"
+                        data-id="${exam.id}"
+                    >
+
+                        <span>
+                            Làm bài
+                        </span>
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    examList.innerHTML =
+        html;
+
+}
+
+
+/*==================================================
+        CLICK LÀM BÀI
+==================================================*/
+
+if (examList) {
+
+    examList.addEventListener(
+        "click",
+        e => {
+
+            const button =
+                e.target.closest(
+                    ".exam-start-btn"
+                );
+
+
+            if (!button) return;
+
+
+            const examId =
+                button.dataset.id;
+
+
+            if (!examId) return;
+
+
+            if (!currentUser) {
+
+                alert(
+                    "Bạn cần đăng nhập để làm bài."
+                );
+
+                return;
+
+            }
+
+
+            window.location.href =
+                `exam-detail.html?id=${examId}`;
+
+        }
+    );
+
+}
+
+
+/*==================================================
+        TÌM KIẾM BÀI KIỂM TRA
+==================================================*/
+
+if (examSearch) {
+
+    examSearch.addEventListener(
+        "input",
+        () => {
+
+            const keyword =
+                examSearch.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const filtered =
+                allExams.filter(
+                    exam => {
+
+                        const title =
+                            (
+                                exam.title ||
+                                exam.name ||
+                                ""
+                            )
+                            .toLowerCase();
+
+
+                        const description =
+                            (
+                                exam.description ||
+                                ""
+                            )
+                            .toLowerCase();
+
+
+                        const subject =
+                            (
+                                exam.subjectName ||
+                                exam.subject ||
+                                ""
+                            )
+                            .toLowerCase();
+
+
+                        return (
+
+                            title.includes(keyword)
+
+                            ||
+
+                            description.includes(keyword)
+
+                            ||
+
+                            subject.includes(keyword)
+
+                        );
+
+                    }
+                );
+
+
+            renderExams(
+                filtered
+            );
+
+        }
+    );
+
+}
+
+
+/*==================================================
+        FILTER BÀI KIỂM TRA
+==================================================*/
+
+examFilterBtns.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                document
+                    .querySelectorAll(
+                        ".exam-filter-btn"
+                    )
+                    .forEach(btn => {
+
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                const filter =
+                    button.dataset.filter;
+
+
+                if (
+                    !filter ||
+                    filter === "all"
+                ) {
+
+                    renderExams(
+                        allExams
+                    );
+
+                    return;
+
+                }
+
+
+                const filtered =
+                    allExams.filter(
+                        exam => {
+
+                            const subject =
+                                (
+                                    exam.subject ||
+                                    exam.subjectName ||
+                                    ""
+                                )
+                                .toLowerCase();
+
+
+                            const grade =
+                                String(
+                                    exam.grade || ""
+                                );
+
+
+                            if (
+                                filter === "hoa"
+                            ) {
+
+                                return subject.includes(
+                                    "hóa"
+                                );
+
+                            }
+
+
+                            if (
+                                filter === "toan"
+                            ) {
+
+                                return subject.includes(
+                                    "toán"
+                                );
+
+                            }
+
+
+                            if (
+                                filter === "ly"
+                            ) {
+
+                                return subject.includes(
+                                    "vật lý"
+                                )
+                                ||
+                                subject.includes(
+                                    "lý"
+                                );
+
+                            }
+
+
+                            if (
+                                filter === "10" ||
+                                filter === "11" ||
+                                filter === "12"
+                            ) {
+
+                                return grade === filter;
+
+                            }
+
+
+                            return true;
+
+                        }
+                    );
+
+
+                renderExams(
+                    filtered
+                );
+
+            }
+        );
 
     }
 );
 
 
-/* =========================================================
-   RETRY
-========================================================= */
+/*==================================================
+        AUTH STATE
+==================================================*/
 
-retryBtn.addEventListener(
-    "click",
-    () => {
+onAuthStateChanged(
+    auth,
+    async user => {
+
+        currentUser =
+            user;
+
+
+        if (!user) {
+
+            window.location.href =
+                "index.html";
+
+            return;
+
+        }
+
+
+        await loadUser(
+            user.uid
+        );
+
+
+        loadNotifications();
+
 
         loadExams();
 
     }
 );
-
-
-/* =========================================================
-   LOADING / STATES
-========================================================= */
-
-function hideAllStates() {
-
-    loadingState.style.display =
-        "none";
-
-    emptyState.style.display =
-        "none";
-
-    errorState.style.display =
-        "none";
-
-    examGrid.style.display =
-        "grid";
-}
-
-
-function showLoading() {
-
-    loadingState.style.display =
-        "flex";
-
-    emptyState.style.display =
-        "none";
-
-    errorState.style.display =
-        "none";
-
-    examGrid.style.display =
-        "none";
-}
-
-
-function showEmpty() {
-
-    loadingState.style.display =
-        "none";
-
-    emptyState.style.display =
-        "block";
-
-    errorState.style.display =
-        "none";
-
-    examGrid.style.display =
-        "none";
-
-    examCount.textContent =
-        "0 bài";
-}
-
-
-function showError(message) {
-
-    loadingState.style.display =
-        "none";
-
-    emptyState.style.display =
-        "none";
-
-    errorState.style.display =
-        "block";
-
-    examGrid.style.display =
-        "none";
-
-    errorMessage.textContent =
-        message;
-}
-
-
-/* =========================================================
-   COUNT QUESTIONS
-========================================================= */
-
-function countQuestions(exam) {
-
-    let count = 0;
-
-
-    /*
-     * part1.questions
-     */
-
-    if (
-        exam.part1 &&
-        Array.isArray(
-            exam.part1.questions
-        )
-    ) {
-
-        count +=
-            exam.part1.questions.length;
-    }
-
-
-    /*
-     * part2.questions
-     */
-
-    if (
-        exam.part2 &&
-        Array.isArray(
-            exam.part2.questions
-        )
-    ) {
-
-        count +=
-            exam.part2.questions.length;
-    }
-
-
-    /*
-     * part3.questions
-     */
-
-    if (
-        exam.part3 &&
-        Array.isArray(
-            exam.part3.questions
-        )
-    ) {
-
-        count +=
-            exam.part3.questions.length;
-    }
-
-
-    return count;
-}
-
-
-/* =========================================================
-   CALCULATE POINTS
-========================================================= */
-
-function calculateTotalPoints(exam) {
-
-    let total = 0;
-
-
-    if (
-        exam.part1 &&
-        typeof exam.part1.points === "number"
-    ) {
-
-        total +=
-            exam.part1.points;
-    }
-
-
-    if (
-        exam.part2 &&
-        typeof exam.part2.points === "number"
-    ) {
-
-        total +=
-            exam.part2.points;
-    }
-
-
-    if (
-        exam.part3 &&
-        typeof exam.part3.points === "number"
-    ) {
-
-        total +=
-            exam.part3.points;
-    }
-
-
-    return total || 0;
-}
-
-
-/* =========================================================
-   DURATION
-========================================================= */
-
-function getDurationFromType(type) {
-
-    if (!type) {
-
-        return null;
-    }
-
-
-    const text =
-        String(type).toLowerCase();
-
-
-    /*
-     * "15p"
-     */
-
-    const match =
-        text.match(/(\d+)\s*p/);
-
-
-    if (match) {
-
-        return Number(
-            match[1]
-        );
-    }
-
-
-    return null;
-}
-
-
-/* =========================================================
-   DATE
-========================================================= */
-
-function getDateValue(value) {
-
-    if (!value) {
-
-        return 0;
-    }
-
-
-    if (
-        typeof value.toMillis ===
-        "function"
-    ) {
-
-        return value.toMillis();
-    }
-
-
-    if (
-        value instanceof Date
-    ) {
-
-        return value.getTime();
-    }
-
-
-    return 0;
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHTML(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-    }
-
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* =========================================================
-   ERROR MESSAGE
-========================================================= */
-
-function getErrorMessage(error) {
-
-    if (
-        error &&
-        error.code ===
-        "permission-denied"
-    ) {
-
-        return "Bạn không có quyền đọc dữ liệu bài kiểm tra.";
-    }
-
-
-    return error?.message ||
-        "Không thể tải dữ liệu bài kiểm tra.";
-}
