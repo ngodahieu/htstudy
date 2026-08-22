@@ -1748,8 +1748,111 @@ confirmStartBtn.addEventListener(
 
     }
 );
+function getAllQuestions(test) {
 
+    const questions = [];
 
+    /*
+     * Duyệt qua tất cả các phần:
+     *
+     * part1
+     * part2
+     * part3
+     * ...
+     */
+
+    Object.keys(test).forEach(key => {
+
+        if (!key.startsWith("part")) {
+            return;
+        }
+
+        const part = test[key];
+
+        if (!part) {
+            return;
+        }
+
+        /*
+         * Lấy questions của phần.
+         */
+        const partQuestions =
+            part.questions;
+
+        if (!partQuestions) {
+            return;
+        }
+
+        /*
+         * Firestore có thể lưu questions
+         * dưới dạng Array.
+         */
+        if (Array.isArray(partQuestions)) {
+
+            partQuestions.forEach(
+                (question, index) => {
+
+                    questions.push({
+
+                        ...question,
+
+                        id:
+                            question.id ||
+                            `${key}_q${index + 1}`,
+
+                        part: key
+
+                    });
+
+                }
+            );
+
+            return;
+        }
+
+        /*
+         * Trường hợp questions là object.
+         */
+        if (
+            typeof partQuestions ===
+            "object"
+        ) {
+
+            Object.entries(
+                partQuestions
+            ).forEach(
+                ([questionId, question]) => {
+
+                    if (
+                        !question ||
+                        typeof question !==
+                        "object"
+                    ) {
+                        return;
+                    }
+
+                    questions.push({
+
+                        ...question,
+
+                        id:
+                            question.id ||
+                            `${key}_${questionId}`,
+
+                        part: key
+
+                    });
+
+                }
+            );
+
+        }
+
+    });
+
+    return questions;
+
+}
 /* ==================================================
    START EXAM
 ================================================== */
@@ -1804,12 +1907,7 @@ async function startExam() {
         /*
          * Lấy danh sách câu hỏi.
          */
-        currentQuestions =
-            Array.isArray(
-                currentTest.questions
-            )
-                ? currentTest.questions
-                : [];
+        currentQuestions = getAllQuestions(currentTest);
 
         /*
          * Reset trạng thái làm bài.
@@ -1919,20 +2017,28 @@ function renderQuestionNavigation() {
 
     grid.innerHTML = "";
 
+
     currentQuestions.forEach(
         (question, index) => {
 
             const button =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
             button.type = "button";
 
             button.className =
                 "question-nav-item";
 
+
             button.textContent =
                 index + 1;
 
+
+            /*
+             * Câu hiện tại.
+             */
             if (
                 index ===
                 currentQuestionIndex
@@ -1944,9 +2050,14 @@ function renderQuestionNavigation() {
 
             }
 
+
+            /*
+             * Kiểm tra đã trả lời chưa.
+             */
             const questionId =
                 question.id ||
-                index + 1;
+                `${question.part}_q${index + 1}`;
+
 
             if (
                 userAnswers[
@@ -1960,6 +2071,10 @@ function renderQuestionNavigation() {
 
             }
 
+
+            /*
+             * Click vào số câu.
+             */
             button.addEventListener(
                 "click",
                 () => {
@@ -1971,12 +2086,13 @@ function renderQuestionNavigation() {
 
                     updateAnsweredCount();
 
-                    renderQuestionNavigation();
-
                 }
             );
 
-            grid.appendChild(button);
+
+            grid.appendChild(
+                button
+            );
 
         }
     );
@@ -2040,7 +2156,6 @@ function updateTimer() {
 /* ==================================================
    QUESTION
 ================================================== */
-
 function renderQuestion() {
 
     if (!currentQuestions.length) {
@@ -2067,32 +2182,102 @@ function renderQuestion() {
 
         `;
 
+        currentQuestionNumber.textContent = 0;
+
+        totalQuestions.textContent = 0;
+
         return;
 
     }
+
 
     const question =
         currentQuestions[
             currentQuestionIndex
         ];
 
+
     const questionNumber =
         currentQuestionIndex + 1;
 
-    currentQuestionNumber.textContent =
-        questionNumber;
 
     const total =
         currentQuestions.length;
 
-    progressBar.style.width =
-        `${(questionNumber / total) * 100}%`;
+
+    /*
+     * Cập nhật tiến độ.
+     */
+    currentQuestionNumber.textContent =
+        questionNumber;
+
+    totalQuestions.textContent =
+        total;
 
 
+    /*
+     * Thanh tiến độ.
+     *
+     * HTML của bạn có:
+     *
+     * progressBar
+     *    └── progressFill
+     *
+     * nên phải đổi width của progressFill.
+     */
+    const progressFill =
+        document.getElementById(
+            "progressFill"
+        );
+
+    if (progressFill) {
+
+        progressFill.style.width =
+            `${(questionNumber / total) * 100}%`;
+
+    }
+
+
+    /*
+     * Lấy đáp án.
+     */
     const options =
-        question.options || [];
+        Array.isArray(question.options)
+            ? question.options
+            : [];
 
 
+    /*
+     * ID câu hỏi.
+     */
+    const questionId =
+        question.id ||
+        `${question.part}_q${questionNumber}`;
+
+
+    /*
+     * Hình ảnh câu hỏi.
+     */
+    const imageHTML =
+        question.image
+            ? `
+                <div class="question-image">
+
+                    <img
+                        src="${escapeHTML(
+                            question.image
+                        )}"
+                        alt="Hình câu hỏi"
+                    >
+
+                </div>
+            `
+            : "";
+
+
+    /*
+     * Tạo câu hỏi.
+     */
     questionContainer.innerHTML = `
 
         <span class="question-number">
@@ -2100,6 +2285,10 @@ function renderQuestion() {
             CÂU ${questionNumber}
 
         </span>
+
+
+        ${imageHTML}
+
 
         <h3 class="question-text">
 
@@ -2111,6 +2300,7 @@ function renderQuestion() {
 
         </h3>
 
+
         <div class="answers">
 
             ${options.map(
@@ -2118,11 +2308,11 @@ function renderQuestion() {
 
                     const checked =
                         userAnswers[
-                            question.id ||
-                            questionNumber
+                            questionId
                         ] === index
                             ? "checked"
                             : "";
+
 
                     return `
 
@@ -2142,9 +2332,11 @@ function renderQuestion() {
                             >
 
                             <span>
+
                                 ${escapeHTML(
                                     option
                                 )}
+
                             </span>
 
                         </label>
@@ -2159,6 +2351,9 @@ function renderQuestion() {
     `;
 
 
+    /*
+     * Bắt sự kiện chọn đáp án.
+     */
     questionContainer
         .querySelectorAll(
             'input[name="answer"]'
@@ -2169,18 +2364,41 @@ function renderQuestion() {
                 "change",
                 () => {
 
-                    const id =
-                        question.id ||
-                        questionNumber;
-
-                    userAnswers[id] =
+                    userAnswers[
+                        questionId
+                    ] =
                         Number(
                             input.value
                         );
 
-                    renderQuestion();
 
                     updateAnsweredCount();
+
+                    renderQuestionNavigation();
+
+                    /*
+                     * Cập nhật class selected
+                     * mà không làm mất đáp án.
+                     */
+                    questionContainer
+                        .querySelectorAll(
+                            ".answer"
+                        )
+                        .forEach(
+                            answer => {
+
+                                answer.classList
+                                    .remove(
+                                        "selected"
+                                    );
+
+                            }
+                        );
+
+                    input
+                        .closest(".answer")
+                        ?.classList
+                        .add("selected");
 
                 }
             );
@@ -2188,18 +2406,37 @@ function renderQuestion() {
         });
 
 
+    /*
+     * Nút câu trước.
+     */
     prevQuestionBtn.disabled =
         currentQuestionIndex === 0;
 
-    nextQuestionBtn.textContent =
+
+    /*
+     * Nút câu tiếp theo.
+     */
+    nextQuestionBtn.innerHTML =
         currentQuestionIndex ===
         total - 1
-            ? "Nộp bài"
-            : "Câu tiếp theo";
-renderQuestionNavigation();
+
+            ? `
+                Nộp bài
+                <i class="fa-solid fa-check"></i>
+              `
+
+            : `
+                Câu tiếp theo
+                <i class="fa-solid fa-arrow-right"></i>
+              `;
+
+
+    /*
+     * Cập nhật danh sách câu hỏi.
+     */
+    renderQuestionNavigation();
+
 }
-
-
 /* ==================================================
    ANSWER COUNT
 ================================================== */
