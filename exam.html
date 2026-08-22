@@ -13,11 +13,19 @@
     <title>Thi thử | H&T STUDY</title>
 
     <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
@@ -27,60 +35,380 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
     >
 
-    <!-- Exam CSS -->
-    <link
-        rel="stylesheet"
-        href="css/exam.css"
-    >
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-    <!-- =========================================
-         HEADER
-    ========================================== -->
+    <!-- =========================
+        BACKGROUND
+    ========================= -->
 
-    <header class="exam-header">
+    <div class="space-bg"></div>
+    <div class="overlay"></div>
 
-        <div class="header-left">
 
-            <a
-                href="index.html"
-                class="logo"
-            >
-                H&T <span>STUDY</span>
-            </a>
+    <!-- =========================
+        HEADER
+    ========================= -->
 
-        </div>
+    <header class="header">
 
-        <div class="header-right">
+        <div class="container">
 
-            <div
-                class="user-info"
-                id="userInfo"
-            >
+            <!-- LOGO -->
 
-                <div class="user-avatar">
-                    <img
-                        id="userAvatar"
-                        src="assets/avatars/default.jpg"
-                        alt="Avatar"
-                    >
+            <a href="index.html" class="logo">
+
+                <img
+                    src="assets/images/logo.png"
+                    alt="H&T STUDY"
+                >
+
+                <div class="logo-text">
+
+                    <h2>H&T STUDY</h2>
+
+                    <span>Chinh phục tri thức</span>
+
                 </div>
 
-                <div class="user-text">
+            </a>
 
-                    <span
-                        class="user-name"
-                        id="userName"
+
+            <!-- HEADER ACTIONS -->
+
+            <div class="header-actions">
+
+                <!-- NAVIGATION -->
+
+                <nav>
+
+                    <ul class="nav-menu">
+
+                        <li>
+
+                            <a href="index.html">
+                                Trang chủ
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a
+                                href="courses.html"
+                                id="coursesLink"
+                            >
+                                Khóa học
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a
+                                href="exam.html"
+                                id="examLink"
+                                class="active"
+                            >
+                                Thi thử
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a
+                                href="result.html"
+                                id="resultLink"
+                            >
+                                Kết quả
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+
+                <!-- RIGHT HEADER -->
+
+                <div class="header-right">
+
+
+                    <!-- =====================
+                        NOTIFICATION
+                    ====================== -->
+
+                    <button
+                        class="notification-btn"
+                        id="notificationBtn"
+                        type="button"
                     >
-                        Đang tải...
-                    </span>
 
-                    <span class="user-role">
-                        Học sinh
-                    </span>
+                        <i class="fa-regular fa-bell"></i>
+
+                        <span
+                            class="badge"
+                            id="notificationBadge"
+                            style="display: none;"
+                        >
+                            0
+                        </span>
+
+                    </button>
+
+
+                    <!-- NOTIFICATION PANEL -->
+
+                    <div
+                        class="notification-panel"
+                        id="notificationPanel"
+                    >
+
+                        <div class="notification-header">
+
+                            <h3>
+                                Thông báo
+                            </h3>
+
+                            <button
+                                id="closeNotification"
+                                type="button"
+                            >
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="notification-list"
+                            id="notificationList"
+                        >
+
+                            <div class="notification-empty">
+
+                                <i class="fa-regular fa-bell-slash"></i>
+
+                                <p>
+                                    Chưa có thông báo nào.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =====================
+                        AVATAR
+                    ====================== -->
+
+                    <div class="avatar">
+
+                        <img
+                            src="assets/avatars/default.jpg"
+                            alt="Avatar"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================
+                        USER MENU
+                    ====================== -->
+
+                    <div
+                        class="user-menu"
+                        id="userMenu"
+                    >
+
+
+                        <!-- GUEST -->
+
+                        <div
+                            class="guest-box"
+                            id="guestBox"
+                        >
+
+                            <div class="guest-avatar">
+
+                                <i class="fa-regular fa-user"></i>
+
+                            </div>
+
+
+                            <h3>
+                                Bạn chưa đăng nhập
+                            </h3>
+
+
+                            <p>
+
+                                Đăng nhập để sử dụng đầy đủ
+                                các chức năng của H&T STUDY.
+
+                            </p>
+
+                        </div>
+
+
+                        <!-- LOGGED USER -->
+
+                        <div
+                            class="user-box"
+                            id="userBox"
+                            style="display: none;"
+                        >
+
+                            <div class="user-profile">
+
+
+                                <img
+                                    id="userAvatar"
+                                    src="assets/avatars/default.jpg"
+                                    alt="Avatar"
+                                >
+
+
+                                <div class="user-info">
+
+                                    <h3 id="userName">
+                                        Nguyễn Văn A
+                                    </h3>
+
+
+                                    <p>
+
+                                        Mã học sinh:
+
+                                        <span id="userStudentId">
+                                            HS0001
+                                        </span>
+
+                                    </p>
+
+
+                                    <p>
+
+                                        Vai trò:
+
+                                        <span id="userRole">
+                                            Học sinh
+                                        </span>
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- GUEST MENU -->
+
+                        <div
+                            class="user-menu-list"
+                            id="guestMenu"
+                        >
+
+                            <button
+                                id="openLogin"
+                                type="button"
+                            >
+
+                                <i class="fa-solid fa-right-to-bracket"></i>
+
+                                Đăng nhập
+
+                            </button>
+
+
+                            <button
+                                id="openGuide"
+                                type="button"
+                            >
+
+                                <i class="fa-regular fa-circle-question"></i>
+
+                                Hướng dẫn
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- USER MENU -->
+
+                        <div
+                            class="user-menu-list"
+                            id="userMenuList"
+                            style="display: none;"
+                        >
+
+                            <button
+                                id="myCoursesBtn"
+                                type="button"
+                            >
+
+                                <i class="fa-solid fa-book-open"></i>
+
+                                Khóa học của tôi
+
+                            </button>
+
+
+                            <button
+                                id="manageBtn"
+                                type="button"
+                                style="display: none;"
+                            >
+
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                                Quản lí
+
+                            </button>
+
+
+                            <button
+                                id="userGuide"
+                                type="button"
+                            >
+
+                                <i class="fa-regular fa-circle-question"></i>
+
+                                Hướng dẫn
+
+                            </button>
+
+
+                            <button
+                                id="logoutBtn"
+                                type="button"
+                            >
+
+                                <i class="fa-solid fa-right-from-bracket"></i>
+
+                                Đăng xuất
+
+                            </button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -91,408 +419,153 @@
     </header>
 
 
-    <!-- =========================================
-         MAIN
-    ========================================== -->
-
-    <main class="exam-container">
-
-        <!-- HERO -->
-
-        <section class="exam-hero">
-
-            <div class="hero-content">
-
-                <div class="hero-icon">
-                    <i class="fa-solid fa-file-pen"></i>
-                </div>
-
-                <div>
-
-                    <h1>
-                        Thi thử
-                    </h1>
-
-                    <p>
-                        Luyện tập và kiểm tra kiến thức của bạn
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =====================================
-             EXAM LIST
-        ====================================== -->
-
-        <section
-            class="exam-list-section"
-            id="examListSection"
-        >
-
-            <div class="section-heading">
-
-                <div>
-
-                    <span class="section-label">
-                        H&T STUDY
-                    </span>
-
-                    <h2>
-                        Bài kiểm tra của bạn
-                    </h2>
-
-                </div>
-
-                <div
-                    class="exam-count"
-                    id="examCount"
-                >
-                    0 bài
-                </div>
-
-            </div>
-
-
-            <!-- Loading -->
-
-            <div
-                class="loading-state"
-                id="loadingState"
-            >
-
-                <div class="loading-spinner"></div>
-
-                <p>
-                    Đang tải bài kiểm tra...
-                </p>
-
-            </div>
-
-
-            <!-- Empty -->
-
-            <div
-                class="empty-state"
-                id="emptyState"
-                style="display:none;"
-            >
-
-                <div class="empty-icon">
-
-                    <i class="fa-regular fa-folder-open"></i>
-
-                </div>
-
-                <h3>
-                    Chưa có bài kiểm tra
-                </h3>
-
-                <p>
-                    Hiện tại chưa có bài kiểm tra nào dành cho bạn.
-                </p>
-
-            </div>
-
-
-            <!-- Error -->
-
-            <div
-                class="error-state"
-                id="errorState"
-                style="display:none;"
-            >
-
-                <div class="error-icon">
-
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-
-                </div>
-
-                <h3>
-                    Không thể tải bài kiểm tra
-                </h3>
-
-                <p id="errorMessage">
-                    Đã xảy ra lỗi khi tải dữ liệu.
-                </p>
-
-                <button
-                    class="retry-btn"
-                    id="retryBtn"
-                >
-                    <i class="fa-solid fa-rotate-right"></i>
-                    Thử lại
-                </button>
-
-            </div>
-
-
-            <!-- Exam cards -->
-
-            <div
-                class="exam-grid"
-                id="examGrid"
-            ></div>
-
-        </section>
-
-
-        <!-- =====================================
-             EXAM DETAIL
-        ====================================== -->
-
-        <section
-            class="exam-detail-section"
-            id="examDetailSection"
-            style="display:none;"
-        >
-
-            <button
-                class="back-btn"
-                id="backBtn"
-            >
-
-                <i class="fa-solid fa-arrow-left"></i>
-
-                <span>
-                    Quay lại danh sách
-                </span>
-
-            </button>
-
-
-            <div class="detail-card">
-
-                <!-- Detail Header -->
-
-                <div class="detail-header">
-
-                    <div class="detail-icon">
-
-                        <i class="fa-solid fa-file-circle-check"></i>
-
-                    </div>
-
-                    <div class="detail-title">
-
-                        <span
-                            class="detail-type"
-                            id="detailType"
-                        >
-                            BÀI KIỂM TRA
-                        </span>
-
-                        <h1 id="detailTitle">
-                            Đang tải...
-                        </h1>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Info -->
-
-                <div class="detail-info-grid">
-
-                    <div class="info-box">
-
-                        <div class="info-icon">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-
-                        <div>
-
-                            <span>
-                                Giáo viên
-                            </span>
-
-                            <strong id="detailTeacher">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="info-box">
-
-                        <div class="info-icon">
-                            <i class="fa-solid fa-list-ol"></i>
-                        </div>
-
-                        <div>
-
-                            <span>
-                                Số câu
-                            </span>
-
-                            <strong id="detailQuestionCount">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="info-box">
-
-                        <div class="info-icon">
-                            <i class="fa-solid fa-star"></i>
-                        </div>
-
-                        <div>
-
-                            <span>
-                                Tổng điểm
-                            </span>
-
-                            <strong id="detailTotalPoints">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="info-box">
-
-                        <div class="info-icon">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-
-                        <div>
-
-                            <span>
-                                Thời gian
-                            </span>
-
-                            <strong id="detailDuration">
-                                —
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Description -->
-
-                <div class="detail-block">
-
-                    <h3>
-
-                        <i class="fa-solid fa-circle-info"></i>
-
-                        Thông tin bài kiểm tra
-
-                    </h3>
-
-                    <p id="detailDescription">
-                        Bài kiểm tra kiến thức.
-                    </p>
-
-                </div>
-
-
-                <!-- Course -->
-
-                <div class="detail-block">
-
-                    <h3>
-
-                        <i class="fa-solid fa-book-open"></i>
-
-                        Khóa học
-
-                    </h3>
-
-                    <p id="detailCourse">
-                        —
-                    </p>
-
-                </div>
-
-
-                <!-- Lesson -->
-
-                <div class="detail-block">
-
-                    <h3>
-
-                        <i class="fa-solid fa-book"></i>
-
-                        Bài học
-
-                    </h3>
-
-                    <p id="detailLesson">
-                        —
-                    </p>
-
-                </div>
-
-
-                <!-- Notice -->
-
-                <div class="detail-notice">
-
-                    <i class="fa-solid fa-circle-exclamation"></i>
-
-                    <div>
-
-                        <strong>
-                            Lưu ý
-                        </strong>
-
-                        <p>
-                            Hiện tại bạn đang xem thông tin chi tiết
-                            của bài kiểm tra. Chức năng bắt đầu làm bài
-                            sẽ được triển khai ở bước tiếp theo.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Start button -->
-
-                <div class="detail-actions">
-
-                    <button
-                        class="start-exam-btn"
-                        id="startExamBtn"
-                        disabled
-                    >
-
-                        <i class="fa-solid fa-play"></i>
-
-                        Bắt đầu làm bài
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
+    <!-- =========================
+        EXAM CONTENT
+    ========================= -->
+
+    <main>
+
+        <!--
+            PHẦN NỘI DUNG BÀI THI
+            SẼ LÀM Ở BƯỚC TIẾP THEO
+        -->
 
     </main>
 
 
-    <!-- =========================================
-         JAVASCRIPT
-    ========================================== -->
+    <!-- =========================
+        LOGIN MODAL
+    ========================= -->
+
+    <div
+        class="login-overlay"
+        id="loginOverlay"
+    >
+
+        <div class="login-modal">
+
+
+            <button
+                type="button"
+                class="login-close"
+                id="closeLogin"
+                title="Close login modal"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+            <div class="login-header">
+
+                <img
+                    src="assets/images/logo.png"
+                    alt="H&T STUDY"
+                >
+
+                <h2>
+                    Đăng nhập
+                </h2>
+
+                <p>
+                    H&T STUDY
+                </p>
+
+            </div>
+
+
+            <form id="loginForm">
+
+
+                <div class="input-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="studentEmail"
+                        placeholder="Nhập email của bạn"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="input-group">
+
+                    <label>
+                        Mã học sinh
+                    </label>
+
+                    <input
+                        type="password"
+                        id="studentPassword"
+                        placeholder="Nhập Mã học sinh"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="remember-box">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                        >
+
+                        Ghi nhớ đăng nhập
+
+                    </label>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-btn"
+                >
+
+                    Đăng nhập
+
+                </button>
+
+
+                <a
+                    href="activate.html"
+                    class="activate-link"
+                >
+
+                    Chưa có tài khoản?
+                    Kích hoạt ngay
+
+                </a>
+
+            </form>
+
+
+            <div class="login-note">
+
+                Chưa có mã học sinh?<br>
+
+                <span>
+                    Liên hệ giáo viên để được cấp tài khoản.
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+        JAVASCRIPT
+    ========================= -->
 
     <script
         type="module"
