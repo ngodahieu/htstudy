@@ -1753,38 +1753,46 @@ confirmStartBtn.addEventListener(
 /* ==================================================
    START EXAM
 ================================================== */
-
 async function startExam() {
 
-    if (!currentTest) return;
+    if (!currentTest) {
+
+        alert("Không tìm thấy bài thi.");
+
+        return;
+
+    }
 
     try {
 
         /*
-         * Lấy lại document test để đảm bảo
-         * dữ liệu mới nhất.
+         * Lấy dữ liệu bài thi mới nhất
+         * từ Firebase.
          */
-
-        const testRef =
-            doc(
-                db,
-                "courses",
-                currentCourse.id,
-                "tests",
-                currentTest.id
-            );
+        const testRef = doc(
+            db,
+            "courses",
+            currentCourse.id,
+            "tests",
+            currentTest.id
+        );
 
         const testSnap =
             await getDoc(testRef);
 
         if (!testSnap.exists()) {
 
-            alert("Không tìm thấy bài thi.");
+            alert(
+                "Bài thi không còn tồn tại."
+            );
 
             return;
 
         }
 
+        /*
+         * Cập nhật bài thi hiện tại.
+         */
         currentTest = {
 
             id: testSnap.id,
@@ -1793,46 +1801,105 @@ async function startExam() {
 
         };
 
-
+        /*
+         * Lấy danh sách câu hỏi.
+         */
         currentQuestions =
-            currentTest.questions || [];
+            Array.isArray(
+                currentTest.questions
+            )
+                ? currentTest.questions
+                : [];
 
+        /*
+         * Reset trạng thái làm bài.
+         */
         currentQuestionIndex = 0;
 
         userAnswers = {};
 
+        /*
+         * Thời gian làm bài.
+         */
         remainingSeconds =
-            Number(currentTest.duration || 0) * 60;
+            Number(
+                currentTest.duration || 0
+            ) * 60;
 
+        /*
+         * Nếu bài thi không có thời gian.
+         */
+        if (remainingSeconds <= 0) {
 
-        examDetail.classList.add("hidden");
+            alert(
+                "Bài thi chưa được thiết lập thời gian."
+            );
 
-        examScreen.classList.remove("hidden");
+            return;
+
+        }
+
+        /*
+         * Chuyển sang màn hình làm bài.
+         */
+        examDetail.classList.add(
+            "hidden"
+        );
+
+        examScreen.classList.remove(
+            "hidden"
+        );
 
         document
             .getElementById("pageHeading")
             .classList.add("hidden");
 
-
+        /*
+         * Header bài thi.
+         */
         testTypeLabel.textContent =
-            getTestType(currentTest.type);
+            getTestType(
+                currentTest.type
+            );
 
         testTitle.textContent =
-            currentTest.title || "Bài thi";
+            currentTest.title ||
+            "Bài thi";
 
+        /*
+         * Tổng số câu.
+         */
         totalQuestions.textContent =
             currentQuestions.length;
 
+        /*
+         * Reset số câu đã trả lời.
+         */
+        answeredCount.textContent =
+            "Đã trả lời: 0";
 
+        /*
+         * Hiển thị câu đầu tiên.
+         */
         renderQuestion();
 
+        /*
+         * Tạo danh sách điều hướng câu hỏi.
+         */
+        renderQuestionNavigation();
+
+        /*
+         * Bắt đầu timer.
+         */
         startTimer();
 
     }
-
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Lỗi khi bắt đầu bài thi:",
+            error
+        );
 
         alert(
             "Không thể bắt đầu bài thi."
@@ -1841,12 +1908,83 @@ async function startExam() {
     }
 
 }
+function renderQuestionNavigation() {
 
+    const grid =
+        document.getElementById(
+            "questionNavGrid"
+        );
 
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    currentQuestions.forEach(
+        (question, index) => {
+
+            const button =
+                document.createElement("button");
+
+            button.type = "button";
+
+            button.className =
+                "question-nav-item";
+
+            button.textContent =
+                index + 1;
+
+            if (
+                index ===
+                currentQuestionIndex
+            ) {
+
+                button.classList.add(
+                    "active"
+                );
+
+            }
+
+            const questionId =
+                question.id ||
+                index + 1;
+
+            if (
+                userAnswers[
+                    questionId
+                ] !== undefined
+            ) {
+
+                button.classList.add(
+                    "answered"
+                );
+
+            }
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    currentQuestionIndex =
+                        index;
+
+                    renderQuestion();
+
+                    updateAnsweredCount();
+
+                    renderQuestionNavigation();
+
+                }
+            );
+
+            grid.appendChild(button);
+
+        }
+    );
+
+}
 /* ==================================================
    TIMER
 ================================================== */
-
 function startTimer() {
 
     clearInterval(timerInterval);
@@ -1860,11 +1998,17 @@ function startTimer() {
 
             updateTimer();
 
-            if (remainingSeconds <= 0) {
+            if (
+                remainingSeconds <= 0
+            ) {
 
                 clearInterval(
                     timerInterval
                 );
+
+                remainingSeconds = 0;
+
+                updateTimer();
 
                 alert(
                     "Đã hết thời gian làm bài."
@@ -1877,8 +2021,6 @@ function startTimer() {
         }, 1000);
 
 }
-
-
 function updateTimer() {
 
     const minutes =
@@ -2054,7 +2196,7 @@ function renderQuestion() {
         total - 1
             ? "Nộp bài"
             : "Câu tiếp theo";
-
+renderQuestionNavigation();
 }
 
 
