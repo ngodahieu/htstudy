@@ -356,6 +356,167 @@
     </div>
 
 </header>
+    <!-- ==================================================
+                    EXAM CONTENT
+================================================== -->
+
+<main class="exam-page">
+
+    <div class="exam-container">
+
+        <!-- TIÊU ĐỀ -->
+
+        <div class="exam-heading">
+
+            <div>
+                <span class="exam-label">
+                    <i class="fa-solid fa-file-pen"></i>
+                    THI THỬ
+                </span>
+
+                <h1 id="examPageTitle">
+                    Bài kiểm tra
+                </h1>
+
+                <p id="examPageDescription">
+                    Các bài kiểm tra trong những khóa học bạn được cấp.
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+                            LOADING
+        ================================================== -->
+
+        <div
+            id="examLoading"
+            class="exam-loading"
+        >
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <p>
+                Đang tải dữ liệu bài kiểm tra...
+            </p>
+
+        </div>
+
+
+        <!-- ==================================================
+                            EMPTY
+        ================================================== -->
+
+        <div
+            id="examEmpty"
+            class="exam-empty"
+            style="display:none;"
+        >
+
+            <i class="fa-regular fa-folder-open"></i>
+
+            <h3>
+                Chưa có bài kiểm tra
+            </h3>
+
+            <p>
+                Hiện tại bạn chưa được cấp khóa học nào
+                hoặc các khóa học chưa có bài kiểm tra.
+            </p>
+
+        </div>
+
+
+        <!-- ==================================================
+                    DANH SÁCH KHÓA HỌC
+        ================================================== -->
+
+        <section
+            id="courseList"
+            class="exam-section"
+        >
+
+            <div class="section-title">
+
+                <i class="fa-solid fa-graduation-cap"></i>
+
+                <h2>
+                    Khóa học được cấp
+                </h2>
+
+            </div>
+
+            <div
+                id="courseExamList"
+                class="exam-list"
+            ></div>
+
+        </section>
+
+
+        <!-- ==================================================
+                    CHI TIẾT KHÓA HỌC
+        ================================================== -->
+
+        <section
+            id="courseDetail"
+            class="exam-section"
+            style="display:none;"
+        >
+
+            <button
+                class="exam-back-btn"
+                id="backToCourses"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Quay lại khóa học
+
+            </button>
+
+
+            <div
+                id="courseDetailContent"
+                class="course-detail-content"
+            ></div>
+
+        </section>
+
+
+        <!-- ==================================================
+                    CHI TIẾT BÀI KIỂM TRA
+        ================================================== -->
+
+        <section
+            id="testDetail"
+            class="exam-section"
+            style="display:none;"
+        >
+
+            <button
+                class="exam-back-btn"
+                id="backToLesson"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Quay lại bài học
+
+            </button>
+
+
+            <div
+                id="testDetailContent"
+                class="test-detail-content"
+            ></div>
+
+        </section>
+
+    </div>
+
+</main>
 <!-- ==================================================
                     FOOTER
 ================================================== -->
