@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Làm bài kiểm tra | H&T STUDY
+    </title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- CSS -->
+    <link
+        rel="stylesheet"
+        href="css/test.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!--==================================================
+                    HEADER
+===================================================-->
+
+<header class="main-header">
+
+    <div class="header-container">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="index.html"
+            class="logo"
+        >
+
+            <div class="logo-icon">
+
+                <i class="fa-solid fa-graduation-cap"></i>
+
+            </div>
+
+            <div class="logo-text">
+
+                <strong>
+                    H&T STUDY
+                </strong>
+
+                <span>
+                    Chinh phục tri thức
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- HEADER RIGHT -->
+
+        <div class="header-right">
+
+
+            <!-- NOTIFICATION -->
+
+            <div class="notification-wrapper">
+
+                <button
+                    type="button"
+                    class="notification-btn"
+                    title="Thông báo"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span class="notification-dot"></span>
+
+                </button>
+
+
+                <div
+                    class="notification-panel"
+                    id="notificationPanel"
+                >
+
+                    <div class="notification-header">
+
+                        <h3>
+                            Thông báo
+                        </h3>
+
+                        <button
+                            type="button"
+                            id="closeNotification"
+                        >
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div class="notification-empty">
+
+                        <i class="fa-regular fa-bell-slash"></i>
+
+                        <p>
+                            Chưa có thông báo mới
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- AVATAR -->
+
+            <div class="avatar-wrapper">
+
+                <button
+                    type="button"
+                    class="avatar"
+                    aria-label="Tài khoản"
+                >
+
+                    <img
+                        src="assets/avatars/default.jpg"
+                        alt="Avatar"
+                    >
+
+                </button>
+
+
+                <!-- USER MENU -->
+
+                <div
+                    class="user-menu"
+                    id="userMenu"
+                >
+
+                    <div
+                        class="user-box"
+                        id="userBox"
+                    >
+
+                        <img
+                            id="userAvatar"
+                            src="assets/avatars/default.jpg"
+                            alt="Avatar"
+                        >
+
+                        <div class="user-info">
+
+                            <strong id="userName">
+                                Người dùng
+                            </strong>
+
+                            <span id="userStudentId">
+                            </span>
+
+                            <small id="userRole">
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="user-menu-list"
+                        id="userMenuList"
+                    >
+
+                        <button
+                            type="button"
+                            id="myCoursesBtn"
+                            class="user-menu-item"
+                        >
+
+                            <i class="fa-solid fa-book-open"></i>
+
+                            <span>
+                                Khóa học của tôi
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="manageBtn"
+                            class="user-menu-item"
+                        >
+
+                            <i class="fa-solid fa-gauge-high"></i>
+
+                            <span>
+                                Quản lý
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            id="userGuide"
+                            class="user-menu-item"
+                        >
+
+                            <i class="fa-solid fa-circle-question"></i>
+
+                            <span>
+                                Hướng dẫn
+                            </span>
+
+                        </button>
+
+
+                        <div class="menu-divider"></div>
+
+
+                        <button
+                            type="button"
+                            id="logoutBtn"
+                            class="user-menu-item logout-item"
+                        >
+
+                            <i class="fa-solid fa-right-from-bracket"></i>
+
+                            <span>
+                                Đăng xuất
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!--==================================================
+                LOADING
+===================================================-->
+
+<div
+    id="testLoading"
+    class="test-loading"
+>
+
+    <div class="loading-card">
+
+        <div class="loading-spinner">
+
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+        </div>
+
+        <h3>
+            Đang tải bài kiểm tra
+        </h3>
+
+        <p>
+            Vui lòng chờ trong giây lát...
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!--==================================================
+                    ERROR
+===================================================-->
+
+<div
+    id="testError"
+    class="test-error"
+    style="display:none;"
+>
+
+</div>
+
+
+
+<!--==================================================
+                TEST CONTAINER
+===================================================-->
+
+<main
+    id="testContainer"
+    class="test-container"
+    style="display:none;"
+>
+
+
+    <!--==================================================
+                    TEST TOP
+    ===================================================-->
+
+    <section class="test-top-card">
+
+
+        <!-- LEFT -->
+
+        <div class="test-heading">
+
+            <div class="test-heading-icon">
+
+                <i class="fa-solid fa-file-pen"></i>
+
+            </div>
+
+
+            <div class="test-heading-info">
+
+                <span class="test-label">
+                    BÀI KIỂM TRA
+                </span>
+
+                <h1 id="testTitle">
+                    Bài kiểm tra
+                </h1>
+
+                <p id="testDescription">
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <div class="test-top-stats">
+
+
+            <div class="test-top-stat">
+
+                <i class="fa-solid fa-list-ol"></i>
+
+                <div>
+
+                    <span>
+                        Số câu
+                    </span>
+
+                    <strong id="testQuestionCount">
+                        0 câu
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="test-top-stat timer-stat">
+
+                <i class="fa-regular fa-clock"></i>
+
+                <div>
+
+                    <span>
+                        Thời gian còn lại
+                    </span>
+
+                    <strong id="testTimer">
+                        --:--
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!--==================================================
+                    TEST BODY
+    ===================================================-->
+
+    <section class="test-layout">
+
+
+        <!--==================================================
+                        QUESTION AREA
+        ===================================================-->
+
+        <div class="test-question-area">
+
+
+            <div class="question-card">
+
+
+                <!-- QUESTION HEADER -->
+
+                <div class="question-card-header">
+
+                    <div class="question-number">
+
+                        <span id="questionNumber">
+                            Câu 1
+                        </span>
+
+                    </div>
+
+                    <span class="question-status">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Câu hỏi
+
+                    </span>
+
+                </div>
+
+
+
+                <!-- QUESTION -->
+
+                <div
+                    id="questionContent"
+                    class="question-content"
+                >
+
+                </div>
+
+
+
+                <!-- ANSWERS -->
+
+                <div
+                    id="answerContainer"
+                    class="answer-container"
+                >
+
+                </div>
+
+
+            </div>
+
+
+
+            <!--==================================================
+                        NAVIGATION
+            ===================================================-->
+
+            <div class="question-navigation">
+
+
+                <button
+                    type="button"
+                    id="previousQuestionBtn"
+                    class="navigation-btn previous-btn"
+                >
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    <span>
+                        Câu trước
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    id="nextQuestionBtn"
+                    class="navigation-btn next-btn"
+                >
+
+                    <span>
+                        Câu sau
+                    </span>
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!--==================================================
+                        SUBMIT
+            ===================================================-->
+
+            <div class="submit-area">
+
+                <div class="submit-warning">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                        Hãy kiểm tra lại đáp án trước khi nộp bài.
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="submitTestBtn"
+                    class="submit-test-btn"
+                >
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                    Nộp bài
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!--==================================================
+                        QUESTION SIDEBAR
+        ===================================================-->
+
+        <aside class="question-sidebar">
+
+
+            <div class="sidebar-card">
+
+
+                <!-- HEADER -->
+
+                <div class="sidebar-card-header">
+
+                    <div>
+
+                        <span>
+                            TIẾN ĐỘ
+                        </span>
+
+                        <h3>
+                            Danh sách câu hỏi
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                </div>
+
+
+
+                <!-- LEGEND -->
+
+                <div class="question-legend">
+
+
+                    <div class="legend-item">
+
+                        <span class="legend-dot current-dot"></span>
+
+                        <span>
+                            Đang làm
+                        </span>
+
+                    </div>
+
+
+                    <div class="legend-item">
+
+                        <span class="legend-dot answered-dot"></span>
+
+                        <span>
+                            Đã trả lời
+                        </span>
+
+                    </div>
+
+
+                    <div class="legend-item">
+
+                        <span class="legend-dot unanswered-dot"></span>
+
+                        <span>
+                            Chưa trả lời
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- QUESTION GRID -->
+
+                <div
+                    id="questionGrid"
+                    class="question-grid"
+                >
+
+                </div>
+
+
+
+                <!-- SIDEBAR BOTTOM -->
+
+                <div class="sidebar-note">
+
+                    <i class="fa-solid fa-lightbulb"></i>
+
+                    <p>
+                        Bạn có thể nhấn trực tiếp vào số câu để chuyển đến câu hỏi.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </aside>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!--==================================================
+                    FOOTER
+===================================================-->
+
+<footer class="test-footer">
+
+    <div class="footer-container">
+
+        <p>
+            © 2026 H&T STUDY
+        </p>
+
+        <span>
+            Chinh phục tri thức - Kiến tạo tương lai
+        </span>
+
+    </div>
+
+</footer>
+
+
+
+<!--==================================================
+                    JAVASCRIPT
+===================================================-->
+
+<script
+    type="module"
+    src="js/test.js"
+></script>
+
+
+</body>
+
+</html>
