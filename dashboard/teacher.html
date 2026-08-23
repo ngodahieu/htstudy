@@ -430,20 +430,30 @@ class="course-list">
     <!-- ==================================================
      TEST PAGE
 ================================================== -->
+<!-- ==================================================
+     TEST PAGE
+================================================== -->
 
 <div id="testPage" style="display:none;">
 
     <div class="dashboard-header">
 
         <h1>
+            <i class="fa-solid fa-file-circle-check"></i>
             Quản lý bài kiểm tra
         </h1>
 
         <p>
-            Tạo và quản lý các bài kiểm tra theo từng chương và bài học.
+            Quản lý bài kiểm tra theo môn học, khóa học,
+            chương và bài học.
         </p>
 
     </div>
+
+
+    <!-- ==============================================
+         TEST TOOLBAR
+    =============================================== -->
 
     <div class="dashboard-form">
 
@@ -461,13 +471,270 @@ class="course-list">
 
         </div>
 
-        <div
-            id="testList"
-            class="chapter-list">
 
-            <p class="empty">
-                Chưa có bài kiểm tra nào.
-            </p>
+        <!-- ==========================================
+             BREADCRUMB
+        =========================================== -->
+
+        <div
+            id="testBreadcrumb"
+            class="test-breadcrumb">
+
+            <button
+                type="button"
+                id="testBackBtn"
+                class="test-back-btn"
+                style="display:none;">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Quay lại
+
+            </button>
+
+            <div id="testBreadcrumbContent">
+
+                <span class="breadcrumb-current">
+                    Tất cả môn học
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             TEST NAVIGATION
+        =========================================== -->
+
+        <div
+            id="testNavigation"
+            class="test-navigation">
+
+
+            <!-- ======================================
+                 STEP 1: MÔN HỌC
+            ======================================= -->
+
+            <div
+                id="testSubjectView"
+                class="test-management-view">
+
+                <div class="test-view-header">
+
+                    <div>
+
+                        <span class="test-view-label">
+                            BƯỚC 1
+                        </span>
+
+                        <h2>
+                            Chọn môn học
+                        </h2>
+
+                        <p>
+                            Chọn môn học để xem các khóa học
+                            mà bạn đang quản lý.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-layer-group"></i>
+
+                </div>
+
+
+                <div
+                    id="testSubjectList"
+                    class="test-card-grid">
+
+                    <div class="empty">
+                        Đang tải môn học...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 STEP 2: KHÓA HỌC
+            ======================================= -->
+
+            <div
+                id="testCourseView"
+                class="test-management-view"
+                style="display:none;">
+
+                <div class="test-view-header">
+
+                    <div>
+
+                        <span class="test-view-label">
+                            BƯỚC 2
+                        </span>
+
+                        <h2 id="testCourseViewTitle">
+                            Khóa học
+                        </h2>
+
+                        <p>
+                            Chọn khóa học để xem các chương.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-book"></i>
+
+                </div>
+
+
+                <div
+                    id="testCourseList"
+                    class="test-card-grid">
+
+                    <div class="empty">
+                        Chưa có khóa học.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 STEP 3: CHƯƠNG
+            ======================================= -->
+
+            <div
+                id="testChapterView"
+                class="test-management-view"
+                style="display:none;">
+
+                <div class="test-view-header">
+
+                    <div>
+
+                        <span class="test-view-label">
+                            BƯỚC 3
+                        </span>
+
+                        <h2 id="testChapterViewTitle">
+                            Chương
+                        </h2>
+
+                        <p>
+                            Chọn chương để xem các bài học.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-list-ol"></i>
+
+                </div>
+
+
+                <div
+                    id="testChapterList"
+                    class="test-card-list">
+
+                    <div class="empty">
+                        Chưa có chương nào.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 STEP 4: BÀI HỌC
+            ======================================= -->
+
+            <div
+                id="testLessonView"
+                class="test-management-view"
+                style="display:none;">
+
+                <div class="test-view-header">
+
+                    <div>
+
+                        <span class="test-view-label">
+                            BƯỚC 4
+                        </span>
+
+                        <h2 id="testLessonViewTitle">
+                            Bài học
+                        </h2>
+
+                        <p>
+                            Chọn bài học để xem các bài kiểm tra.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                </div>
+
+
+                <div
+                    id="testLessonList"
+                    class="test-card-list">
+
+                    <div class="empty">
+                        Chưa có bài học nào.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ======================================
+                 STEP 5: CÁC BÀI KIỂM TRA
+            ======================================= -->
+
+            <div
+                id="testListView"
+                class="test-management-view"
+                style="display:none;">
+
+                <div class="test-view-header">
+
+                    <div>
+
+                        <span class="test-view-label">
+                            BƯỚC 5
+                        </span>
+
+                        <h2 id="testListViewTitle">
+                            Bài kiểm tra
+                        </h2>
+
+                        <p>
+                            Các bài kiểm tra thuộc bài học này.
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-file-circle-check"></i>
+
+                </div>
+
+
+                <div
+                    id="testList"
+                    class="test-card-list">
+
+                    <div class="empty">
+                        Chưa có bài kiểm tra nào.
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
