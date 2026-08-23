@@ -1684,3 +1684,814 @@ ROOT
         right:-80px;
     }
 }
+/*==================================================
+                EXAM PAGE
+==================================================*/
+
+.exam-page {
+    position: relative;
+    z-index: 2;
+    padding: 110px 30px 60px;
+    min-height: calc(100vh - 80px);
+}
+
+.exam-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+/*==================================================
+                HEADING
+==================================================*/
+
+.exam-heading {
+    margin-bottom: 30px;
+}
+
+.exam-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #60a5fa;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.exam-heading h1 {
+    color: white;
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.exam-heading p {
+    color: #94a3b8;
+    font-size: 15px;
+}
+
+
+/*==================================================
+                LOADING
+==================================================*/
+
+.exam-loading {
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    color: #94a3b8;
+}
+
+.exam-loading i {
+    font-size: 30px;
+    color: #3b82f6;
+}
+
+
+/*==================================================
+                EMPTY
+==================================================*/
+
+.exam-empty {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 20px;
+    color: #94a3b8;
+}
+
+.exam-empty i {
+    font-size: 50px;
+    color: #3b82f6;
+    margin-bottom: 15px;
+}
+
+.exam-empty h3 {
+    color: white;
+    margin-bottom: 8px;
+}
+
+.exam-empty p {
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+
+/*==================================================
+                SECTION
+==================================================*/
+
+.exam-section {
+    width: 100%;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.section-title i {
+    color: #60a5fa;
+    font-size: 22px;
+}
+
+.section-title h2 {
+    color: white;
+    font-size: 23px;
+}
+
+
+/*==================================================
+                COURSE CARD
+==================================================*/
+
+.exam-list {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(340px, 1fr)
+    );
+    gap: 22px;
+}
+
+.exam-course-card {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: rgba(15, 23, 42, 0.94);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 20px;
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25);
+    transition: 0.3s ease;
+}
+
+.exam-course-card:hover {
+    transform: translateY(-6px);
+    border-color: #3b82f6;
+    box-shadow:
+        0 15px 40px rgba(37, 99, 235, 0.25);
+}
+
+.exam-course-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.exam-course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s ease;
+}
+
+.exam-course-card:hover
+.exam-course-image img {
+    transform: scale(1.05);
+}
+
+.exam-course-info {
+    padding: 22px;
+}
+
+.exam-course-subject {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #60a5fa;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.exam-course-info h3 {
+    color: white;
+    font-size: 21px;
+    margin: 10px 0;
+}
+
+.exam-course-info p {
+    color: #94a3b8;
+    line-height: 1.6;
+    min-height: 50px;
+}
+
+.exam-course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 18px 0;
+}
+
+.exam-course-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.exam-course-meta i {
+    color: #60a5fa;
+}
+
+.exam-open-course {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #1d4ed8
+    );
+    color: white;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.exam-open-course:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 20px rgba(59, 130, 246, 0.35);
+}
+
+.exam-open-course i {
+    margin-left: 8px;
+}
+
+
+/*==================================================
+                BACK BUTTON
+==================================================*/
+
+.exam-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+    padding: 10px 16px;
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.8);
+    color: #93c5fd;
+    font-family: inherit;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.exam-back-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+
+/*==================================================
+                COURSE DETAIL
+==================================================*/
+
+.course-detail-header {
+    padding: 28px;
+    margin-bottom: 25px;
+    border-radius: 18px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30, 64, 175, 0.7),
+            rgba(15, 23, 42, 0.95)
+        );
+    border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.detail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #60a5fa;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.course-detail-header h2 {
+    color: white;
+    font-size: 28px;
+    margin: 10px 0;
+}
+
+.course-detail-header p {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+
+/*==================================================
+                CHAPTER
+==================================================*/
+
+.chapter-block {
+    margin-bottom: 20px;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.9);
+    overflow: hidden;
+}
+
+.chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(30, 41, 59, 0.7);
+}
+
+.chapter-number {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #1e3a8a
+    );
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.chapter-header span {
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.chapter-header h3 {
+    color: white;
+    font-size: 20px;
+    margin: 3px 0;
+}
+
+.chapter-header p {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+
+/*==================================================
+                LESSON
+==================================================*/
+
+.lesson-block {
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.lesson-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 17px 20px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.lesson-header:hover {
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.lesson-number {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9px;
+    background: #1e3a8a;
+    color: #bfdbfe;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.lesson-title {
+    flex: 1;
+}
+
+.lesson-title span {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.lesson-title h4 {
+    color: #e2e8f0;
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.lesson-arrow {
+    color: #64748b;
+    transition: 0.3s;
+}
+
+.lesson-block.open
+.lesson-arrow {
+    transform: rotate(180deg);
+    color: #60a5fa;
+}
+
+
+/*==================================================
+                TEST LIST
+==================================================*/
+
+.lesson-tests {
+    padding: 0 20px 15px 68px;
+}
+
+.test-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    background: rgba(2, 6, 23, 0.5);
+    transition: 0.25s;
+}
+
+.test-item:hover {
+    border-color: #3b82f6;
+    background: rgba(30, 64, 175, 0.12);
+}
+
+.test-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    font-size: 18px;
+}
+
+.test-info {
+    flex: 1;
+}
+
+.test-info > span {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.test-info h5 {
+    color: #e2e8f0;
+    font-size: 15px;
+    margin: 3px 0 7px;
+}
+
+.test-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.test-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.test-meta i {
+    color: #60a5fa;
+}
+
+.open-test-btn {
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 13px;
+    background: #2563eb;
+    color: white;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.open-test-btn:hover {
+    background: #1d4ed8;
+}
+
+
+/*==================================================
+                TEST DETAIL
+==================================================*/
+
+.test-detail-card {
+    padding: 30px;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.test-detail-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.test-detail-icon {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #1e3a8a
+    );
+    color: white;
+    font-size: 25px;
+}
+
+.test-detail-top h2 {
+    color: white;
+    font-size: 27px;
+    margin: 7px 0;
+}
+
+.test-description {
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+
+/*==================================================
+                TEST STATS
+==================================================*/
+
+.test-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.test-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px;
+    border-radius: 13px;
+    background: rgba(30, 41, 59, 0.65);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.test-stat > i {
+    color: #60a5fa;
+    font-size: 21px;
+}
+
+.test-stat span {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.test-stat strong {
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+
+/*==================================================
+                STRUCTURE
+==================================================*/
+
+.test-structure {
+    margin-top: 25px;
+}
+
+.test-structure h3 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: white;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.test-structure h3 i {
+    color: #60a5fa;
+}
+
+.structure-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.structure-item {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(2, 6, 23, 0.5);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+.structure-item span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.structure-item strong {
+    color: #bfdbfe;
+}
+
+
+/*==================================================
+                START BUTTON
+==================================================*/
+
+.test-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+.start-test-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 22px;
+    border: none;
+    border-radius: 11px;
+    background: linear-gradient(
+        135deg,
+        #3b82f6,
+        #1e3a8a
+    );
+    color: white;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-test-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+
+/*==================================================
+                EMPTY / ERROR
+==================================================*/
+
+.lesson-empty,
+.test-empty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.test-empty {
+    margin-top: 10px;
+    border: 1px dashed rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+}
+
+.exam-error {
+    padding: 20px;
+    color: #fca5a5;
+    text-align: center;
+}
+
+.detail-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    color: #94a3b8;
+}
+
+.detail-loading i {
+    color: #3b82f6;
+}
+
+
+/*==================================================
+                MOBILE
+==================================================*/
+
+@media (max-width: 900px) {
+
+    .test-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .exam-page {
+        padding: 100px 15px 40px;
+    }
+
+    .exam-heading h1 {
+        font-size: 27px;
+    }
+
+    .exam-list {
+        grid-template-columns: 1fr;
+    }
+
+    .chapter-header {
+        padding: 15px;
+    }
+
+    .lesson-tests {
+        padding-left: 20px;
+    }
+
+    .test-item {
+        align-items: flex-start;
+    }
+
+    .open-test-btn {
+        padding: 8px 10px;
+    }
+
+    .test-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .structure-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .test-detail-card {
+        padding: 20px;
+    }
+
+    .test-detail-top h2 {
+        font-size: 22px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .test-item {
+        flex-wrap: wrap;
+    }
+
+    .test-info {
+        min-width: calc(100% - 60px);
+    }
+
+    .open-test-btn {
+        width: 100%;
+    }
+
+}
