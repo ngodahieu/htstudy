@@ -86,6 +86,11 @@ const testQuestionCount =
 
 const testTimer =
     document.getElementById("testTimer");
+const headerTestTimer =
+    document.getElementById("headerTestTimer");
+
+const headerSubmitTestBtn =
+    document.getElementById("headerSubmitTestBtn");
 
 const questionNumber =
     document.getElementById("questionNumber");
@@ -107,84 +112,6 @@ const nextQuestionBtn =
 
 const submitTestBtn =
     document.getElementById("submitTestBtn");
-
-
-/*==================================================
-                HEADER USER
-==================================================*/
-
-const avatar =
-    document.querySelector(".avatar");
-
-const userMenu =
-    document.getElementById("userMenu");
-
-const userName =
-    document.getElementById("userName");
-
-const userStudentId =
-    document.getElementById("userStudentId");
-
-const userRole =
-    document.getElementById("userRole");
-
-const userAvatar =
-    document.getElementById("userAvatar");
-
-const userBox =
-    document.getElementById("userBox");
-
-const userMenuList =
-    document.getElementById("userMenuList");
-
-const logoutBtn =
-    document.getElementById("logoutBtn");
-
-const myCoursesBtn =
-    document.getElementById("myCoursesBtn");
-
-const manageBtn =
-    document.getElementById("manageBtn");
-
-let currentRole = "";
-
-
-/*==================================================
-                USER MENU
-==================================================*/
-
-if (avatar) {
-
-    avatar.addEventListener("click", (e) => {
-
-        e.stopPropagation();
-
-        if (userMenu) {
-
-            userMenu.classList.toggle("active");
-
-        }
-
-    });
-
-}
-
-
-document.addEventListener("click", (e) => {
-
-    if (
-        userMenu &&
-        avatar &&
-        !userMenu.contains(e.target) &&
-        !avatar.contains(e.target)
-    ) {
-
-        userMenu.classList.remove("active");
-
-    }
-
-});
-
 
 /*==================================================
                 LOAD USER
@@ -268,14 +195,16 @@ async function loadUser(uid) {
         }
 
 
-        if (userName) {
+        const headerUserName =
+    document.getElementById("headerUserName");
 
-            userName.textContent =
-                user.name ||
-                "Người dùng";
+if (headerUserName) {
 
-        }
+    headerUserName.textContent =
+        user.name ||
+        "Người dùng";
 
+}
 
         if (userStudentId) {
 
@@ -1250,15 +1179,22 @@ function updateTimer() {
 
 
     if (
-        remainingSeconds <= 0
-    ) {
+    remainingSeconds <= 0
+) {
 
-        testTimer.textContent =
+    testTimer.textContent =
+        "00:00";
+
+    if (headerTestTimer) {
+
+        headerTestTimer.textContent =
             "00:00";
 
-        return;
-
     }
+
+    return;
+
+}
 
 
     const hours =
@@ -1279,19 +1215,33 @@ function updateTimer() {
         remainingSeconds % 60;
 
 
-    if (hours > 0) {
+    let timerText = "";
 
-        testTimer.textContent =
-            `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+if (hours > 0) {
 
-    }
+    timerText =
+        `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 
-    else {
+}
 
-        testTimer.textContent =
-            `${pad(minutes)}:${pad(seconds)}`;
+else {
 
-    }
+    timerText =
+        `${pad(minutes)}:${pad(seconds)}`;
+
+}
+
+
+testTimer.textContent =
+    timerText;
+
+
+if (headerTestTimer) {
+
+    headerTestTimer.textContent =
+        timerText;
+
+}
 
 
     const timerStat =
@@ -1302,6 +1252,11 @@ if (
 ) {
 
     testTimer.classList.add("danger");
+if (headerTestTimer) {
+
+    headerTestTimer.classList.add("danger");
+
+}
 
     if (timerStat) {
         timerStat.classList.add("danger");
@@ -1312,6 +1267,11 @@ if (
 else {
 
     testTimer.classList.remove("danger");
+if (headerTestTimer) {
+
+    headerTestTimer.classList.remove("danger");
+
+}
 
     if (timerStat) {
         timerStat.classList.remove("danger");
@@ -1350,7 +1310,18 @@ if (submitTestBtn) {
     );
 
 }
+if (headerSubmitTestBtn) {
 
+    headerSubmitTestBtn.addEventListener(
+        "click",
+        () => {
+
+            submitTest();
+
+        }
+    );
+
+}
 
 /*==================================================
                 SUBMIT
@@ -1819,81 +1790,6 @@ function showError(message) {
     }
 
 }
-
-
-/*==================================================
-                USER BUTTONS
-==================================================*/
-
-if (logoutBtn) {
-
-    logoutBtn.addEventListener(
-        "click",
-        async () => {
-
-            clearInterval(
-                timerInterval
-            );
-
-
-            await signOut(
-                auth
-            );
-
-
-            window.location.href =
-                "index.html";
-
-        }
-    );
-
-}
-
-
-if (myCoursesBtn) {
-
-    myCoursesBtn.addEventListener(
-        "click",
-        () => {
-
-            window.location.href =
-                "my-courses.html";
-
-        }
-    );
-
-}
-
-
-if (manageBtn) {
-
-    manageBtn.addEventListener(
-        "click",
-        () => {
-
-            if (
-                currentRole === "Admin"
-            ) {
-
-                window.location.href =
-                    "dashboard/admin.html";
-
-            }
-
-            else if (
-                currentRole === "Giáo viên"
-            ) {
-
-                window.location.href =
-                    "dashboard/teacher.html";
-
-            }
-
-        }
-    );
-
-}
-
 
 /*==================================================
                 ESCAPE HTML
