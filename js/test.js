@@ -860,13 +860,14 @@ function renderAnswers(question) {
 
 
             if (
-                savedAnswer === optionLetter
-            ) {
+    savedAnswer === optionLetter
+) {
 
-                input.checked =
-                    true;
+    input.checked = true;
 
-            }
+    wrapper.classList.add("selected");
+
+}
 
 
             const letter =
@@ -911,19 +912,24 @@ function renderAnswers(question) {
 
 
             input.addEventListener(
-                "change",
-                () => {
+    "change",
+    () => {
 
-                    answers[
-                        currentQuestionIndex
-                    ] =
-                        optionLetter;
+        answers[currentQuestionIndex] =
+            optionLetter;
 
+        answerContainer
+            .querySelectorAll(".answer-option")
+            .forEach(option => {
+                option.classList.remove("selected");
+            });
 
-                    updateQuestionGrid();
+        wrapper.classList.add("selected");
 
-                }
-            );
+        updateQuestionGrid();
+
+    }
+);
 
 
             answerContainer.appendChild(
@@ -1288,23 +1294,30 @@ function updateTimer() {
     }
 
 
-    if (
-        remainingSeconds <= 60
-    ) {
+    const timerStat =
+    document.querySelector(".timer-stat");
 
-        testTimer.classList.add(
-            "danger"
-        );
+if (
+    remainingSeconds <= 60
+) {
 
+    testTimer.classList.add("danger");
+
+    if (timerStat) {
+        timerStat.classList.add("danger");
     }
 
-    else {
+}
 
-        testTimer.classList.remove(
-            "danger"
-        );
+else {
 
+    testTimer.classList.remove("danger");
+
+    if (timerStat) {
+        timerStat.classList.remove("danger");
     }
+
+}
 
 }
 
@@ -1422,6 +1435,18 @@ async function finishTest() {
         return;
 
     }
+if (!currentUser) {
+
+    alert(
+        "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại."
+    );
+
+    window.location.href =
+        "index.html";
+
+    return;
+
+}
 
 
     submitted = true;
