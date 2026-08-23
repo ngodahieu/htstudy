@@ -954,15 +954,19 @@ function renderQuestion() {
     }
 
 
-    renderAnswers(
-        question
-    );
+renderAnswers(
+    question
+);
 
+updateQuestionGrid();
 
-    updateQuestionGrid();
+updateNavigation();
 
-    updateNavigation();
+/*------------------------------------------
+    RENDER CÔNG THỨC TOÁN / HÓA
+------------------------------------------*/
 
+renderMath();
 }
 
 
@@ -2083,7 +2087,6 @@ function normalizeAnswer(value) {
 /*==================================================
                 FORMAT QUESTION
 ==================================================*/
-
 function formatQuestionText(value) {
 
     if (
@@ -2095,12 +2098,45 @@ function formatQuestionText(value) {
 
     }
 
-
     return String(value);
 
 }
+/*==================================================
+            RENDER MATHJAX
+==================================================*/
 
+function renderMath() {
 
+    if (
+        typeof MathJax === "undefined"
+    ) {
+
+        return;
+
+    }
+
+    if (
+        typeof MathJax.typesetPromise !== "function"
+    ) {
+
+        return;
+
+    }
+
+    MathJax.typesetPromise([
+        questionContent,
+        answerContainer
+    ])
+    .catch(error => {
+
+        console.error(
+            "Lỗi render MathJax:",
+            error
+        );
+
+    });
+
+}
 /*==================================================
                 LOADING
 ==================================================*/
