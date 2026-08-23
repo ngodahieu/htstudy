@@ -136,6 +136,67 @@ document.getElementById("testQuestionTotal");
 
 const testTotalPoint =
 document.getElementById("testTotalPoint");
+/* ====================================
+        TEST NAVIGATION
+==================================== */
+
+const testSubjectView =
+document.getElementById("testSubjectView");
+
+const testCourseView =
+document.getElementById("testCourseView");
+
+const testChapterView =
+document.getElementById("testChapterView");
+
+const testLessonView =
+document.getElementById("testLessonView");
+
+const testListView =
+document.getElementById("testListView");
+
+const testSubjectList =
+document.getElementById("testSubjectList");
+
+const testCourseList =
+document.getElementById("testCourseList");
+
+const testChapterList =
+document.getElementById("testChapterList");
+
+const testLessonList =
+document.getElementById("testLessonList");
+
+const testCourseViewTitle =
+document.getElementById("testCourseViewTitle");
+
+const testChapterViewTitle =
+document.getElementById("testChapterViewTitle");
+
+const testLessonViewTitle =
+document.getElementById("testLessonViewTitle");
+
+const testListViewTitle =
+document.getElementById("testListViewTitle");
+
+const testBreadcrumbContent =
+document.getElementById("testBreadcrumbContent");
+
+const testBackBtn =
+document.getElementById("testBackBtn");
+
+
+/* ====================================
+        TEST STATE
+==================================== */
+
+let testCurrentSubject = null;
+let testCurrentCourseId = "";
+let testCurrentChapterId = "";
+let testCurrentLessonId = "";
+
+let editingTestId = "";
+let editingTestCourseId = "";
 const menuItems = document.querySelectorAll(".menu-item");
 
 function setActiveMenu(activeButton){
@@ -504,83 +565,342 @@ menuTests.addEventListener("click", async () => {
 
     testPage.style.display = "block";
 
-    await loadTestCourses();
+    resetTestNavigation();
+
+    await loadTestSubjects();
 
 });
 /* ====================================
-        LOAD BÀI KIỂM TRA
+        TEST NAVIGATION
 ==================================== */
 
-async function loadTeacherTests(){
+function hideTestViews(){
 
-    testList.innerHTML = "Đang tải...";
+    testSubjectView.style.display = "none";
+    testCourseView.style.display = "none";
+    testChapterView.style.display = "none";
+    testLessonView.style.display = "none";
+    testListView.style.display = "none";
 
-    const q = query(
-        collection(db, "courses")
-    );
+}
 
-    const snapshot =
-        await getDocs(q);
 
-    const tests = [];
+/* ====================================
+        RESET TEST NAVIGATION
+==================================== */
 
-    for(const courseDoc of snapshot.docs){
+function resetTestNavigation(){
 
-        const course =
-            courseDoc.data();
+    testCurrentSubject = null;
+    testCurrentCourseId = "";
+    testCurrentChapterId = "";
+    testCurrentLessonId = "";
 
-        if(course.teacherId !== currentTeacherId){
-            continue;
-        }
+    hideTestViews();
 
-        const testSnapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "courses",
-                    courseDoc.id,
-                    "tests"
-                )
-            );
+    testSubjectView.style.display = "block";
 
-        for(const testDoc of testSnapshot.docs){
+    testBackBtn.style.display = "none";
 
-            const test =
-                testDoc.data();
+    testBreadcrumbContent.innerHTML = `
 
-            tests.push({
+        <span class="breadcrumb-current">
+            Tất cả môn học
+        </span>
 
-                id: testDoc.id,
+    `;
 
-                courseId: courseDoc.id,
+}
 
-                courseName:
-                    `${course.subjectName || course.subject || ""} ${course.grade || ""} - ${course.name || ""}`,
 
-                ...test
+/* ====================================
+        BREADCRUMB
+==================================== */
+
+function updateTestBreadcrumb(){
+
+    let html = "";
+
+    html += `
+        <span
+            class="breadcrumb-item"
+            data-level="subject">
+
+            ${escapeHtmlTeacher(
+                testCurrentSubject || "Môn học"
+            )}
+
+        </span>
+    `;
+
+    if(testCurrentCourseId){
+
+        html += `
+            <span class="breadcrumb-separator">
+                /
+            </span>
+
+            <span
+                class="breadcrumb-item"
+                data-level="course">
+
+                Khóa học
+
+            </span>
+        `;
+
+    }
+
+    if(testCurrentChapterId){
+
+        html += `
+            <span class="breadcrumb-separator">
+                /
+            </span>
+
+            <span
+                class="breadcrumb-item"
+                data-level="chapter">
+
+                Chương
+
+            </span>
+        `;
+
+    }
+
+    if(testCurrentLessonId){
+
+        html += `
+            <span class="breadcrumb-separator">
+                /
+            </span>
+
+            <span class="breadcrumb-item">
+                Bài học
+            </span>
+        `;
+
+    }
+
+    testBreadcrumbContent.innerHTML = html;
+
+    testBackBtn.style.display =
+        testCurrentSubject ? "flex" : "none";
+
+}
+
+
+/* ====================================
+        STEP 1
+        LOAD MÔN HỌC
+==================================== */
+
+async function loadTestSubjects(){
+
+    hideTestViews();
+
+    testSubjectView.style.display = "block";
+
+    testSubjectList.innerHTML = `
+
+        <div class="empty">
+            Đang tải môn học...
+        </div>
+
+    `;
+
+    testBackBtn.style.display = "none";
+
+    try{
+
+        const q = query(
+
+            collection(db, "courses"),
+
+            where(
+                "teacherId",
+                "==",
+                currentTeacherId
+            )
+
+        );
+
+        const snapshot =
+            await getDocs(q);
+
+        const subjects = new Map();
+
+        snapshot.forEach(courseDoc => {
+
+            const data =
+                courseDoc.data();
+
+            const subject =
+                data.subjectName ||
+                data.subject ||
+                "Chưa xác định";
+
+            if(!subjects.has(subject)){
+
+                subjects.set(
+                    subject,
+                    []
+                );
+
+            }
+
+            subjects.get(subject).push({
+
+                id: courseDoc.id,
+
+                ...data
 
             });
+
+        });
+
+
+        if(!subjects.size){
+
+            testSubjectList.innerHTML = `
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                    <h3>
+                        Chưa có môn học
+                    </h3>
+
+                    <p>
+                        Bạn chưa được phân công khóa học nào.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        testSubjectList.innerHTML = "";
+
+
+        for(const [
+            subject,
+            courses
+        ] of subjects){
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "test-card";
+
+            card.innerHTML = `
+
+                <div class="test-card-icon">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                </div>
+
+                <div class="test-card-content">
+
+                    <h3>
+                        ${escapeHtmlTeacher(subject)}
+                    </h3>
+
+                    <p>
+                        ${courses.length} khóa học
+                    </p>
+
+                </div>
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            `;
+
+            card.addEventListener(
+                "click",
+                () => {
+
+                    openTestSubject(
+                        subject,
+                        courses
+                    );
+
+                }
+            );
+
+            testSubjectList.appendChild(card);
 
         }
 
     }
+    catch(error){
 
-    if(!tests.length){
+        console.error(error);
 
-        testList.innerHTML = `
+        testSubjectList.innerHTML = `
 
             <div class="empty">
 
-                <i class="fa-solid fa-file-circle-xmark"></i>
+                Không thể tải danh sách môn học.
 
-                <h3>
-                    Chưa có bài kiểm tra nào
-                </h3>
+            </div>
 
-                <p>
-                    Hãy bấm "Tạo bài kiểm tra" để tạo bài đầu tiên.
-                </p>
+        `;
 
+    }
+
+}
+
+
+/* ====================================
+        STEP 2
+        OPEN MÔN HỌC
+==================================== */
+
+async function openTestSubject(
+    subject,
+    courses
+){
+
+    testCurrentSubject = subject;
+
+    testCurrentCourseId = "";
+    testCurrentChapterId = "";
+    testCurrentLessonId = "";
+
+    hideTestViews();
+
+    testCourseView.style.display = "block";
+
+    testCourseViewTitle.textContent =
+        subject;
+
+    updateTestBreadcrumb();
+
+    testCourseList.innerHTML = "";
+
+
+    courses.sort(
+        (a,b) =>
+            Number(a.grade || 0) -
+            Number(b.grade || 0)
+    );
+
+
+    if(!courses.length){
+
+        testCourseList.innerHTML = `
+
+            <div class="empty">
+                Chưa có khóa học.
             </div>
 
         `;
@@ -589,128 +909,238 @@ async function loadTeacherTests(){
 
     }
 
-    testList.innerHTML = "";
 
-    for(const test of tests){
+    courses.forEach(course => {
 
-        let locationText =
-            "Chưa xác định vị trí";
+        const card =
+            document.createElement("div");
 
-        if(test.chapterId && test.lessonId){
+        card.className =
+            "test-card";
 
-            try{
+        card.innerHTML = `
 
-                const chapterSnap =
-                    await getDoc(
-                        doc(
-                            db,
-                            "courses",
-                            test.courseId,
-                            "chapters",
-                            test.chapterId
-                        )
-                    );
+            <div class="test-card-icon">
 
-                const lessonSnap =
-                    await getDoc(
-                        doc(
-                            db,
-                            "courses",
-                            test.courseId,
-                            "chapters",
-                            test.chapterId,
-                            "lessons",
-                            test.lessonId
-                        )
-                    );
+                <i class="fa-solid fa-book"></i>
 
-                const chapter =
-                    chapterSnap.exists()
-                        ? chapterSnap.data()
-                        : {};
+            </div>
 
-                const lesson =
-                    lessonSnap.exists()
-                        ? lessonSnap.data()
-                        : {};
+            <div class="test-card-content">
 
-                locationText = `
-                    Chương ${chapter.order || ""}
-                    ${chapter.title || ""}
-                    → Bài ${lesson.order || ""}
-                    ${lesson.title || ""}
-                `;
+                <h3>
+
+                    ${escapeHtmlTeacher(
+                        course.grade
+                            ? `Lớp ${course.grade}`
+                            : ""
+                    )}
+
+                    ${escapeHtmlTeacher(
+                        course.name || ""
+                    )}
+
+                </h3>
+
+                <p>
+
+                    ${escapeHtmlTeacher(
+                        course.description ||
+                        "Khóa học do bạn quản lý"
+                    )}
+
+                </p>
+
+            </div>
+
+            <i class="fa-solid fa-chevron-right"></i>
+
+        `;
+
+        card.addEventListener(
+            "click",
+            () => {
+
+                openTestCourse(
+                    course.id,
+                    course.name ||
+                    `Lớp ${course.grade || ""}`
+                );
 
             }
-            catch(error){
+        );
 
-                console.error(error);
+        testCourseList.appendChild(card);
+
+    });
+
+}
+
+
+/* ====================================
+        STEP 3
+        OPEN KHÓA HỌC
+==================================== */
+
+async function openTestCourse(
+    courseId,
+    courseName
+){
+
+    testCurrentCourseId =
+        courseId;
+
+    testCurrentChapterId = "";
+    testCurrentLessonId = "";
+
+    hideTestViews();
+
+    testChapterView.style.display =
+        "block";
+
+    testChapterViewTitle.textContent =
+        courseName || "Chương";
+
+    updateTestBreadcrumb();
+
+    testChapterList.innerHTML = `
+
+        <div class="empty">
+            Đang tải chương...
+        </div>
+
+    `;
+
+
+    try{
+
+        const snapshot =
+            await getDocs(
+
+                collection(
+                    db,
+                    "courses",
+                    courseId,
+                    "chapters"
+                )
+
+            );
+
+        const chapters = [];
+
+        snapshot.forEach(
+            chapterDoc => {
+
+                chapters.push({
+
+                    id: chapterDoc.id,
+
+                    ...chapterDoc.data()
+
+                });
 
             }
+        );
+
+
+        chapters.sort(
+            (a,b) =>
+                Number(a.order || 0) -
+                Number(b.order || 0)
+        );
+
+
+        if(!chapters.length){
+
+            testChapterList.innerHTML = `
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-folder-open"></i>
+
+                    <h3>
+                        Chưa có chương
+                    </h3>
+
+                </div>
+
+            `;
+
+            return;
 
         }
 
-        testList.innerHTML += `
 
-            <div class="chapter-card test-item">
+        testChapterList.innerHTML = "";
 
-                <div>
 
-                    <h3>
+        chapters.forEach(
+            chapter => {
 
-                        <i class="fa-solid fa-file-circle-check"></i>
+                const card =
+                    document.createElement("div");
 
-                        ${escapeHtmlTeacher(
-                            test.title || "Bài kiểm tra"
-                        )}
+                card.className =
+                    "chapter-card test-navigation-card";
 
-                    </h3>
+                card.innerHTML = `
 
-                    <p>
+                    <div>
 
-                        📚 ${escapeHtmlTeacher(
-                            test.courseName
-                        )}
+                        <h3>
 
-                    </p>
+                            Chương
+                            ${escapeHtmlTeacher(
+                                chapter.order || ""
+                            )}
 
-                    <p>
+                            -
+                            ${escapeHtmlTeacher(
+                                chapter.title || ""
+                            )}
 
-                        📍 ${locationText}
+                        </h3>
 
-                    </p>
+                        <p>
 
-                    <p>
+                            ${escapeHtmlTeacher(
+                                chapter.description || ""
+                            )}
 
-                        ⏱ ${Number(test.duration || 0)} phút
+                        </p>
 
-                        &nbsp; | &nbsp;
+                    </div>
 
-                        📝 ${Number(test.questionCount || 0)} câu
+                    <i class="fa-solid fa-chevron-right"></i>
 
-                        &nbsp; | &nbsp;
+                `;
 
-                        ⭐ ${Number(test.totalPoints || 0)} điểm
+                card.addEventListener(
+                    "click",
+                    () => {
 
-                    </p>
+                        openTestChapter(
+                            chapter.id,
+                            chapter.title
+                        );
 
-                </div>
+                    }
+                );
 
-                <div class="chapter-actions">
+                testChapterList.appendChild(card);
 
-                    <button
-                        class="chapter-delete"
-                        onclick="deleteTeacherTest(
-                            '${test.courseId}',
-                            '${test.id}'
-                        )">
+            }
+        );
 
-                        Xóa
+    }
+    catch(error){
 
-                    </button>
+        console.error(error);
 
-                </div>
+        testChapterList.innerHTML = `
 
+            <div class="empty">
+                Không thể tải chương.
             </div>
 
         `;
@@ -718,27 +1148,640 @@ async function loadTeacherTests(){
     }
 
 }
-function escapeHtmlTeacher(value = ""){
 
-    return String(value)
 
-        .replace(/&/g, "&amp;")
+/* ====================================
+        STEP 4
+        OPEN CHƯƠNG
+==================================== */
 
-        .replace(/</g, "&lt;")
+async function openTestChapter(
+    chapterId,
+    chapterTitle
+){
 
-        .replace(/>/g, "&gt;")
+    testCurrentChapterId =
+        chapterId;
 
-        .replace(/"/g, "&quot;")
+    testCurrentLessonId = "";
 
-        .replace(/'/g, "&#039;");
+    hideTestViews();
+
+    testLessonView.style.display =
+        "block";
+
+    testLessonViewTitle.textContent =
+        chapterTitle || "Bài học";
+
+    updateTestBreadcrumb();
+
+    testLessonList.innerHTML = `
+
+        <div class="empty">
+            Đang tải bài học...
+        </div>
+
+    `;
+
+
+    try{
+
+        const snapshot =
+            await getDocs(
+
+                collection(
+                    db,
+                    "courses",
+                    testCurrentCourseId,
+                    "chapters",
+                    chapterId,
+                    "lessons"
+                )
+
+            );
+
+        const lessons = [];
+
+        snapshot.forEach(
+            lessonDoc => {
+
+                lessons.push({
+
+                    id: lessonDoc.id,
+
+                    ...lessonDoc.data()
+
+                });
+
+            }
+        );
+
+
+        lessons.sort(
+            (a,b) =>
+                Number(a.order || 0) -
+                Number(b.order || 0)
+        );
+
+
+        if(!lessons.length){
+
+            testLessonList.innerHTML = `
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-book-open"></i>
+
+                    <h3>
+                        Chưa có bài học
+                    </h3>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        testLessonList.innerHTML = "";
+
+
+        lessons.forEach(
+            lesson => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "chapter-card test-navigation-card";
+
+                card.innerHTML = `
+
+                    <div>
+
+                        <h3>
+
+                            Bài
+                            ${escapeHtmlTeacher(
+                                lesson.order || ""
+                            )}
+
+                            -
+                            ${escapeHtmlTeacher(
+                                lesson.title || ""
+                            )}
+
+                        </h3>
+
+                        <p>
+
+                            ${escapeHtmlTeacher(
+                                lesson.description || ""
+                            )}
+
+                        </p>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                `;
+
+                card.addEventListener(
+                    "click",
+                    () => {
+
+                        openTestLesson(
+                            lesson.id,
+                            lesson.title
+                        );
+
+                    }
+                );
+
+                testLessonList.appendChild(card);
+
+            }
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        testLessonList.innerHTML = `
+
+            <div class="empty">
+                Không thể tải bài học.
+            </div>
+
+        `;
+
+    }
 
 }
+
+
+/* ====================================
+        STEP 5
+        OPEN BÀI HỌC
+==================================== */
+
+async function openTestLesson(
+    lessonId,
+    lessonTitle
+){
+
+    testCurrentLessonId =
+        lessonId;
+
+    hideTestViews();
+
+    testListView.style.display =
+        "block";
+
+    testListViewTitle.textContent =
+        lessonTitle || "Bài kiểm tra";
+
+    updateTestBreadcrumb();
+
+    await loadTestsForLesson();
+
+}
+
+
+/* ====================================
+        LOAD TEST THEO BÀI HỌC
+==================================== */
+
+async function loadTestsForLesson(){
+
+    testList.innerHTML = `
+
+        <div class="empty">
+            Đang tải bài kiểm tra...
+        </div>
+
+    `;
+
+
+    try{
+
+        const snapshot =
+            await getDocs(
+
+                collection(
+                    db,
+                    "courses",
+                    testCurrentCourseId,
+                    "tests"
+                )
+
+            );
+
+
+        const tests = [];
+
+        snapshot.forEach(
+            testDoc => {
+
+                const data =
+                    testDoc.data();
+
+                if(
+                    data.chapterId ===
+                        testCurrentChapterId
+                    &&
+                    data.lessonId ===
+                        testCurrentLessonId
+                ){
+
+                    tests.push({
+
+                        id: testDoc.id,
+
+                        ...data
+
+                    });
+
+                }
+
+            }
+        );
+
+
+        tests.sort(
+            (a,b) => {
+
+                const aTime =
+                    a.createdAt?.seconds || 0;
+
+                const bTime =
+                    b.createdAt?.seconds || 0;
+
+                return bTime - aTime;
+
+            }
+        );
+
+
+        if(!tests.length){
+
+            testList.innerHTML = `
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-file-circle-xmark"></i>
+
+                    <h3>
+                        Chưa có bài kiểm tra
+                    </h3>
+
+                    <p>
+                        Hãy bấm "Tạo bài kiểm tra"
+                        để tạo bài đầu tiên cho bài học này.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        testList.innerHTML = "";
+
+
+        tests.forEach(
+            test => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "chapter-card test-item";
+
+                card.innerHTML = `
+
+                    <div>
+
+                        <h3>
+
+                            <i
+                                class="fa-solid fa-file-circle-check">
+                            </i>
+
+                            ${escapeHtmlTeacher(
+                                test.title ||
+                                "Bài kiểm tra"
+                            )}
+
+                        </h3>
+
+                        <p>
+
+                            ⏱
+                            ${Number(
+                                test.duration || 0
+                            )}
+                            phút
+
+                            &nbsp; | &nbsp;
+
+                            📝
+                            ${Number(
+                                test.questionCount || 0
+                            )}
+                            câu
+
+                            &nbsp; | &nbsp;
+
+                            ⭐
+                            ${Number(
+                                test.totalPoints || 0
+                            )}
+                            điểm
+
+                        </p>
+
+                        <p>
+
+                            ${
+                                test.description
+                                ? escapeHtmlTeacher(
+                                    test.description
+                                )
+                                : "Không có mô tả."
+                            }
+
+                        </p>
+
+                    </div>
+
+                    <div class="chapter-actions">
+
+                        <button
+                            class="chapter-edit"
+                            data-test-id="${test.id}">
+
+                            <i
+                                class="fa-solid fa-pen">
+                            </i>
+
+                            Sửa
+
+                        </button>
+
+                        <button
+                            class="chapter-delete"
+                            data-test-id="${test.id}">
+
+                            <i
+                                class="fa-solid fa-trash">
+                            </i>
+
+                            Xóa
+
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                card
+                    .querySelector(
+                        ".chapter-edit"
+                    )
+                    .addEventListener(
+                        "click",
+                        () => {
+
+                            editTeacherTest(
+                                test.id,
+                                testCurrentCourseId
+                            );
+
+                        }
+                    );
+
+
+                card
+                    .querySelector(
+                        ".chapter-delete"
+                    )
+                    .addEventListener(
+                        "click",
+                        () => {
+
+                            deleteTeacherTest(
+                                testCurrentCourseId,
+                                test.id
+                            );
+
+                        }
+                    );
+
+
+                testList.appendChild(card);
+
+            }
+        );
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        testList.innerHTML = `
+
+            <div class="empty">
+                Không thể tải bài kiểm tra.
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ====================================
+        QUAY LẠI
+==================================== */
+
+testBackBtn.addEventListener(
+    "click",
+    async () => {
+
+        if(!testCurrentSubject){
+
+            return;
+
+        }
+
+
+        if(testCurrentLessonId){
+
+            testCurrentLessonId = "";
+
+            hideTestViews();
+
+            testLessonView.style.display =
+                "block";
+
+            updateTestBreadcrumb();
+
+            return;
+
+        }
+
+
+        if(testCurrentChapterId){
+
+            testCurrentChapterId = "";
+
+            hideTestViews();
+
+            testChapterView.style.display =
+                "block";
+
+            updateTestBreadcrumb();
+
+            return;
+
+        }
+
+
+        if(testCurrentCourseId){
+
+            testCurrentCourseId = "";
+
+            hideTestViews();
+
+            testCourseView.style.display =
+                "block";
+
+            updateTestBreadcrumb();
+
+            return;
+
+        }
+
+
+        testCurrentSubject = null;
+
+        resetTestNavigation();
+
+        await loadTestSubjects();
+
+    }
+);
+
+
+/* ====================================
+        BREADCRUMB CLICK
+==================================== */
+
+testBreadcrumbContent.addEventListener(
+    "click",
+    async event => {
+
+        const item =
+            event.target.closest(
+                ".breadcrumb-item"
+            );
+
+        if(!item){
+
+            return;
+
+        }
+
+        const level =
+            item.dataset.level;
+
+
+        if(level === "subject"){
+
+            testCurrentCourseId = "";
+            testCurrentChapterId = "";
+            testCurrentLessonId = "";
+
+            hideTestViews();
+
+            testCourseView.style.display =
+                "block";
+
+            const q = query(
+
+                collection(
+                    db,
+                    "courses"
+                ),
+
+                where(
+                    "teacherId",
+                    "==",
+                    currentTeacherId
+                )
+
+            );
+
+            const snapshot =
+                await getDocs(q);
+
+            const courses = [];
+
+            snapshot.forEach(
+                courseDoc => {
+
+                    const data =
+                        courseDoc.data();
+
+                    const subject =
+                        data.subjectName ||
+                        data.subject ||
+                        "Chưa xác định";
+
+                    if(
+                        subject ===
+                        testCurrentSubject
+                    ){
+
+                        courses.push({
+
+                            id: courseDoc.id,
+
+                            ...data
+
+                        });
+
+                    }
+
+                }
+            );
+
+            await openTestSubject(
+                testCurrentSubject,
+                courses
+            );
+
+        }
+
+    }
+);
 window.deleteTeacherTest =
 async function(courseId, testId){
 
     if(
         !confirm(
-            "Bạn có chắc muốn xóa bài kiểm tra này?"
+            "Bạn có chắc muốn xóa bài kiểm tra này?\n\n" +
+            "Hành động này không thể hoàn tác."
         )
     ){
 
@@ -746,9 +1789,11 @@ async function(courseId, testId){
 
     }
 
+
     try{
 
         await deleteDoc(
+
             doc(
                 db,
                 "courses",
@@ -756,13 +1801,24 @@ async function(courseId, testId){
                 "tests",
                 testId
             )
+
         );
+
 
         alert(
             "Đã xóa bài kiểm tra."
         );
 
-        await loadTeacherTests();
+
+        if(
+            testCurrentLessonId &&
+            testCurrentChapterId &&
+            testCurrentCourseId
+        ){
+
+            await loadTestsForLesson();
+
+        }
 
     }
     catch(error){
@@ -770,21 +1826,317 @@ async function(courseId, testId){
         console.error(error);
 
         alert(
-            "Không thể xóa bài kiểm tra."
+            "Không thể xóa bài kiểm tra: " +
+            error.message
         );
 
     }
 
 };
+/* ====================================
+        SỬA BÀI KIỂM TRA
+==================================== */
+
+async function editTeacherTest(
+    testId,
+    courseId
+){
+
+    try{
+
+        const testRef =
+            doc(
+                db,
+                "courses",
+                courseId,
+                "tests",
+                testId
+            );
+
+
+        const snap =
+            await getDoc(testRef);
+
+
+        if(!snap.exists()){
+
+            alert(
+                "Không tìm thấy bài kiểm tra."
+            );
+
+            return;
+
+        }
+
+
+        const data =
+            snap.data();
+
+
+        editingTestId =
+            testId;
+
+        editingTestCourseId =
+            courseId;
+
+
+        /* =========================
+                THÔNG TIN
+        ========================= */
+
+        testTitle.value =
+            data.title || "";
+
+        testDescription.value =
+            data.description || "";
+
+        testType.value =
+            data.type ||
+            `${data.duration || 15}p`;
+
+
+        /* =========================
+                ĐIỂM
+        ========================= */
+
+        part1Point.value =
+            data.part1?.points ?? 0.5;
+
+
+        part2Score1.value =
+            data.part2?.scores?.one ?? 0.1;
+
+        part2Score2.value =
+            data.part2?.scores?.two ?? 0.25;
+
+        part2Score3.value =
+            data.part2?.scores?.three ?? 0.5;
+
+        part2Score4.value =
+            data.part2?.scores?.four ?? 1;
+
+
+        part3Point.value =
+            data.part3?.points ?? 0.5;
+
+
+        /* =========================
+                CÂU HỎI
+        ========================= */
+
+        part1QuestionData =
+            JSON.parse(
+                JSON.stringify(
+                    data.part1?.questions || []
+                )
+            );
+
+
+        part2QuestionData =
+            JSON.parse(
+                JSON.stringify(
+                    data.part2?.questions || []
+                )
+            );
+
+
+        part3QuestionData =
+            JSON.parse(
+                JSON.stringify(
+                    data.part3?.questions || []
+                )
+            );
+
+
+        /* =========================
+                MỞ KHÓA HỌC
+        ========================= */
+
+        await loadTestCourses();
+
+
+        testCourse.value =
+            data.courseId || courseId;
+
+
+        testCourse.dispatchEvent(
+            new Event("change")
+        );
+
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    150
+                )
+        );
+
+
+        testChapter.value =
+            data.chapterId || "";
+
+
+        testChapter.dispatchEvent(
+            new Event("change")
+        );
+
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    150
+                )
+        );
+
+
+        testLesson.value =
+            data.lessonId || "";
+
+
+        /* =========================
+                RENDER
+        ========================= */
+
+        renderPart1Questions();
+
+        renderPart2Questions();
+
+        renderPart3Questions();
+
+        updateTestTotal();
+
+
+        /* =========================
+                ĐỔI TIÊU ĐỀ MODAL
+        ========================= */
+
+        const modalTitle =
+            testModal.querySelector(
+                "h2"
+            );
+
+        if(modalTitle){
+
+            modalTitle.innerHTML = `
+
+                <i class="fa-solid fa-pen"></i>
+
+                Chỉnh sửa bài kiểm tra
+
+            `;
+
+        }
+
+
+        saveTest.innerHTML = `
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Lưu thay đổi
+
+        `;
+
+
+        testModal.style.display =
+            "flex";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Không thể tải bài kiểm tra: " +
+            error.message
+        );
+
+    }
+
+}
 createTestBtn.addEventListener(
     "click",
     async () => {
+
+        editingTestId = "";
+        editingTestCourseId = "";
 
         resetTestBuilder();
 
         await loadTestCourses();
 
-        testModal.style.display = "flex";
+
+        const modalTitle =
+            testModal.querySelector("h2");
+
+        if(modalTitle){
+
+            modalTitle.innerHTML = `
+
+                <i class="fa-solid fa-file-circle-check"></i>
+
+                Tạo bài kiểm tra
+
+            `;
+
+        }
+
+
+        saveTest.innerHTML = `
+
+            <i class="fa-solid fa-floppy-disk"></i>
+
+            Lưu bài kiểm tra
+
+        `;
+
+
+        /* Nếu đang ở bài học nào thì
+           tự chọn luôn vị trí */
+
+        if(
+            testCurrentCourseId &&
+            testCurrentChapterId &&
+            testCurrentLessonId
+        ){
+
+            testCourse.value =
+                testCurrentCourseId;
+
+            testCourse.dispatchEvent(
+                new Event("change")
+            );
+
+            setTimeout(
+                () => {
+
+                    testChapter.value =
+                        testCurrentChapterId;
+
+                    testChapter.dispatchEvent(
+                        new Event("change")
+                    );
+
+                    setTimeout(
+                        () => {
+
+                            testLesson.value =
+                                testCurrentLessonId;
+
+                        },
+                        150
+                    );
+
+                },
+                150
+            );
+
+        }
+
+
+        testModal.style.display =
+            "flex";
 
     }
 );
@@ -2027,65 +3379,66 @@ function updateTestTotal(){
 }
 function resetTestBuilder(){
 
-    // =========================
-    // RESET DỮ LIỆU CÂU HỎI
-    // =========================
-
     part1QuestionData = [];
     part2QuestionData = [];
     part3QuestionData = [];
 
-    // =========================
-    // RESET THÔNG TIN BÀI TEST
-    // =========================
+    editingTestId = "";
+    editingTestCourseId = "";
+
 
     testTitle.value = "";
 
     testDescription.value = "";
 
-    testType.value = "30p";
+    testType.value = "15p";
+
 
     testCourse.value = "";
 
+
     testChapter.innerHTML = `
+
         <option value="">
             -- Chọn chương --
         </option>
+
     `;
 
+
     testLesson.innerHTML = `
+
         <option value="">
             -- Chọn bài học --
         </option>
+
     `;
 
+
     testChapter.disabled = true;
+
     testLesson.disabled = true;
 
-    // =========================
-    // RESET ĐIỂM
-    // =========================
 
-    part1Point.value = "";
+    part1Point.value = "0.5";
 
-    part2Score1.value = "";
-    part2Score2.value = "";
-    part2Score3.value = "";
-    part2Score4.value = "";
+    part2Score1.value = "0.1";
 
-    part3Point.value = "";
+    part2Score2.value = "0.25";
 
-    // =========================
-    // RESET HIỂN THỊ CÂU HỎI
-    // =========================
+    part2Score3.value = "0.5";
+
+    part2Score4.value = "1";
+
+    part3Point.value = "0.5";
+
 
     renderPart1Questions();
+
     renderPart2Questions();
+
     renderPart3Questions();
 
-    // =========================
-    // RESET TỔNG
-    // =========================
 
     updateTestTotal();
 
@@ -2509,18 +3862,528 @@ async function saveNewTest(){
            LƯU FIRESTORE
         ========================== */
 
-        await addDoc(
+async function saveNewTest(){
 
-            collection(
-                db,
-                "courses",
-                courseId,
-                "tests"
-            ),
+    try{
 
-            testData
+        const courseId =
+            testCourse.value;
 
+        const chapterId =
+            testChapter.value;
+
+        const lessonId =
+            testLesson.value;
+
+        const title =
+            testTitle.value.trim();
+
+        const description =
+            testDescription.value.trim();
+
+        const duration =
+            Number(
+                testType.value.replace("p","")
+            );
+
+
+        /* =========================
+                KIỂM TRA CƠ BẢN
+        ========================= */
+
+        if(!courseId){
+
+            alert(
+                "Vui lòng chọn khóa học."
+            );
+
+            return;
+
+        }
+
+
+        if(!chapterId){
+
+            alert(
+                "Vui lòng chọn chương."
+            );
+
+            return;
+
+        }
+
+
+        if(!lessonId){
+
+            alert(
+                "Vui lòng chọn bài học."
+            );
+
+            return;
+
+        }
+
+
+        if(!title){
+
+            alert(
+                "Vui lòng nhập tên bài kiểm tra."
+            );
+
+            return;
+
+        }
+
+
+        if(
+            !part1QuestionData.length &&
+            !part2QuestionData.length &&
+            !part3QuestionData.length
+        ){
+
+            alert(
+                "Bài kiểm tra chưa có câu hỏi."
+            );
+
+            return;
+
+        }
+
+
+        /* =========================
+                VALIDATE PHẦN I
+        ========================= */
+
+        for(
+            let i = 0;
+            i < part1QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part1QuestionData[i];
+
+
+            if(
+                !q.question ||
+                !q.question.trim()
+            ){
+
+                alert(
+                    `Phần I - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !q.options ||
+                q.options.length !== 4 ||
+                q.options.some(
+                    option =>
+                        !option ||
+                        !option.trim()
+                )
+            ){
+
+                alert(
+                    `Phần I - Câu ${i + 1} chưa nhập đủ 4 đáp án.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+                VALIDATE PHẦN II
+        ========================= */
+
+        for(
+            let i = 0;
+            i < part2QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part2QuestionData[i];
+
+
+            if(
+                !q.question ||
+                !q.question.trim()
+            ){
+
+                alert(
+                    `Phần II - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !q.statements ||
+                q.statements.length !== 4 ||
+                q.statements.some(
+                    statement =>
+                        !statement ||
+                        !statement.trim()
+                )
+            ){
+
+                alert(
+                    `Phần II - Câu ${i + 1} chưa nhập đủ 4 ý.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+                VALIDATE PHẦN III
+        ========================= */
+
+        for(
+            let i = 0;
+            i < part3QuestionData.length;
+            i++
+        ){
+
+            const q =
+                part3QuestionData[i];
+
+
+            if(
+                !q.question ||
+                !q.question.trim()
+            ){
+
+                alert(
+                    `Phần III - Câu ${i + 1} chưa có nội dung.`
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !q.answer ||
+                !String(q.answer).trim()
+            ){
+
+                alert(
+                    `Phần III - Câu ${i + 1} chưa có đáp án.`
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* =========================
+                TỔNG
+        ========================= */
+
+        const questionCount =
+            part1QuestionData.length +
+            part2QuestionData.length +
+            part3QuestionData.length;
+
+
+        const totalPoints =
+            (
+                part1QuestionData.length *
+                Number(
+                    part1Point.value || 0
+                )
+            )
+            +
+            (
+                part2QuestionData.length *
+                Number(
+                    part2Score4.value || 0
+                )
+            )
+            +
+            (
+                part3QuestionData.length *
+                Number(
+                    part3Point.value || 0
+                )
+            );
+
+
+        /* =========================
+                DATA
+        ========================= */
+
+        const testData = {
+
+            title,
+
+            description,
+
+            type:
+                testType.value,
+
+            duration,
+
+            courseId,
+
+            chapterId,
+
+            lessonId,
+
+            teacherId:
+                currentTeacherId,
+
+            teacherName:
+                currentTeacherName,
+
+
+            part1: {
+
+                points:
+                    Number(
+                        part1Point.value || 0
+                    ),
+
+                questions:
+                    part1QuestionData
+
+            },
+
+
+            part2: {
+
+                scores: {
+
+                    one:
+                        Number(
+                            part2Score1.value || 0
+                        ),
+
+                    two:
+                        Number(
+                            part2Score2.value || 0
+                        ),
+
+                    three:
+                        Number(
+                            part2Score3.value || 0
+                        ),
+
+                    four:
+                        Number(
+                            part2Score4.value || 0
+                        )
+
+                },
+
+                questions:
+                    part2QuestionData
+
+            },
+
+
+            part3: {
+
+                points:
+                    Number(
+                        part3Point.value || 0
+                    ),
+
+                questions:
+                    part3QuestionData
+
+            },
+
+
+            questionCount,
+
+            totalPoints,
+
+            updatedAt:
+                serverTimestamp()
+
+        };
+
+
+        /* ====================================
+                ĐANG SỬA
+        ==================================== */
+
+        if(editingTestId){
+
+            const oldCourseId =
+                editingTestCourseId;
+
+
+            /*
+             * Nếu vẫn cùng khóa học:
+             * update trực tiếp.
+             */
+
+            if(
+                oldCourseId === courseId
+            ){
+
+                await updateDoc(
+
+                    doc(
+                        db,
+                        "courses",
+                        oldCourseId,
+                        "tests",
+                        editingTestId
+                    ),
+
+                    testData
+
+                );
+
+            }
+
+
+            /*
+             * Nếu đổi khóa học:
+             * tạo document mới ở khóa học mới
+             * rồi xóa document cũ.
+             */
+
+            else{
+
+                await addDoc(
+
+                    collection(
+                        db,
+                        "courses",
+                        courseId,
+                        "tests"
+                    ),
+
+                    {
+
+                        ...testData,
+
+                        createdAt:
+                            serverTimestamp()
+
+                    }
+
+                );
+
+
+                await deleteDoc(
+
+                    doc(
+                        db,
+                        "courses",
+                        oldCourseId,
+                        "tests",
+                        editingTestId
+                    )
+
+                );
+
+            }
+
+
+            alert(
+                "Đã cập nhật bài kiểm tra."
+            );
+
+        }
+
+
+        /* ====================================
+                TẠO MỚI
+        ==================================== */
+
+        else{
+
+            await addDoc(
+
+                collection(
+                    db,
+                    "courses",
+                    courseId,
+                    "tests"
+                ),
+
+                {
+
+                    ...testData,
+
+                    createdAt:
+                        serverTimestamp()
+
+                }
+
+            );
+
+
+            alert(
+                "Đã tạo bài kiểm tra thành công."
+            );
+
+        }
+
+
+        /* =========================
+                RESET
+        ========================= */
+
+        editingTestId = "";
+
+        editingTestCourseId = "";
+
+        testModal.style.display =
+            "none";
+
+        resetTestBuilder();
+
+
+        /*
+         * Nếu đang ở bài học hiện tại
+         * thì tải lại danh sách.
+         */
+
+        if(
+            testCurrentCourseId &&
+            testCurrentChapterId &&
+            testCurrentLessonId
+        ){
+
+            await loadTestsForLesson();
+
+        }
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(
+            "Không thể lưu bài kiểm tra: " +
+            error.message
         );
+
+    }
+
+}
 
 
         alert(
