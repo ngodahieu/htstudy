@@ -1783,3 +1783,19 @@ body {
     }
 
 }
+.timer-stat.danger {
+    animation: timerDanger 0.8s ease-in-out infinite alternate;
+}
+
+
+@keyframes timerDanger {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.03);
+    }
+
+}
