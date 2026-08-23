@@ -1,1 +1,588 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Thi thử | H&T STUDY</title>
+
+    <!-- Google Font -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/exam.css">
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+                    BACKGROUND
+================================================== -->
+
+<div class="space-bg"></div>
+
+<div class="overlay"></div>
+
+
+<!-- ==================================================
+                    HEADER
+================================================== -->
+
+<header class="header">
+
+    <div class="container">
+
+
+        <!-- ==========================
+                LOGO
+        =========================== -->
+
+        <a
+            class="logo"
+            href="index.html"
+        >
+
+            <img
+                src="assets/images/logo.png"
+                alt="H&T STUDY"
+            >
+
+            <div class="logo-text">
+
+                <h2>H&T STUDY</h2>
+
+                <span>
+                    Chinh phục tri thức
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- ==========================
+                HEADER ACTIONS
+        =========================== -->
+
+        <div class="header-actions">
+
+
+            <!-- ==========================
+                    NAVIGATION
+            =========================== -->
+
+            <nav>
+
+                <ul class="nav-menu">
+
+                    <li>
+
+                        <a href="index.html">
+                            Trang chủ
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a href="courses.html">
+                            Khóa học
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a
+                            class="active"
+                            href="exam.html"
+                        >
+                            Thi thử
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a href="#">
+                            Kết quả
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </nav>
+
+
+            <!-- ==========================
+                    HEADER RIGHT
+            =========================== -->
+
+            <div class="header-right">
+
+
+                <!-- ==========================
+                        NOTIFICATION
+                =========================== -->
+
+                <button
+                    class="notification-btn"
+                    id="notificationBtn"
+                >
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span
+                        class="badge"
+                        id="notificationBadge"
+                        style="display:none;"
+                    >
+                        0
+                    </span>
+
+                </button>
+
+
+                <!-- ==========================
+                        NOTIFICATION PANEL
+                =========================== -->
+
+                <div
+                    class="notification-panel"
+                    id="notificationPanel"
+                >
+
+                    <div class="notification-header">
+
+                        <h3>
+                            Thông báo
+                        </h3>
+
+                        <button
+                            id="closeNotification"
+                        >
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="notification-list"
+                        id="notificationList"
+                    >
+
+                        <div class="notification-empty">
+
+                            <i class="fa-regular fa-bell-slash"></i>
+
+                            <p>
+                                Chưa có thông báo nào.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ==========================
+                        AVATAR
+                =========================== -->
+
+                <div class="avatar">
+
+                    <img
+                        src="assets/avatars/default.jpg"
+                        alt="Avatar"
+                    >
+
+                </div>
+
+
+                <!-- ==========================
+                        USER MENU
+                =========================== -->
+
+                <div
+                    class="user-menu"
+                    id="userMenu"
+                >
+
+
+                    <!-- USER INFO -->
+
+                    <div
+                        class="user-box"
+                        id="userBox"
+                        style="display:none;"
+                    >
+
+                        <div class="user-profile">
+
+                            <img
+                                id="userAvatar"
+                                src="assets/avatars/default.jpg"
+                                alt="Avatar"
+                            >
+
+                            <div class="user-info">
+
+                                <h3 id="userName"></h3>
+
+                                <p>
+
+                                    Mã học sinh:
+
+                                    <span id="userStudentId"></span>
+
+                                </p>
+
+                                <p>
+
+                                    Vai trò:
+
+                                    <span id="userRole"></span>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MENU -->
+
+                    <div
+                        class="user-menu-list"
+                        id="userMenuList"
+                        style="display:none;"
+                    >
+
+
+                        <!-- KHÓA HỌC -->
+
+                        <button id="myCoursesBtn">
+
+                            <i class="fa-solid fa-book-open"></i>
+
+                            Khóa học của tôi
+
+                        </button>
+
+
+                        <!-- QUẢN LÍ -->
+
+                        <button
+                            id="manageBtn"
+                            style="display:none;"
+                        >
+
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                            Quản lí
+
+                        </button>
+
+
+                        <!-- HƯỚNG DẪN -->
+
+                        <button id="userGuide">
+
+                            <i class="fa-regular fa-circle-question"></i>
+
+                            Hướng dẫn
+
+                        </button>
+
+
+                        <!-- ĐĂNG XUẤT -->
+
+                        <button id="logoutBtn">
+
+                            <i class="fa-solid fa-right-from-bracket"></i>
+
+                            Đăng xuất
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- ==================================================
+                    EXAM HERO
+================================================== -->
+
+<section class="exam-hero">
+
+    <div class="container">
+
+        <div class="exam-hero-content">
+
+            <span class="exam-hero-label">
+
+                <i class="fa-solid fa-graduation-cap"></i>
+
+                H&T STUDY
+
+            </span>
+
+
+            <h1>
+                Thi thử
+            </h1>
+
+
+            <p>
+                Luyện tập, kiểm tra kiến thức và đánh giá
+                năng lực qua các đề thi thử.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+                    EXAM FILTER
+================================================== -->
+
+<section class="exam-filter">
+
+    <div class="container">
+
+
+        <div class="exam-filter-box">
+
+
+            <button
+                class="exam-filter-btn active"
+                data-filter="all"
+            >
+
+                Tất cả
+
+            </button>
+
+
+            <button
+                class="exam-filter-btn"
+                data-filter="10"
+            >
+
+                Lớp 10
+
+            </button>
+
+
+            <button
+                class="exam-filter-btn"
+                data-filter="11"
+            >
+
+                Lớp 11
+
+            </button>
+
+
+            <button
+                class="exam-filter-btn"
+                data-filter="12"
+            >
+
+                Lớp 12
+
+            </button>
+
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="exam-search">
+
+            <input
+                type="text"
+                id="examSearch"
+                placeholder="Tìm kiếm đề thi..."
+            >
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+                    EXAM LIST
+================================================== -->
+
+<section class="exam-section">
+
+    <div class="container">
+
+
+        <div class="section-heading">
+
+            <span>
+                LUYỆN TẬP
+            </span>
+
+            <h2>
+                Danh sách đề thi
+            </h2>
+
+            <p>
+                Chọn một đề thi để bắt đầu làm bài.
+            </p>
+
+        </div>
+
+
+        <!-- ==========================
+                EXAM GRID
+        =========================== -->
+
+        <div
+            class="exam-grid"
+            id="examGrid"
+        >
+
+            <!-- JS render đề thi -->
+
+
+            <div class="exam-loading">
+
+                <div class="exam-loading-icon">
+
+                    <i class="fa-solid fa-spinner"></i>
+
+                </div>
+
+                <p>
+                    Đang tải danh sách đề thi...
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+                EMPTY
+        =========================== -->
+
+        <div
+            class="exam-empty"
+            id="examEmpty"
+            style="display:none;"
+        >
+
+            <i class="fa-regular fa-folder-open"></i>
+
+            <h3>
+                Không tìm thấy đề thi
+            </h3>
+
+            <p>
+                Hiện chưa có đề thi phù hợp.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+                    FOOTER
+================================================== -->
+
+<footer class="footer">
+
+    <div class="copyright">
+
+        © 2026 H&T STUDY
+
+    </div>
+
+</footer>
+
+
+
+<!-- ==================================================
+                    JAVASCRIPT
+================================================== -->
+
+<script
+    type="module"
+    src="js/exam.js"
+></script>
+
+
+</body>
+
+</html>
+```
 
