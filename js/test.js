@@ -48,6 +48,13 @@ let timerInterval = null;
 
 let submitted = false;
 /*==================================================
+        LƯU TRẠNG THÁI BÀI KIỂM TRA
+==================================================*/
+
+let testStorageKey = null;
+let testTimerKey = null;
+let testAnswerKey = null;
+/*==================================================
                 LẤY PARAMETER URL
 ==================================================*/
 
@@ -60,7 +67,28 @@ currentCourseId =
 currentTestId =
     urlParams.get("testId");
 
+/*==================================================
+        STORAGE KEY
+==================================================*/
 
+function initializeStorageKeys() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    const userId =
+        currentUser.uid;
+
+    testStorageKey =
+        `htstudy_test_${userId}_${currentCourseId}_${currentTestId}`;
+
+    testTimerKey =
+        `${testStorageKey}_timer`;
+
+    testAnswerKey =
+        `${testStorageKey}_answers`;
+}
 /*==================================================
                 DOM
 ==================================================*/
@@ -258,6 +286,165 @@ if (headerUserName) {
 
 }
 
+/*==================================================
+            SAVE ANSWERS
+==================================================*/
+
+function saveAnswers() {
+
+    if (!testAnswerKey) {
+        return;
+    }
+
+    try {
+
+        localStorage.setItem(
+            testAnswerKey,
+            JSON.stringify(answers)
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể lưu đáp án:",
+            error
+        );
+
+    }
+
+}
+
+
+/*==================================================
+            LOAD ANSWERS
+==================================================*/
+
+function loadAnswers() {
+
+    if (!testAnswerKey) {
+        return {};
+    }
+
+    try {
+
+        const savedAnswers =
+            localStorage.getItem(
+                testAnswerKey
+            );
+
+        if (!savedAnswers) {
+            return {};
+        }
+
+        const parsed =
+            JSON.parse(
+                savedAnswers
+            );
+
+        if (
+            parsed &&
+            typeof parsed === "object"
+        ) {
+
+            return parsed;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể tải đáp án đã lưu:",
+            error
+        );
+
+    }
+
+    return {};
+
+}
+/*==================================================
+        SAVE CURRENT QUESTION
+==================================================*/
+
+function saveCurrentQuestion() {
+
+    if (!testStorageKey) {
+        return;
+    }
+
+    try {
+
+        localStorage.setItem(
+            `${testStorageKey}_currentQuestion`,
+            String(currentQuestionIndex)
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể lưu câu hiện tại:",
+            error
+        );
+
+    }
+
+}
+
+
+/*==================================================
+        LOAD CURRENT QUESTION
+==================================================*/
+
+function loadCurrentQuestion() {
+
+    if (!testStorageKey) {
+        return 0;
+    }
+
+    try {
+
+        const savedIndex =
+            localStorage.getItem(
+                `${testStorageKey}_currentQuestion`
+            );
+
+        if (savedIndex === null) {
+            return 0;
+        }
+
+        const index =
+            Number(savedIndex);
+
+        if (
+            Number.isInteger(index) &&
+            index >= 0 &&
+            index < questions.length
+        ) {
+
+            return index;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể tải câu hiện tại:",
+            error
+        );
+
+    }
+
+    return 0;
+
+}
 
 /*==================================================
                 LOAD TEST
@@ -385,16 +572,26 @@ async function loadTest() {
 
         }
 
+/*------------------------------------------
+        KHỞI TẠO TRẠNG THÁI
+------------------------------------------*/
 
-        /*------------------------------------------
-                INITIALIZE
-        ------------------------------------------*/
+initializeStorageKeys();
 
-        answers = {};
+/*
+    Nếu reload trang:
+    - Lấy lại đáp án
+    - Lấy lại câu đang làm
+*/
 
-        currentQuestionIndex = 0;
+answers =
+    loadAnswers();
 
-        submitted = false;
+currentQuestionIndex =
+    loadCurrentQuestion();
+
+submitted =
+    false;
 
 
         renderTestInfo();
@@ -603,16 +800,18 @@ function renderQuestionGrid() {
 
 
             button.addEventListener(
-                "click",
-                () => {
+    "click",
+    () => {
 
-                    currentQuestionIndex =
-                        index;
+        currentQuestionIndex =
+            index;
 
-                    renderQuestion();
+        saveCurrentQuestion();
 
-                }
-            );
+        renderQuestion();
+
+    }
+);
 
 
             questionGrid.appendChild(
@@ -626,8 +825,6 @@ function renderQuestionGrid() {
     updateQuestionGrid();
 
 }
-
-
 /*==================================================
             UPDATE QUESTION GRID
 ==================================================*/
@@ -650,23 +847,51 @@ function updateQuestionGrid() {
     buttons.forEach(
         (button, index) => {
 
-            button.classList.toggle(
+            const isCurrent =
+                index === currentQuestionIndex;
+
+            const hasAnswer =
+                answers[index] !== undefined &&
+                answers[index] !== null &&
+                String(
+                    answers[index]
+                ).trim() !== "";
+
+
+            /*----------------------------------
+                XÓA TRẠNG THÁI CŨ
+            ----------------------------------*/
+
+            button.classList.remove(
                 "current",
-                index === currentQuestionIndex
+                "answered"
             );
 
 
-            button.classList.toggle(
-                "answered",
-                answers[index] !== undefined
-            );
+            /*----------------------------------
+                ƯU TIÊN ANSWERED
+            ----------------------------------*/
+
+            if (hasAnswer) {
+
+                button.classList.add(
+                    "answered"
+                );
+
+            }
+
+            else if (isCurrent) {
+
+                button.classList.add(
+                    "current"
+                );
+
+            }
 
         }
     );
 
 }
-
-
 /*==================================================
                 RENDER QUESTION
 ==================================================*/
@@ -839,20 +1064,43 @@ function renderAnswers(question) {
             );
 
 
-            input.addEventListener(
+input.addEventListener(
     "change",
     () => {
 
         answers[currentQuestionIndex] =
             optionLetter;
 
+        /*----------------------------------
+            LƯU ĐÁP ÁN NGAY LẬP TỨC
+        ----------------------------------*/
+
+        saveAnswers();
+
+
+        /*----------------------------------
+            HIỂN THỊ OPTION ĐANG CHỌN
+        ----------------------------------*/
+
         answerContainer
             .querySelectorAll(".answer-option")
             .forEach(option => {
-                option.classList.remove("selected");
+
+                option.classList.remove(
+                    "selected"
+                );
+
             });
 
-        wrapper.classList.add("selected");
+
+        wrapper.classList.add(
+            "selected"
+        );
+
+
+        /*----------------------------------
+            CẬP NHẬT DANH SÁCH CÂU HỎI
+        ----------------------------------*/
 
         updateQuestionGrid();
 
@@ -960,20 +1208,23 @@ function renderTextAnswer(question) {
         answers[currentQuestionIndex] || "";
 
 
-    textarea.addEventListener(
-        "input",
-        () => {
+textarea.addEventListener(
+    "input",
+    () => {
 
-            answers[
-                currentQuestionIndex
-            ] =
-                textarea.value;
+        answers[
+            currentQuestionIndex
+        ] =
+            textarea.value;
 
 
-            updateQuestionGrid();
+        saveAnswers();
 
-        }
-    );
+
+        updateQuestionGrid();
+
+    }
+);
 
 
     answerContainer.appendChild(
@@ -1025,9 +1276,11 @@ if (nextQuestionBtn) {
 
                 currentQuestionIndex++;
 
-                renderQuestion();
+saveCurrentQuestion();
 
-                scrollToQuestion();
+renderQuestion();
+
+scrollToQuestion();
 
             }
 
@@ -1053,9 +1306,11 @@ if (previousQuestionBtn) {
 
                 currentQuestionIndex--;
 
-                renderQuestion();
+saveCurrentQuestion();
 
-                scrollToQuestion();
+renderQuestion();
+
+scrollToQuestion();
 
             }
 
@@ -1092,8 +1347,6 @@ function scrollToQuestion() {
     }
 
 }
-
-
 /*==================================================
                 TIMER
 ==================================================*/
@@ -1111,7 +1364,9 @@ function startTimer() {
         ) || 0;
 
 
-    /* Không giới hạn */
+    /*------------------------------------------
+        KHÔNG GIỚI HẠN THỜI GIAN
+    ------------------------------------------*/
 
     if (duration <= 0) {
 
@@ -1122,48 +1377,183 @@ function startTimer() {
 
         }
 
+        if (headerTestTimer) {
+
+            headerTestTimer.textContent =
+                "Không giới hạn";
+
+        }
+
         return;
 
     }
 
 
-    remainingSeconds =
-        duration * 60;
+    /*------------------------------------------
+        LẤY THỜI ĐIỂM KẾT THÚC ĐÃ LƯU
+    ------------------------------------------*/
+
+    let endTime =
+        null;
 
 
-    updateTimer();
+    try {
 
+        const savedEndTime =
+            localStorage.getItem(
+                testTimerKey
+            );
+
+
+        if (savedEndTime) {
+
+            endTime =
+                Number(
+                    savedEndTime
+                );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể đọc timer:",
+            error
+        );
+
+    }
+
+
+    /*------------------------------------------
+        NẾU CHƯA CÓ TIMER
+        → TẠO TIMER MỚI
+    ------------------------------------------*/
+
+    if (
+        !endTime ||
+        !Number.isFinite(endTime)
+    ) {
+
+        endTime =
+            Date.now() +
+            duration * 60 * 1000;
+
+
+        try {
+
+            localStorage.setItem(
+                testTimerKey,
+                String(endTime)
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Không thể lưu timer:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*------------------------------------------
+        UPDATE NGAY
+    ------------------------------------------*/
+
+    updateRemainingTime(
+        endTime
+    );
+
+
+    /*------------------------------------------
+        CHẠY ĐỒNG HỒ
+    ------------------------------------------*/
 
     timerInterval =
         setInterval(
             () => {
 
-                remainingSeconds--;
-
-
-                updateTimer();
-
-
-                if (
-                    remainingSeconds <= 0
-                ) {
-
-                    clearInterval(
-                        timerInterval
-                    );
-
-
-                    autoSubmit();
-
-                }
+                updateRemainingTime(
+                    endTime
+                );
 
             },
             1000
         );
 
 }
+/*==================================================
+        UPDATE REMAINING TIME
+==================================================*/
+
+function updateRemainingTime(endTime) {
+
+    const now =
+        Date.now();
 
 
+    const difference =
+        endTime - now;
+
+
+    remainingSeconds =
+        Math.max(
+            0,
+            Math.ceil(
+                difference / 1000
+            )
+        );
+
+
+    updateTimer();
+
+
+    /*------------------------------------------
+        HẾT GIỜ
+    ------------------------------------------*/
+
+    if (
+        remainingSeconds <= 0
+    ) {
+
+        clearInterval(
+            timerInterval
+        );
+
+
+        /*--------------------------------------
+            XÓA TIMER CŨ
+        --------------------------------------*/
+
+        try {
+
+            localStorage.removeItem(
+                testTimerKey
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Không thể xóa timer:",
+                error
+            );
+
+        }
+
+
+        autoSubmit();
+
+    }
+
+}
 /*==================================================
                 UPDATE TIMER
 ==================================================*/
@@ -1393,7 +1783,43 @@ async function autoSubmit() {
 
 }
 
+/*==================================================
+        CLEAR TEST STORAGE
+==================================================*/
 
+function clearTestStorage() {
+
+    if (!testStorageKey) {
+        return;
+    }
+
+
+    try {
+
+        localStorage.removeItem(
+            testAnswerKey
+        );
+
+        localStorage.removeItem(
+            testTimerKey
+        );
+
+        localStorage.removeItem(
+            `${testStorageKey}_currentQuestion`
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Không thể xóa dữ liệu bài kiểm tra:",
+            error
+        );
+
+    }
+
+}
 /*==================================================
                 FINISH TEST
 ==================================================*/
@@ -1489,7 +1915,11 @@ if (!currentUser) {
             ),
             resultData
         );
+/*------------------------------------------
+        XÓA TRẠNG THÁI BÀI ĐANG LÀM
+------------------------------------------*/
 
+clearTestStorage();
 
         /*
             Chuyển sang trang kết quả
