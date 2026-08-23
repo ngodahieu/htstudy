@@ -141,6 +141,30 @@ const submitTestBtn =
     document.getElementById("submitTestBtn");
 
 /*==================================================
+                HEADER / USER DOM
+==================================================*/
+
+const userBox =
+    document.getElementById("userBox");
+
+const userMenuList =
+    document.getElementById("userMenuList");
+
+const userAvatar =
+    document.getElementById("userAvatar");
+
+const userStudentId =
+    document.getElementById("userStudentId");
+
+const userRole =
+    document.getElementById("userRole");
+
+const myCoursesBtn =
+    document.getElementById("myCoursesBtn");
+
+const manageBtn =
+    document.getElementById("manageBtn");
+/*==================================================
                 LOAD USER
 ==================================================*/
 
