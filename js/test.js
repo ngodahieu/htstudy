@@ -24,8 +24,9 @@ from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 /*==================================================
                 BIẾN TOÀN CỤC
 ==================================================*/
-
 let currentUser = null;
+
+let currentRole = "";
 
 let currentCourseId = null;
 
@@ -46,8 +47,6 @@ let remainingSeconds = 0;
 let timerInterval = null;
 
 let submitted = false;
-
-
 /*==================================================
                 LẤY PARAMETER URL
 ==================================================*/
