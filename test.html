@@ -60,10 +60,7 @@
 
         <!-- LOGO -->
 
-        <a
-            href="index.html"
-            class="logo"
-        >
+        <div class="logo">
 
             <div class="logo-icon">
 
@@ -83,199 +80,76 @@
 
             </div>
 
-        </a>
+        </div>
 
 
-        <!-- HEADER RIGHT -->
+<!-- HEADER RIGHT -->
 
-        <div class="header-right">
+<div class="header-right">
 
+    <!-- USER NAME -->
 
-            <!-- NOTIFICATION -->
+    <div class="test-user-info">
 
-            <div class="notification-wrapper">
+        <div class="test-user-icon">
 
-                <button
-                    type="button"
-                    class="notification-btn"
-                    title="Thông báo"
-                >
+            <i class="fa-solid fa-user"></i>
 
-                    <i class="fa-regular fa-bell"></i>
+        </div>
 
-                    <span class="notification-dot"></span>
+        <div class="test-user-text">
 
-                </button>
+            <span>
+                HỌC SINH
+            </span>
 
-
-                <div
-                    class="notification-panel"
-                    id="notificationPanel"
-                >
-
-                    <div class="notification-header">
-
-                        <h3>
-                            Thông báo
-                        </h3>
-
-                        <button
-                            type="button"
-                            id="closeNotification"
-                        >
-
-                            <i class="fa-solid fa-xmark"></i>
-
-                        </button>
-
-                    </div>
-
-
-                    <div class="notification-empty">
-
-                        <i class="fa-regular fa-bell-slash"></i>
-
-                        <p>
-                            Chưa có thông báo mới
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- AVATAR -->
-
-            <div class="avatar-wrapper">
-
-                <button
-                    type="button"
-                    class="avatar"
-                    aria-label="Tài khoản"
-                >
-
-                    <img
-                        src="assets/avatars/default.jpg"
-                        alt="Avatar"
-                    >
-
-                </button>
-
-
-                <!-- USER MENU -->
-
-                <div
-                    class="user-menu"
-                    id="userMenu"
-                >
-
-                    <div
-                        class="user-box"
-                        id="userBox"
-                    >
-
-                        <img
-                            id="userAvatar"
-                            src="assets/avatars/default.jpg"
-                            alt="Avatar"
-                        >
-
-                        <div class="user-info">
-
-                            <strong id="userName">
-                                Người dùng
-                            </strong>
-
-                            <span id="userStudentId">
-                            </span>
-
-                            <small id="userRole">
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="user-menu-list"
-                        id="userMenuList"
-                    >
-
-                        <button
-                            type="button"
-                            id="myCoursesBtn"
-                            class="user-menu-item"
-                        >
-
-                            <i class="fa-solid fa-book-open"></i>
-
-                            <span>
-                                Khóa học của tôi
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            id="manageBtn"
-                            class="user-menu-item"
-                        >
-
-                            <i class="fa-solid fa-gauge-high"></i>
-
-                            <span>
-                                Quản lý
-                            </span>
-
-                        </button>
-
-
-                        <button
-                            type="button"
-                            id="userGuide"
-                            class="user-menu-item"
-                        >
-
-                            <i class="fa-solid fa-circle-question"></i>
-
-                            <span>
-                                Hướng dẫn
-                            </span>
-
-                        </button>
-
-
-                        <div class="menu-divider"></div>
-
-
-                        <button
-                            type="button"
-                            id="logoutBtn"
-                            class="user-menu-item logout-item"
-                        >
-
-                            <i class="fa-solid fa-right-from-bracket"></i>
-
-                            <span>
-                                Đăng xuất
-                            </span>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
+            <strong id="headerUserName">
+                Đang tải...
+            </strong>
 
         </div>
 
     </div>
 
+
+    <!-- HEADER TIMER -->
+
+    <div class="header-test-timer">
+
+        <i class="fa-regular fa-clock"></i>
+
+        <div>
+
+            <span>
+                THỜI GIAN
+            </span>
+
+            <strong id="headerTestTimer">
+                --:--
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUBMIT -->
+
+    <button
+        type="button"
+        id="headerSubmitTestBtn"
+        class="header-submit-btn"
+    >
+
+        <i class="fa-solid fa-paper-plane"></i>
+
+        <span>
+            Nộp bài
+        </span>
+
+    </button>
+
+</div>
 </header>
 
 
