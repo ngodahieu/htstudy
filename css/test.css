@@ -1730,3 +1730,29 @@ body {
     }
 
 }
+.question-number.current {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+/*========================================
+    CÂU ĐÃ TRẢ LỜI
+========================================*/
+
+.question-number.answered {
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+}
+
+
+/*========================================
+    CÂU HIỆN TẠI + ĐÃ TRẢ LỜI
+    → XANH LÁ
+========================================*/
+
+.question-number.current.answered {
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+}
