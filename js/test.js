@@ -2189,7 +2189,18 @@ function makeChemicalSubscript(digit) {
     return `<sub class="chemical-subscript">${digit}</sub>`;
 
 }
-
+const subscriptMap = {
+    "0": "₀",
+    "1": "₁",
+    "2": "₂",
+    "3": "₃",
+    "4": "₄",
+    "5": "₅",
+    "6": "₆",
+    "7": "₇",
+    "8": "₈",
+    "9": "₉"
+};
 
     /*
         Danh sách ký hiệu nguyên tố
