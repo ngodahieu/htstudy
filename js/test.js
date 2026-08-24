@@ -2189,18 +2189,6 @@ function makeChemicalSubscript(digit) {
     return `<sub class="chemical-subscript">${digit}</sub>`;
 
 }
-const subscriptMap = {
-    "0": "₀",
-    "1": "₁",
-    "2": "₂",
-    "3": "₃",
-    "4": "₄",
-    "5": "₅",
-    "6": "₆",
-    "7": "₇",
-    "8": "₈",
-    "9": "₉"
-};
 
     /*
         Danh sách ký hiệu nguyên tố
@@ -2241,19 +2229,6 @@ const subscriptMap = {
     /*
         Hàm chuyển số thành chỉ số dưới
     */
-
-    function toSubscript(number) {
-
-        return String(number)
-            .split("")
-            .map(
-                digit =>
-                    subscriptMap[digit] || digit
-            )
-            .join("");
-
-    }
-
 
     /*
         Nhận diện một công thức hóa học.
@@ -2403,10 +2378,10 @@ const subscriptMap = {
             */
 
             return match.replace(
-                /\d+/g,
-                number =>
-                    toSubscript(number)
-            );
+    /\d+/g,
+    number =>
+        `<sub class="chemical-subscript">${number}</sub>`
+);
 
         }
     );
