@@ -2185,7 +2185,6 @@ console.log("FORMAT INPUT:", value);
 /*==================================================
         NHẬN DIỆN CÔNG THỨC HÓA HỌC
 ==================================================*/
-
 function convertChemicalFormulas(text) {
 
     const elements = [
@@ -2229,45 +2228,39 @@ function convertChemicalFormulas(text) {
 
 
     /*
-        Nhận diện các dạng:
+        ==========================================
+        CÔNG THỨC HÓA HỌC KHÔNG CÓ NGOẶC
+        ==========================================
 
         H2O
         CO2
         CH3COOH
         CH3COCH3
         CH3COOCH3
-        H2SO4
-        Ca(OH)2
-        Al2(SO4)3
-        Fe2O3
+        HCOOH
         C6H12O6
     */
 
-    const chemicalRegex =
-        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*|\([A-Z][a-z]?\d*\)+\d*)+(?![A-Za-z])/g;
+    const simpleFormulaRegex =
+        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*)+(?![A-Za-z])/g;
 
 
-    return text.replace(
-        chemicalRegex,
+    text = text.replace(
+        simpleFormulaRegex,
         (match) => {
 
             /*
-                Phải có số hoặc ngoặc
-                mới coi là công thức Hóa.
-            */
+                Tách công thức thành các nguyên tố.
 
-            if (
-                !/\d/.test(match) &&
-                !/[()]/.test(match)
-            ) {
-
-                return match;
-
-            }
-
-
-            /*
-                Lấy toàn bộ nguyên tố
+                Ví dụ:
+                CH3COOH
+                →
+                C
+                H3
+                C
+                O
+                O
+                H
             */
 
             const elementMatches =
@@ -2277,15 +2270,13 @@ function convertChemicalFormulas(text) {
 
 
             if (!elementMatches) {
-
                 return match;
-
             }
 
 
             /*
-                Kiểm tra toàn bộ nguyên tố
-                có hợp lệ không
+                Kiểm tra tất cả nguyên tố
+                có phải nguyên tố hóa học hay không.
             */
 
             const allValid =
@@ -2296,14 +2287,13 @@ function convertChemicalFormulas(text) {
 
 
             if (!allValid) {
-
                 return match;
-
             }
 
 
             /*
-                Chuyển số thành chỉ số dưới
+                Chuyển toàn bộ chữ số
+                thành chỉ số dưới.
             */
 
             return match.replace(
@@ -2315,6 +2305,69 @@ function convertChemicalFormulas(text) {
         }
     );
 
+
+    /*
+        ==========================================
+        CÔNG THỨC CÓ NGOẶC
+        ==========================================
+
+        Ca(OH)2
+        Al2(SO4)3
+        Mg(OH)2
+        Fe(NO3)3
+    */
+
+    const bracketFormulaRegex =
+        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*|\([A-Z][a-z]?\d*\)\d*)+(?![A-Za-z])/g;
+
+
+    text = text.replace(
+        bracketFormulaRegex,
+        (match) => {
+
+            /*
+                Kiểm tra xem có thực sự
+                chứa công thức hóa học.
+            */
+
+            const elementMatches =
+                match.match(
+                    /[A-Z][a-z]?/g
+                );
+
+
+            if (!elementMatches) {
+                return match;
+            }
+
+
+            const allValid =
+                elementMatches.every(
+                    element =>
+                        elements.includes(element)
+                );
+
+
+            if (!allValid) {
+                return match;
+            }
+
+
+            /*
+                Chuyển số thành chỉ số dưới.
+            */
+
+            return match.replace(
+                /\d/g,
+                digit =>
+                    subscriptMap[digit]
+            );
+
+        }
+    );
+
+
+    return text;
 }
 /*==================================================
         NHẬN DIỆN CÔNG THỨC TOÁN / VẬT LÝ
