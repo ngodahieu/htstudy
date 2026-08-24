@@ -2189,17 +2189,7 @@ function formatQuestionText(value) {
 function convertChemicalFormulas(text) {
 
     /*
-        Danh sách nguyên tố hóa học.
-
-        Dùng để phân biệt:
-
-        H2SO4   → công thức hóa học
-
-        Câu 2   → không phải công thức
-
-        CO2     → công thức
-
-        2026    → không phải công thức
+        Các nguyên tố hóa học hợp lệ
     */
 
     const elements = [
@@ -2228,21 +2218,25 @@ function convertChemicalFormulas(text) {
         "Zn", "Zr"
     ];
 
+
     /*
-        Regex tìm các chuỗi có dạng:
+        Regex nhận diện công thức Hóa học.
+
+        Ví dụ:
 
         H2O
         CO2
         H2SO4
+        CH3COOH
+        CH3COCH3
+        CH3COOCH3
+        HCOOH
         Ca(OH)2
         Al2(SO4)3
-        Fe2O3
-
-        Không đụng vào số thông thường.
     */
 
     const chemicalRegex =
-        /(?<![A-Za-z])(?:[A-Z][a-z]?(?:\d+)?|\([A-Z][a-z]?(?:\d+)?(?:[A-Z][a-z]?(?:\d+)?)*\)\d+)+(?![A-Za-z])/g;
+        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*|\((?:[A-Z][a-z]?\d*)+\)\d*)+(?![A-Za-z])/g;
 
 
     return text.replace(
@@ -2250,16 +2244,17 @@ function convertChemicalFormulas(text) {
         (match) => {
 
             /*
-                Kiểm tra có ít nhất một
-                chữ số hoặc nhóm ngoặc.
+                Phải có ít nhất một chữ số
+                hoặc ngoặc nhóm.
 
-                Như vậy:
+                Ví dụ:
 
-                H2SO4  → xử lý
+                H2O       → xử lý
+                CH3COOH   → xử lý
+                Ca(OH)2   → xử lý
 
-                H2     → xử lý
-
-                Câu    → không xử lý
+                HCOOH     → giữ nguyên
+                H2        → xử lý
             */
 
             if (
@@ -2271,12 +2266,10 @@ function convertChemicalFormulas(text) {
 
             }
 
-            /*
-                Kiểm tra từng nguyên tố.
 
-                Mục đích tránh biến những
-                chuỗi chữ + số bình thường
-                thành công thức.
+            /*
+                Tách các nguyên tố để kiểm tra
+                công thức có hợp lệ hay không.
             */
 
             const elementMatches =
@@ -2284,11 +2277,13 @@ function convertChemicalFormulas(text) {
                     /[A-Z][a-z]?/g
                 );
 
+
             if (!elementMatches) {
 
                 return match;
 
             }
+
 
             const allValid =
                 elementMatches.every(
@@ -2298,21 +2293,52 @@ function convertChemicalFormulas(text) {
                         )
                 );
 
+
             if (!allValid) {
 
                 return match;
 
             }
 
-            /*
-                MathJax mhchem
 
-                H2SO4
+            /*
+                Chuyển số thường thành
+                chỉ số dưới Unicode.
+
+                0 → ₀
+                1 → ₁
+                2 → ₂
+                3 → ₃
+                ...
+
+                Ví dụ:
+
+                CH3COOH
                 ↓
-                \ce{H2SO4}
+                CH₃COOH
             */
 
-            return `\\(\\ce{${match}}\\)`;
+            const subscriptMap = {
+
+                "0": "₀",
+                "1": "₁",
+                "2": "₂",
+                "3": "₃",
+                "4": "₄",
+                "5": "₅",
+                "6": "₆",
+                "7": "₇",
+                "8": "₈",
+                "9": "₉"
+
+            };
+
+
+            return match.replace(
+                /\d/g,
+                digit =>
+                    subscriptMap[digit]
+            );
 
         }
     );
