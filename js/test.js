@@ -2185,11 +2185,12 @@ function formatQuestionText(value) {
 /*==================================================
         NHẬN DIỆN CÔNG THỨC HÓA HỌC
 ==================================================*/
-
 function convertChemicalFormulas(text) {
 
     /*
-        Các nguyên tố hóa học hợp lệ
+        ==========================================
+        CÁC NGUYÊN TỐ HÓA HỌC HỢP LỆ
+        ==========================================
     */
 
     const elements = [
@@ -2220,9 +2221,31 @@ function convertChemicalFormulas(text) {
 
 
     /*
-        Regex nhận diện công thức Hóa học.
+        ==========================================
+        BẢNG CHUYỂN SỐ → CHỈ SỐ DƯỚI
+        ==========================================
+    */
 
-        Ví dụ:
+    const subscriptMap = {
+        "0": "₀",
+        "1": "₁",
+        "2": "₂",
+        "3": "₃",
+        "4": "₄",
+        "5": "₅",
+        "6": "₆",
+        "7": "₇",
+        "8": "₈",
+        "9": "₉"
+    };
+
+
+    /*
+        ==========================================
+        REGEX NHẬN DIỆN CÔNG THỨC HÓA HỌC
+        ==========================================
+
+        Hỗ trợ:
 
         H2O
         CO2
@@ -2230,13 +2253,14 @@ function convertChemicalFormulas(text) {
         CH3COOH
         CH3COCH3
         CH3COOCH3
-        HCOOH
         Ca(OH)2
         Al2(SO4)3
+        C6H12O6
+        Fe2O3
     */
 
     const chemicalRegex =
-        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*|\((?:[A-Z][a-z]?\d*)+\)\d*)+(?![A-Za-z])/g;
+        /(?<![A-Za-z])(?:[A-Z][a-z]?(?:\d+)?|\((?:[A-Z][a-z]?(?:\d+)?)+\)(?:\d+)?)+(?![A-Za-z])/g;
 
 
     return text.replace(
@@ -2244,17 +2268,9 @@ function convertChemicalFormulas(text) {
         (match) => {
 
             /*
-                Phải có ít nhất một chữ số
-                hoặc ngoặc nhóm.
-
-                Ví dụ:
-
-                H2O       → xử lý
-                CH3COOH   → xử lý
-                Ca(OH)2   → xử lý
-
-                HCOOH     → giữ nguyên
-                H2        → xử lý
+                ==================================
+                KIỂM TRA CÓ PHẢI CÔNG THỨC HÓA
+                ==================================
             */
 
             if (
@@ -2268,8 +2284,9 @@ function convertChemicalFormulas(text) {
 
 
             /*
-                Tách các nguyên tố để kiểm tra
-                công thức có hợp lệ hay không.
+                ==================================
+                LẤY TÊN NGUYÊN TỐ
+                ==================================
             */
 
             const elementMatches =
@@ -2285,12 +2302,16 @@ function convertChemicalFormulas(text) {
             }
 
 
+            /*
+                ==================================
+                KIỂM TRA NGUYÊN TỐ HỢP LỆ
+                ==================================
+            */
+
             const allValid =
                 elementMatches.every(
                     element =>
-                        elements.includes(
-                            element
-                        )
+                        elements.includes(element)
                 );
 
 
@@ -2302,37 +2323,10 @@ function convertChemicalFormulas(text) {
 
 
             /*
-                Chuyển số thường thành
-                chỉ số dưới Unicode.
-
-                0 → ₀
-                1 → ₁
-                2 → ₂
-                3 → ₃
-                ...
-
-                Ví dụ:
-
-                CH3COOH
-                ↓
-                CH₃COOH
+                ==================================
+                CHUYỂN SỐ THÀNH CHỈ SỐ DƯỚI
+                ==================================
             */
-
-            const subscriptMap = {
-
-                "0": "₀",
-                "1": "₁",
-                "2": "₂",
-                "3": "₃",
-                "4": "₄",
-                "5": "₅",
-                "6": "₆",
-                "7": "₇",
-                "8": "₈",
-                "9": "₉"
-
-            };
-
 
             return match.replace(
                 /\d/g,
