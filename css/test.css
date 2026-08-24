@@ -1756,3 +1756,9 @@ body {
     color: #ffffff;
     border-color: #22c55e;
 }
+.chemical-subscript{
+    font-size:0.85em;
+    line-height:0;
+    vertical-align:-0.25em;
+    font-weight:500;
+}
