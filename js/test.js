@@ -1851,35 +1851,33 @@ function clearTestStorage() {
 /*==================================================
                 FINISH TEST
 ==================================================*/
+/*==================================================
+                FINISH TEST
+==================================================*/
 
 async function finishTest() {
 
     if (submitted) {
+        return;
+    }
+
+    if (!currentUser) {
+
+        alert(
+            "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại."
+        );
+
+        window.location.href =
+            "index.html";
 
         return;
-
     }
-if (!currentUser) {
-
-    alert(
-        "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại."
-    );
-
-    window.location.href =
-        "index.html";
-
-    return;
-
-}
-
 
     submitted = true;
-
 
     clearInterval(
         timerInterval
     );
-
 
     if (submitTestBtn) {
 
@@ -1894,12 +1892,147 @@ if (!currentUser) {
 
     }
 
+    if (headerSubmitTestBtn) {
+
+        headerSubmitTestBtn.disabled =
+            true;
+
+    }
 
     try {
+
+        /*==========================================
+                TÍNH ĐIỂM
+        ==========================================*/
 
         const scoreData =
             calculateScore();
 
+
+        /*==========================================
+                PHÂN TÍCH CÂU ĐÚNG / SAI / BỎ TRỐNG
+        ==========================================*/
+
+        let wrong = 0;
+
+        let unanswered = 0;
+
+
+        questions.forEach(
+            (question, index) => {
+
+                const userAnswer =
+                    answers[index];
+
+
+                /*------------------------------
+                    CHƯA TRẢ LỜI
+                ------------------------------*/
+
+                if (
+                    userAnswer === undefined ||
+                    userAnswer === null ||
+                    String(userAnswer).trim() === ""
+                ) {
+
+                    unanswered++;
+
+                    return;
+
+                }
+
+
+                /*------------------------------
+                    ĐÁP ÁN ĐÚNG
+                ------------------------------*/
+
+                const correctAnswer =
+                    normalizeAnswer(
+                        question.correctAnswer ||
+                        question.answer ||
+                        question.correct ||
+                        ""
+                    );
+
+
+                /*------------------------------
+                    ĐÁP ÁN SAI
+                ------------------------------*/
+
+                if (
+                    normalizeAnswer(
+                        userAnswer
+                    ) !== correctAnswer
+                ) {
+
+                    wrong++;
+
+                }
+
+            }
+        );
+
+
+        /*==========================================
+                LƯU THÔNG TIN CÂU HỎI
+        ==========================================*/
+
+        const resultQuestions =
+            questions.map(
+                (question, index) => {
+
+                    const correctAnswer =
+                        normalizeAnswer(
+                            question.correctAnswer ||
+                            question.answer ||
+                            question.correct ||
+                            ""
+                        );
+
+                    const userAnswer =
+                        answers[index] || "";
+
+
+                    return {
+
+                        question:
+                            question.question ||
+                            question.content ||
+                            question.text ||
+                            "",
+
+                        options:
+                            getQuestionOptions(
+                                question
+                            ),
+
+                        correctAnswer:
+                            correctAnswer,
+
+                        userAnswer:
+                            userAnswer,
+
+                        isCorrect:
+                            userAnswer !== "" &&
+                            normalizeAnswer(
+                                userAnswer
+                            ) === correctAnswer,
+
+                        part:
+                            question.part || 1,
+
+                        partQuestionIndex:
+                            question.partQuestionIndex || 1
+
+                    };
+
+                }
+            );
+
+
+        /*==========================================
+                DỮ LIỆU KẾT QUẢ
+        ==========================================*/
 
         const resultData = {
 
@@ -1912,14 +2045,27 @@ if (!currentUser) {
             testId:
                 currentTestId,
 
+            testTitle:
+                currentTest.title ||
+                "Bài kiểm tra",
+
             answers:
                 answers,
+
+            questions:
+                resultQuestions,
 
             score:
                 scoreData.score,
 
             correct:
                 scoreData.correct,
+
+            wrong:
+                wrong,
+
+            unanswered:
+                unanswered,
 
             total:
                 questions.length,
@@ -1930,11 +2076,15 @@ if (!currentUser) {
         };
 
 
-        /*
-            Lưu kết quả:
+        console.log(
+            "RESULT DATA:",
+            resultData
+        );
 
-            results
-        */
+
+        /*==========================================
+                LƯU FIRESTORE
+        ==========================================*/
 
         await addDoc(
             collection(
@@ -1943,30 +2093,21 @@ if (!currentUser) {
             ),
             resultData
         );
-/*------------------------------------------
-        XÓA TRẠNG THÁI BÀI ĐANG LÀM
-------------------------------------------*/
 
-clearTestStorage();
 
-        /*
-            Chuyển sang trang kết quả
-        */
+        /*==========================================
+                XÓA TRẠNG THÁI BÀI ĐANG LÀM
+        ==========================================*/
 
-        const params =
-            new URLSearchParams({
+        clearTestStorage();
 
-                courseId:
-                    currentCourseId,
 
-                testId:
-                    currentTestId
-
-            });
-
+        /*==========================================
+                QUAY VỀ TRANG CHỦ
+        ==========================================*/
 
         window.location.href =
-            `test-result.html?${params.toString()}`;
+            "index.html";
 
     }
 
@@ -1995,6 +2136,14 @@ clearTestStorage();
         }
 
 
+        if (headerSubmitTestBtn) {
+
+            headerSubmitTestBtn.disabled =
+                false;
+
+        }
+
+
         alert(
             "Không thể nộp bài. Vui lòng thử lại."
         );
@@ -2002,8 +2151,6 @@ clearTestStorage();
     }
 
 }
-
-
 /*==================================================
                 TÍNH ĐIỂM
 ==================================================*/
