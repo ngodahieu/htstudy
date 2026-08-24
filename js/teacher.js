@@ -1,5 +1,9 @@
 import { auth, db } from "./firebase.js";
 import {
+    formatChemicalFormula,
+    formatChemistryText
+} from "./chemistry.js";
+import {
     onAuthStateChanged,
     signOut
 }
@@ -21,6 +25,15 @@ import {
     setDoc
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+function updateChemistryPreview(input, preview) {
+
+    if (!input || !preview) return;
+
+    preview.innerHTML =
+        formatChemistryText(input.value);
+
+}
 /*====================================
         LẤY CÁC THÀNH PHẦN HTML
 ====================================*/
