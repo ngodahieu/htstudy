@@ -2185,13 +2185,8 @@ function formatQuestionText(value) {
 /*==================================================
         NHẬN DIỆN CÔNG THỨC HÓA HỌC
 ==================================================*/
-function convertChemicalFormulas(text) {
 
-    /*
-        ==========================================
-        CÁC NGUYÊN TỐ HÓA HỌC HỢP LỆ
-        ==========================================
-    */
+function convertChemicalFormulas(text) {
 
     const elements = [
         "Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au",
@@ -2219,13 +2214,6 @@ function convertChemicalFormulas(text) {
         "Zn", "Zr"
     ];
 
-
-    /*
-        ==========================================
-        BẢNG CHUYỂN SỐ → CHỈ SỐ DƯỚI
-        ==========================================
-    */
-
     const subscriptMap = {
         "0": "₀",
         "1": "₁",
@@ -2241,26 +2229,22 @@ function convertChemicalFormulas(text) {
 
 
     /*
-        ==========================================
-        REGEX NHẬN DIỆN CÔNG THỨC HÓA HỌC
-        ==========================================
-
-        Hỗ trợ:
+        Nhận diện các dạng:
 
         H2O
         CO2
-        H2SO4
         CH3COOH
         CH3COCH3
         CH3COOCH3
+        H2SO4
         Ca(OH)2
         Al2(SO4)3
-        C6H12O6
         Fe2O3
+        C6H12O6
     */
 
     const chemicalRegex =
-        /(?<![A-Za-z])(?:[A-Z][a-z]?(?:\d+)?|\((?:[A-Z][a-z]?(?:\d+)?)+\)(?:\d+)?)+(?![A-Za-z])/g;
+        /(?<![A-Za-z])(?:[A-Z][a-z]?\d*|\([A-Z][a-z]?\d*\)+\d*)+(?![A-Za-z])/g;
 
 
     return text.replace(
@@ -2268,9 +2252,8 @@ function convertChemicalFormulas(text) {
         (match) => {
 
             /*
-                ==================================
-                KIỂM TRA CÓ PHẢI CÔNG THỨC HÓA
-                ==================================
+                Phải có số hoặc ngoặc
+                mới coi là công thức Hóa.
             */
 
             if (
@@ -2284,9 +2267,7 @@ function convertChemicalFormulas(text) {
 
 
             /*
-                ==================================
-                LẤY TÊN NGUYÊN TỐ
-                ==================================
+                Lấy toàn bộ nguyên tố
             */
 
             const elementMatches =
@@ -2303,9 +2284,8 @@ function convertChemicalFormulas(text) {
 
 
             /*
-                ==================================
-                KIỂM TRA NGUYÊN TỐ HỢP LỆ
-                ==================================
+                Kiểm tra toàn bộ nguyên tố
+                có hợp lệ không
             */
 
             const allValid =
@@ -2323,9 +2303,7 @@ function convertChemicalFormulas(text) {
 
 
             /*
-                ==================================
-                CHUYỂN SỐ THÀNH CHỈ SỐ DƯỚI
-                ==================================
+                Chuyển số thành chỉ số dưới
             */
 
             return match.replace(
