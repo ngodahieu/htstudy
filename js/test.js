@@ -2090,7 +2090,7 @@ function normalizeAnswer(value) {
 ==================================================*/
 
 function formatQuestionText(value) {
-
+console.log("FORMAT INPUT:", value);
     if (
         value === null ||
         value === undefined
