@@ -2085,8 +2085,10 @@ function normalizeAnswer(value) {
 
 
 /*==================================================
-                FORMAT QUESTION
+        FORMAT QUESTION / ANSWER
+        TỰ ĐỘNG NHẬN DIỆN CÔNG THỨC
 ==================================================*/
+
 function formatQuestionText(value) {
 
     if (
@@ -2098,7 +2100,374 @@ function formatQuestionText(value) {
 
     }
 
-    return String(value);
+    let text =
+        String(value);
+
+    /*
+        Nếu nội dung đã có MathJax / LaTeX
+        thì giữ nguyên.
+    */
+
+    if (
+        text.includes("\\(") ||
+        text.includes("\\[") ||
+        text.includes("$$")
+    ) {
+
+        return text;
+
+    }
+
+    /*
+        Escape HTML trước
+        để nội dung câu hỏi an toàn.
+    */
+
+    text =
+        escapeHTML(text);
+
+    /*
+        ==============================
+        1. CÔNG THỨC HÓA HỌC
+        ==============================
+
+        Ví dụ:
+
+        H2O
+        CO2
+        H2SO4
+        Ca(OH)2
+        Al2(SO4)3
+        Fe2O3
+        C6H12O6
+        CH3COOH
+    */
+
+    text =
+        convertChemicalFormulas(
+            text
+        );
+
+    /*
+        ==============================
+        2. CÔNG THỨC TOÁN / LÝ
+        ==============================
+
+        Ví dụ:
+
+        x2
+        x^2
+        x3
+        a2 + b2
+        v = s/t
+        F = m.a
+        E = mc2
+    */
+
+    text =
+        convertMathFormulas(
+            text
+        );
+
+    /*
+        Xuống dòng
+    */
+
+    text =
+        text.replace(
+            /\n/g,
+            "<br>"
+        );
+
+    return text;
+
+}
+/*==================================================
+        NHẬN DIỆN CÔNG THỨC HÓA HỌC
+==================================================*/
+
+function convertChemicalFormulas(text) {
+
+    /*
+        Danh sách nguyên tố hóa học.
+
+        Dùng để phân biệt:
+
+        H2SO4   → công thức hóa học
+
+        Câu 2   → không phải công thức
+
+        CO2     → công thức
+
+        2026    → không phải công thức
+    */
+
+    const elements = [
+        "Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au",
+        "Ba", "Be", "Bh", "Bi", "Bk", "Br",
+        "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu",
+        "Db", "Ds", "Dy",
+        "Er", "Es", "Eu",
+        "Fe", "Fl", "Fm", "Fr",
+        "Ga", "Gd", "Ge",
+        "H", "He", "Hf", "Hg", "Ho", "Hs",
+        "In", "Ir",
+        "K", "Kr",
+        "La", "Li", "Lr", "Lu",
+        "Lv",
+        "Mc", "Md", "Mg", "Mn", "Mo", "Mt",
+        "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np",
+        "Os",
+        "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
+        "Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru",
+        "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
+        "Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm",
+        "Ts",
+        "Xe",
+        "Y", "Yb",
+        "Zn", "Zr"
+    ];
+
+    /*
+        Regex tìm các chuỗi có dạng:
+
+        H2O
+        CO2
+        H2SO4
+        Ca(OH)2
+        Al2(SO4)3
+        Fe2O3
+
+        Không đụng vào số thông thường.
+    */
+
+    const chemicalRegex =
+        /(?<![A-Za-z])(?:[A-Z][a-z]?(?:\d+)?|\([A-Z][a-z]?(?:\d+)?(?:[A-Z][a-z]?(?:\d+)?)*\)\d+)+(?![A-Za-z])/g;
+
+
+    return text.replace(
+        chemicalRegex,
+        (match) => {
+
+            /*
+                Kiểm tra có ít nhất một
+                chữ số hoặc nhóm ngoặc.
+
+                Như vậy:
+
+                H2SO4  → xử lý
+
+                H2     → xử lý
+
+                Câu    → không xử lý
+            */
+
+            if (
+                !/\d/.test(match) &&
+                !/[()]/.test(match)
+            ) {
+
+                return match;
+
+            }
+
+            /*
+                Kiểm tra từng nguyên tố.
+
+                Mục đích tránh biến những
+                chuỗi chữ + số bình thường
+                thành công thức.
+            */
+
+            const elementMatches =
+                match.match(
+                    /[A-Z][a-z]?/g
+                );
+
+            if (!elementMatches) {
+
+                return match;
+
+            }
+
+            const allValid =
+                elementMatches.every(
+                    element =>
+                        elements.includes(
+                            element
+                        )
+                );
+
+            if (!allValid) {
+
+                return match;
+
+            }
+
+            /*
+                MathJax mhchem
+
+                H2SO4
+                ↓
+                \ce{H2SO4}
+            */
+
+            return `\\(\\ce{${match}}\\)`;
+
+        }
+    );
+
+}
+/*==================================================
+        NHẬN DIỆN CÔNG THỨC TOÁN / VẬT LÝ
+==================================================*/
+
+function convertMathFormulas(text) {
+
+    /*
+        ==============================
+        LŨY THỪA DẠNG x^2
+        ==============================
+
+        x^2
+        x^3
+        a^2
+        m^2
+    */
+
+    text =
+        text.replace(
+            /(?<![A-Za-z0-9\\])([A-Za-z])\^(\d+)(?![A-Za-z0-9])/g,
+            "\\($1^{$2}\\)"
+        );
+
+
+    /*
+        ==============================
+        LŨY THỪA DẠNG x2
+        ==============================
+
+        x2
+        x3
+        a2
+        m2
+
+        Không áp dụng nếu phía trước
+        là chữ cái viết hoa kiểu H2SO4
+        vì công thức Hóa đã được xử lý trước.
+    */
+
+    text =
+        text.replace(
+            /(?<![A-Za-z])([a-z])(\d+)(?![A-Za-z])/g,
+            "\\($1^{$2}\\)"
+        );
+
+
+    /*
+        ==============================
+        PHÂN SỐ ĐƠN GIẢN
+        ==============================
+
+        a/b
+        x/y
+        m/t
+
+        Chỉ xử lý dạng rất đơn giản
+        để tránh ảnh hưởng text bình thường.
+    */
+
+    text =
+        text.replace(
+            /(?<![A-Za-z0-9\\])([a-zA-Z])\/([a-zA-Z])(?![A-Za-z0-9])/g,
+            "\\(\\frac{$1}{$2}\\)"
+        );
+
+
+    /*
+        ==============================
+        CÔNG THỨC VẬT LÝ / TOÁN
+        ==============================
+
+        Ví dụ:
+
+        F = ma
+        F=ma
+
+        v = s/t
+        E = mc2
+        P = Fv
+    */
+
+    text =
+        text.replace(
+            /(?<![A-Za-z0-9\\])([A-Za-z])\s*=\s*([A-Za-z0-9]+(?:[*/.][A-Za-z0-9]+)*)(?![A-Za-z0-9])/g,
+            (match, left, right) => {
+
+                /*
+                    Nếu đã nằm trong MathJax
+                    thì không xử lý lại.
+                */
+
+                if (
+                    match.includes("\\(")
+                ) {
+
+                    return match;
+
+                }
+
+                let formula =
+                    right;
+
+                /*
+                    Chuyển dấu . thành
+                    phép nhân.
+                */
+
+                formula =
+                    formula.replace(
+                        /\./g,
+                        "\\cdot "
+                    );
+
+                /*
+                    Chuyển dạng a/b
+                    thành phân số.
+                */
+
+                const fractionMatch =
+                    formula.match(
+                        /^([A-Za-z0-9]+)\/([A-Za-z0-9]+)$/
+                    );
+
+                if (fractionMatch) {
+
+                    formula =
+                        `\\frac{${fractionMatch[1]}}{${fractionMatch[2]}}`;
+
+                }
+
+                /*
+                    Xử lý số mũ ở dạng:
+
+                    mc2
+                    x2
+                */
+
+                formula =
+                    formula.replace(
+                        /([A-Za-z])(\d+)/g,
+                        "$1^{$2}"
+                    );
+
+                return `\\(${left} = ${formula}\\)`;
+
+            }
+        );
+
+
+    return text;
 
 }
 /*==================================================
