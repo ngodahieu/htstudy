@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả học tập | H&T STUDY</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/exam.css">
+    <link rel="stylesheet" href="css/result.css">
+</head>
+
+<body>
+
+<div class="space-bg"></div>
+<div class="overlay"></div>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="container">
+        <a class="logo" href="index.html">
+            <img src="assets/images/logo.png" alt="H&T STUDY">
+            <div class="logo-text">
+                <h2>H&T STUDY</h2>
+                <span>Chinh phục tri thức</span>
+            </div>
+        </a>
+
+        <div class="header-actions">
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Trang chủ</a></li>
+                    <li><a href="courses.html">Khóa học</a></li>
+                    <li><a href="exam.html">Thi thử</a></li>
+                    <li><a class="active" href="result.html">Kết quả</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-right">
+                <button class="notification-btn" id="notificationBtn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge" id="notificationBadge" style="display:none;">0</span>
+                </button>
+
+                <div class="avatar">
+                    <img src="assets/avatars/default.jpg" alt="Avatar">
+                </div>
+
+                <div class="user-menu" id="userMenu">
+                    <div class="user-box" id="userBox" style="display:none;">
+                        <div class="user-profile">
+                            <img id="userAvatar" src="assets/avatars/default.jpg" alt="Avatar">
+                            <div class="user-info">
+                                <h3 id="userName"></h3>
+                                <p>Mã học sinh: <span id="userStudentId"></span></p>
+                                <p>Vai trò: <span id="userRole"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-menu-list" id="userMenuList" style="display:none;">
+                        <button id="myCoursesBtn"><i class="fa-solid fa-book-open"></i> Khóa học của tôi</button>
+                        <button id="manageBtn" style="display:none;"><i class="fa-solid fa-screwdriver-wrench"></i> Quản lí</button>
+                        <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- MAIN RESULT CONTENT -->
+<main class="exam-page">
+    <div class="exam-container">
+        <!-- HEADING -->
+        <div class="exam-heading">
+            <div>
+                <span class="exam-label">
+                    <i class="fa-solid fa-square-poll-vertical"></i> KẾT QUẢ HỌC TẬP
+                </span>
+                <h1 id="pageTitle">Lịch sử làm bài</h1>
+                <p id="pageDescription">Xem lại điểm số, thống kê câu đúng/sai và chi tiết lời giải các bài kiểm tra đã hoàn thành.</p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div id="resultLoading" class="exam-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <p>Đang tải dữ liệu kết quả...</p>
+        </div>
+
+        <!-- EMPTY -->
+        <div id="resultEmpty" class="exam-empty" style="display:none;">
+            <i class="fa-regular fa-folder-open"></i>
+            <h3>Chưa có dữ liệu kết quả</h3>
+            <p>Bạn chưa thực hiện bài kiểm tra nào hoặc chưa có lịch sử làm bài.</p>
+        </div>
+
+        <!-- DANH SÁCH KHÓA HỌC -->
+        <section id="courseList" class="exam-section">
+            <div class="section-title">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <h2>Khóa học đã tham gia</h2>
+            </div>
+            <div id="courseResultList" class="exam-list"></div>
+        </section>
+
+        <!-- CHI TIẾT KHÓA HỌC (CHƯƠNG & BÀI HỌC) -->
+        <section id="courseDetail" class="exam-section" style="display:none;">
+            <button class="exam-back-btn" id="backToCourses">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách khóa học
+            </button>
+            <div id="courseDetailContent" class="course-detail-content"></div>
+        </section>
+
+        <!-- XEM BÁO CÁO & BÀI LÀM CHI TIẾT -->
+        <section id="testResultDetail" class="exam-section" style="display:none;">
+            <button class="exam-back-btn" id="backToLessons">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại bài học
+            </button>
+            
+            <div id="resultDetailContent">
+                <!-- Nội dung thống kê và câu hỏi sẽ được render bằng JS -->
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="copyright">© 2026 H&T STUDY</div>
+</footer>
+
+<script type="module" src="js/result.js"></script>
+</body>
+</html>
