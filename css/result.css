@@ -1,0 +1,203 @@
+/*==================================================
+        H&T STUDY - RESULT PAGE STYLES
+==================================================*/
+
+/* DASHBOARD THỐNG KÊ */
+.result-stats-card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.result-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    border-radius: 14px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-box.score { border-color: rgba(59, 130, 246, 0.4); }
+.stat-box.correct { border-color: rgba(34, 197, 94, 0.4); }
+.stat-box.wrong { border-color: rgba(239, 68, 68, 0.4); }
+.stat-box.unanswered { border-color: rgba(234, 179, 8, 0.4); }
+
+.stat-box i {
+    font-size: 26px;
+}
+
+.stat-box.score i { color: #60a5fa; }
+.stat-box.correct i { color: #4ade80; }
+.stat-box.wrong i { color: #f87171; }
+.stat-box.unanswered i { color: #facc15; }
+
+.stat-info span {
+    display: block;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 2px;
+}
+
+.stat-info strong {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* DANH SÁCH CÂU HỎI & ĐÁP ÁN */
+.review-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.review-item {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 16px;
+    padding: 22px;
+    transition: 0.3s;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.review-question-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.review-status-badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.review-status-badge.correct {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.review-status-badge.wrong {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.review-status-badge.skipped {
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.review-question-body {
+    font-size: 15px;
+    color: #e2e8f0;
+    margin-bottom: 18px;
+    line-height: 1.6;
+}
+
+/* TÔ MÀU ĐÁP ÁN */
+.review-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.review-option .opt-letter {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* ĐÁP ÁN ĐÚNG THÍ SÍNH CHỌN (TÔ XANH) */
+.review-option.is-correct-selected {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border-color: #22c55e !important;
+    color: #f0fdf4 !important;
+}
+
+.review-option.is-correct-selected .opt-letter {
+    background: #22c55e !important;
+    color: #ffffff !important;
+}
+
+/* ĐÁP ÁN SAI THÍ SINH CHỌN (TÔ ĐỎ) */
+.review-option.is-wrong-selected {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: #ef4444 !important;
+    color: #fef2f2 !important;
+}
+
+.review-option.is-wrong-selected .opt-letter {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+/* ĐÁP ÁN CHUẨN CỦA ĐỀ (VIỀN XANH NHẮC NHỞ KHI CHỌN SAI) */
+.review-option.is-target-correct {
+    border: 2px dashed #22c55e !important;
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.review-option.is-target-correct::after {
+    content: "(Đáp án đúng)";
+    margin-left: auto;
+    font-size: 12px;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+@media (max-width: 850px) {
+    .result-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .result-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
