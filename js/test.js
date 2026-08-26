@@ -2229,462 +2229,108 @@ function normalizeAnswer(value) {
         .toUpperCase();
 
 }
-
-
 /*==================================================
         FORMAT QUESTION / ANSWER
-        TỰ ĐỘNG NHẬN DIỆN CÔNG THỨC
+        TỰ ĐỘNG NHẬN DIỆN CÔNG THỨC HÓA / TOÁN
 ==================================================*/
 
 function formatQuestionText(value) {
-
-    console.log("FORMAT INPUT:", value);
-
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
+    if (value === null || value === undefined) {
         return "";
-
     }
 
+    let text = String(value);
 
-    let text =
-        String(value);
-
-
-    /*
-        Nếu nội dung đã là MathJax / LaTeX
-        thì giữ nguyên.
-    */
-
+    /* Nếu chuỗi đã chứa mã LaTeX/MathJax chuẩn thì giữ nguyên */
     if (
         text.includes("\\(") ||
         text.includes("\\[") ||
         text.includes("$$")
     ) {
-
         return text;
-
     }
 
+    /* Escape HTML bảo mật */
+    text = escapeHTML(text);
 
-    /*
-        Escape HTML
-    */
+    /* Chuyển đổi công thức hóa học (CnH2nO2, Ca(OH)2,...) */
+    text = convertChemicalFormulas(text);
 
-    text =
-        escapeHTML(text);
+    /* Chuyển đổi công thức toán học/vật lý (lũy thừa, dấu so sánh,...) */
+    text = convertMathFormulas(text);
 
-
-    /*
-        ==============================
-        CÔNG THỨC HÓA HỌC
-        ==============================
-
-        CH3COOH
-        →
-        CH₃COOH
-
-        H2SO4
-        →
-        H₂SO₄
-
-        C6H12O6
-        →
-        C₆H₁₂O₆
-    */
-
-    text =
-        convertChemicalFormulas(text);
-
-
-    /*
-        ==============================
-        CÔNG THỨC TOÁN / VẬT LÝ
-        ==============================
-    */
-
-    text =
-        convertMathFormulas(text);
-
-
-    /*
-        Xuống dòng
-    */
-
-    text =
-        text.replace(
-            /\n/g,
-            "<br>"
-        );
-
+    /* Xử lý xuống dòng */
+    text = text.replace(/\n/g, "<br>");
 
     return text;
-
 }
+
+
 /*==================================================
         CHUYỂN CÔNG THỨC HÓA HỌC
 ==================================================*/
 
 function convertChemicalFormulas(text) {
-
-function makeChemicalSubscript(digit) {
-
-    return `<sub class="chemical-subscript">${digit}</sub>`;
-
-}
-
-    /*
-        Danh sách ký hiệu nguyên tố
-    */
-
-    const elements = new Set([
-
-        "H", "He",
-        "Li", "Be", "B", "C", "N", "O", "F", "Ne",
-
-        "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
-
-        "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe",
-        "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se",
-        "Br", "Kr",
-
-        "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru",
-        "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te",
-        "I", "Xe",
-
-        "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm",
-        "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb",
-        "Lu",
-
-        "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au",
-        "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
-
-        "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu",
-        "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No",
-        "Lr",
-
-        "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg",
-        "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"
-
-    ]);
-
-
-    /*
-        Hàm chuyển số thành chỉ số dưới
-    */
-
-    /*
-        Nhận diện một công thức hóa học.
-
-        Ví dụ:
-
-        H2O
-        CO2
-        H2SO4
-        CH3COOH
-        CH3COCH3
-        CH3COOCH3
-        C6H12O6
-        Ca(OH)2
-        Al2(SO4)3
-        Fe(NO3)3
-    */
-
-    const formulaRegex =
-        /(?<![A-Za-z])(?:[A-Z][a-z]?(?:\d+)?|\((?:[A-Z][a-z]?(?:\d+)?)+\)(?:\d+)?)+(?![A-Za-z])/g;
-
-
-    return text.replace(
-        formulaRegex,
-        match => {
-
-            /*
-                Tách từng thành phần:
-
-                CH3COOH
-
-                C
-                H3
-                C
-                O
-                O
-                H
-            */
-
-            const tokens =
-                match.match(
-                    /[A-Z][a-z]?(?:\d+)?|\((?:[A-Z][a-z]?(?:\d+)?)+\)(?:\d+)?/g
-                );
-
-
-            if (!tokens) {
-                return match;
-            }
-
-
-            /*
-                Kiểm tra xem có thật sự là
-                công thức hóa học hay không.
-            */
-
-            for (const token of tokens) {
-
-                /*
-                    Trường hợp:
-
-                    Ca2
-                    Fe3
-                    H2
-                */
-
-                if (!token.startsWith("(")) {
-
-                    const elementMatch =
-                        token.match(
-                            /^([A-Z][a-z]?)(\d+)?$/
-                        );
-
-
-                    if (!elementMatch) {
-                        return match;
-                    }
-
-
-                    const element =
-                        elementMatch[1];
-
-
-                    if (!elements.has(element)) {
-                        return match;
-                    }
-
-                }
-
-                /*
-                    Trường hợp:
-
-                    (OH)2
-                    (SO4)3
-                    (NO3)2
-                */
-
-                else {
-
-                    const inside =
-                        token.match(
-                            /^\((.*)\)(\d+)?$/
-                        );
-
-
-                    if (!inside) {
-                        return match;
-                    }
-
-
-                    const content =
-                        inside[1];
-
-
-                    const innerElements =
-                        content.match(
-                            /[A-Z][a-z]?/g
-                        );
-
-
-                    if (!innerElements) {
-                        return match;
-                    }
-
-
-                    const valid =
-                        innerElements.every(
-                            element =>
-                                elements.has(element)
-                        );
-
-
-                    if (!valid) {
-                        return match;
-                    }
-
-                }
-
-            }
-
-
-            /*
-                Đã xác định chắc chắn đây là
-                công thức hóa học.
-
-                Chuyển toàn bộ số thành
-                chỉ số dưới.
-            */
-
-            return match.replace(
-    /\d+/g,
-    number =>
-        `<sub class="chemical-subscript">${number}</sub>`
-);
-
-        }
+    if (!text) return "";
+
+    /* 1. Chuẩn hóa ký hiệu so sánh & mũi tên (xử lý cả dạng đã bị escapeHTML) */
+    text = text
+        .replace(/&gt;=/g, "≥")
+        .replace(/&lt;=/g, "≤")
+        .replace(/&gt;/g, ">")
+        .replace(/&lt;/g, "<")
+        .replace(/&amp;/g, "&")
+        .replace(/>=/g, "≥")
+        .replace(/<=/g, "≤")
+        .replace(/!=|&ne;/g, "≠")
+        .replace(/-&gt;|->/g, "→")
+        .replace(/&lt;=&gt;|<=>/g, "⇄");
+
+    /* 2. Danh sách nguyên tố hóa học phổ biến trong THPT */
+    const chemElements = [
+        "He","Li","Be","Ne","Na","Mg","Al","Si","Ar","Ca","Sc","Ti","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Zr","Nb","Mo","Ag","Cd","In","Sn","Sb","Te","Xe","Ba","La","Ce","Pt","Au","Hg","Pb","Bi","Rn","Ra","U","Cl",
+        "C","H","O","N","S","P","F","I","K","B","V"
+    ];
+
+    const elementPattern = "(?:" + chemElements.join("|") + "|\\))";
+
+    /* Pattern nhận diện chỉ số dưới: 2n+2, 2n-2, 2n+1, 2n-6, 2n, n, m, x, y, các số thuần túy... */
+    const subscriptPattern = "(?:2n[+-]\\d+|n[+-]\\d+|\\d+n|2n|[nmxykab]|[0-9]+)";
+
+    /* Regex khớp: Nguyên tố/Ngoặc đóng + chỉ số (không theo sau bởi chữ cái viết thường) */
+    const chemRegex = new RegExp(
+        `(${elementPattern})(${subscriptPattern})(?![a-z])`,
+        "g"
     );
 
+    /* Lặp thay thế để bọc <sub> cho các công thức liên tiếp như CnH2nO2 */
+    let previous;
+    do {
+        previous = text;
+        text = text.replace(chemRegex, (match, elem, sub) => {
+            if (sub.includes("<sub") || elem.includes("sub>")) return match;
+            return `${elem}<sub class="chemical-subscript">${sub}</sub>`;
+        });
+    } while (text !== previous);
+
+    return text;
 }
+
+
 /*==================================================
-        NHẬN DIỆN CÔNG THỨC TOÁN / VẬT LÝ
+        CHUYỂN CÔNG THỨC TOÁN / VẬT LÝ
 ==================================================*/
 
 function convertMathFormulas(text) {
+    if (!text) return "";
 
-    /*
-        ==============================
-        LŨY THỪA DẠNG x^2
-        ==============================
+    /* Xử lý số mũ / lũy thừa x^2, x^(2n), 10^-3, a^n */
+    text = text.replace(/(?<![A-Za-z0-9\\])([A-Za-z0-9]+)\^([A-Za-z0-9+\-]+)/g, "$1<sup>$2</sup>");
 
-        x^2
-        x^3
-        a^2
-        m^2
-    */
-
-    text =
-        text.replace(
-            /(?<![A-Za-z0-9\\])([A-Za-z])\^(\d+)(?![A-Za-z0-9])/g,
-            "\\($1^{$2}\\)"
-        );
-
-
-    /*
-        ==============================
-        LŨY THỪA DẠNG x2
-        ==============================
-
-        x2
-        x3
-        a2
-        m2
-
-        Không áp dụng nếu phía trước
-        là chữ cái viết hoa kiểu H2SO4
-        vì công thức Hóa đã được xử lý trước.
-    */
-
-    text =
-        text.replace(
-            /(?<![A-Za-z])([a-z])(\d+)(?![A-Za-z])/g,
-            "\\($1^{$2}\\)"
-        );
-
-
-    /*
-        ==============================
-        PHÂN SỐ ĐƠN GIẢN
-        ==============================
-
-        a/b
-        x/y
-        m/t
-
-        Chỉ xử lý dạng rất đơn giản
-        để tránh ảnh hưởng text bình thường.
-    */
-
-    text =
-        text.replace(
-            /(?<![A-Za-z0-9\\])([a-zA-Z])\/([a-zA-Z])(?![A-Za-z0-9])/g,
-            "\\(\\frac{$1}{$2}\\)"
-        );
-
-
-    /*
-        ==============================
-        CÔNG THỨC VẬT LÝ / TOÁN
-        ==============================
-
-        Ví dụ:
-
-        F = ma
-        F=ma
-
-        v = s/t
-        E = mc2
-        P = Fv
-    */
-
-    text =
-        text.replace(
-            /(?<![A-Za-z0-9\\])([A-Za-z])\s*=\s*([A-Za-z0-9]+(?:[*/.][A-Za-z0-9]+)*)(?![A-Za-z0-9])/g,
-            (match, left, right) => {
-
-                /*
-                    Nếu đã nằm trong MathJax
-                    thì không xử lý lại.
-                */
-
-                if (
-                    match.includes("\\(")
-                ) {
-
-                    return match;
-
-                }
-
-                let formula =
-                    right;
-
-                /*
-                    Chuyển dấu . thành
-                    phép nhân.
-                */
-
-                formula =
-                    formula.replace(
-                        /\./g,
-                        "\\cdot "
-                    );
-
-                /*
-                    Chuyển dạng a/b
-                    thành phân số.
-                */
-
-                const fractionMatch =
-                    formula.match(
-                        /^([A-Za-z0-9]+)\/([A-Za-z0-9]+)$/
-                    );
-
-                if (fractionMatch) {
-
-                    formula =
-                        `\\frac{${fractionMatch[1]}}{${fractionMatch[2]}}`;
-
-                }
-
-                /*
-                    Xử lý số mũ ở dạng:
-
-                    mc2
-                    x2
-                */
-
-                formula =
-                    formula.replace(
-                        /([A-Za-z])(\d+)/g,
-                        "$1^{$2}"
-                    );
-
-                return `\\(${left} = ${formula}\\)`;
-
-            }
-        );
-
+    /* Ký hiệu cộng trừ ± */
+    text = text.replace(/\+-|\+\/-/g, "±");
 
     return text;
-
 }
 /*==================================================
             RENDER MATHJAX
