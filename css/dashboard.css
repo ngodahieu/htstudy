@@ -4148,3 +4148,63 @@ background:#cfcfcf;
     }
 
 }
+/*==============================
+    FORMULA LIVE PREVIEW
+==============================*/
+
+.formula-preview {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1e293b;
+    min-height: 38px;
+    word-break: break-word;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.formula-preview.opt-preview {
+    margin-top: 4px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-left-width: 3px;
+    border-left-color: #60a5fa;
+    background: #fafafa;
+}
+
+.preview-label {
+    font-weight: 700;
+    color: #2563eb;
+    white-space: nowrap;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preview-placeholder {
+    color: #94a3b8;
+}
+
+.preview-content {
+    color: #0f172a;
+}
+
+.option-row-wrapper,
+.tf-row-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+/* Định dạng chỉ số dưới/chỉ số trên trong xem trước */
+.formula-preview sub,
+.formula-preview sup {
+    font-size: 0.8em;
+    line-height: 0;
+}
