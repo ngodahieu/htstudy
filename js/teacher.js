@@ -1671,9 +1671,13 @@ async function saveNewTest() {
             teacherId: currentTeacherId,
             teacherName: currentTeacherName,
             part1: {
-                points: Number(part1Point.value || 0),
-                questions: part1QuestionData
-            },
+        points: Number(part1Point.value || 0),
+        questions: part1QuestionData.map(q => ({
+            ...q,
+            points: Number(part1Point.value || 0), // Lưu điểm trực tiếp vào từng câu
+            correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer)) // Chuyển 0,1,2,3 thành A,B,C,D
+        }))
+    },
             part2: {
                 scores: {
                     one: Number(part2Score1.value || 0),
