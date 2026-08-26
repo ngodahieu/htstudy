@@ -2214,20 +2214,20 @@ function calculateScore() {
     };
 
 }
-
-
 /*==================================================
             NORMALIZE ANSWER
 ==================================================*/
 
 function normalizeAnswer(value) {
-
-    return String(
-        value || ""
-    )
-        .trim()
-        .toUpperCase();
-
+    if (value === undefined || value === null) return "";
+    const str = String(value).trim();
+    
+    // Nếu đáp án dạng số chỉ số mảng ("0", "1", "2", "3") -> Đổi thành ('A', 'B', 'C', 'D')
+    if (!isNaN(str) && str !== "") {
+        return String.fromCharCode(65 + parseInt(str, 10));
+    }
+    
+    return str.toUpperCase();
 }
 /*==================================================
         FORMAT QUESTION / ANSWER
