@@ -653,99 +653,43 @@ submitted =
 ==================================================*/
 
 function extractQuestions(test) {
-
     const result = [];
+    
+    if (test.part1?.questions) {
+        test.part1.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 1,
+                points: q.points ?? test.part1.points ?? 0.5, // Lấy điểm chuẩn của Phần I
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
 
+    if (test.part2?.questions) {
+        test.part2.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 2,
+                scores: test.part2.scores,
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
 
-    /*
-        Hỗ trợ:
-
-        part1: [
-            {...},
-            {...}
-        ]
-
-        part2: [
-            {...}
-        ]
-
-        part3: [
-            {...}
-        ]
-
-        hoặc:
-
-        part1: {
-            questions: [...]
-        }
-    */
-
-
-    const parts = [
-        test.part1,
-        test.part2,
-        test.part3
-    ];
-
-
-    parts.forEach(
-        (part, partIndex) => {
-
-            if (!part) {
-
-                return;
-
-            }
-
-
-            let partQuestions = [];
-
-
-            if (Array.isArray(part)) {
-
-                partQuestions =
-                    part;
-
-            }
-
-            else if (
-                typeof part === "object" &&
-                Array.isArray(part.questions)
-            ) {
-
-                partQuestions =
-                    part.questions;
-
-            }
-
-
-            partQuestions.forEach(
-                (question, index) => {
-
-                    result.push({
-
-                        ...question,
-
-                        part:
-                            partIndex + 1,
-
-                        partQuestionIndex:
-                            index + 1
-
-                    });
-
-                }
-            );
-
-        }
-    );
-
+    if (test.part3?.questions) {
+        test.part3.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 3,
+                points: q.points ?? test.part3.points ?? 0.5,
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
 
     return result;
-
 }
-
-
 /*==================================================
                 RENDER TEST INFO
 ==================================================*/
@@ -973,247 +917,91 @@ renderMath();
 /*==================================================
                 RENDER ANSWERS
 ==================================================*/
-
 function renderAnswers(question) {
-
-    if (!answerContainer) {
-
-        return;
-
-    }
-
-
+    if (!answerContainer) return;
     answerContainer.innerHTML = "";
 
+    // PHẦN I: Trắc nghiệm A, B, C, D
+    if (question.part === 1) {
+        const options = getQuestionOptions(question);
+        options.forEach((option, index) => {
+            const letter = String.fromCharCode(65 + index);
+            const wrapper = document.createElement("label");
+            wrapper.className = "answer-option";
+            const checked = answers[currentQuestionIndex] === letter ? "checked" : "";
+            if (checked) wrapper.classList.add("selected");
 
-    const options =
-        getQuestionOptions(
-            question
-        );
+            wrapper.innerHTML = `
+                <input type="radio" name="part1-ans" value="${letter}" ${checked}>
+                <span class="answer-letter">${letter}</span>
+                <span class="answer-text">${formatQuestionText(option)}</span>
+            `;
 
-
-    if (!options.length) {
-
-        renderTextAnswer(
-            question
-        );
-
-        return;
-
-    }
-
-
-    options.forEach(
-        (option, index) => {
-
-            const wrapper =
-                document.createElement("label");
-
-
-            wrapper.className =
-                "answer-option";
-
-
-            const optionLetter =
-                String.fromCharCode(
-                    65 + index
-                );
-
-
-            const input =
-                document.createElement("input");
-
-
-            input.type =
-                "radio";
-
-
-            input.name =
-                "question-answer";
-
-
-            input.value =
-                optionLetter;
-
-
-            const savedAnswer =
-                answers[currentQuestionIndex];
-
-
-            if (
-    savedAnswer === optionLetter
-) {
-
-    input.checked = true;
-
-    wrapper.classList.add("selected");
-
-}
-
-
-            const letter =
-                document.createElement("span");
-
-
-            letter.className =
-                "answer-letter";
-
-
-            letter.textContent =
-                optionLetter;
-
-
-            const text =
-                document.createElement("span");
-
-
-            text.className =
-                "answer-text";
-
-
-            text.innerHTML =
-                formatQuestionText(
-                    option
-                );
-
-
-            wrapper.appendChild(
-                input
-            );
-
-
-            wrapper.appendChild(
-                letter
-            );
-
-
-            wrapper.appendChild(
-                text
-            );
-
-
-input.addEventListener(
-    "change",
-    () => {
-
-        answers[currentQuestionIndex] =
-            optionLetter;
-
-        /*----------------------------------
-            LƯU ĐÁP ÁN NGAY LẬP TỨC
-        ----------------------------------*/
-
-        saveAnswers();
-
-
-        /*----------------------------------
-            HIỂN THỊ OPTION ĐANG CHỌN
-        ----------------------------------*/
-
-        answerContainer
-            .querySelectorAll(".answer-option")
-            .forEach(option => {
-
-                option.classList.remove(
-                    "selected"
-                );
-
+            wrapper.querySelector("input").addEventListener("change", () => {
+                answers[currentQuestionIndex] = letter;
+                saveAnswers();
+                renderQuestion();
             });
-
-
-        wrapper.classList.add(
-            "selected"
-        );
-
-
-        /*----------------------------------
-            CẬP NHẬT DANH SÁCH CÂU HỎI
-        ----------------------------------*/
-
-        updateQuestionGrid();
-
+            answerContainer.appendChild(wrapper);
+        });
     }
-);
 
-
-            answerContainer.appendChild(
-                wrapper
-            );
-
+    // PHẦN II: Đúng / Sai (4 mệnh đề a, b, c, d)
+    else if (question.part === 2) {
+        if (!answers[currentQuestionIndex]) {
+            answers[currentQuestionIndex] = [null, null, null, null];
         }
-    );
+        const statements = question.statements || [];
+        statements.forEach((stmt, sIdx) => {
+            const row = document.createElement("div");
+            row.className = "tf-answer-row";
+            const currentVal = answers[currentQuestionIndex][sIdx];
 
+            row.innerHTML = `
+                <div class="tf-stmt-text"><b>${String.fromCharCode(97 + sIdx)}.</b> ${formatQuestionText(stmt)}</div>
+                <div class="tf-btn-group">
+                    <button type="button" class="btn-tf ${currentVal === true ? 'active-true' : ''}" data-val="true">Đúng</button>
+                    <button type="button" class="btn-tf ${currentVal === false ? 'active-false' : ''}" data-val="false">Sai</button>
+                </div>
+            `;
+
+            row.querySelectorAll(".btn-tf").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    const val = e.target.dataset.val === "true";
+                    answers[currentQuestionIndex][sIdx] = val;
+                    saveAnswers();
+                    renderQuestion();
+                });
+            });
+            answerContainer.appendChild(row);
+        });
+    }
+
+    // PHẦN III: Trả lời ngắn / Điền số
+    else if (question.part === 3) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "short-answer-input";
+        input.placeholder = "Nhập đáp án (ví dụ: 0,25)...";
+        input.value = answers[currentQuestionIndex] || "";
+
+        input.addEventListener("input", (e) => {
+            answers[currentQuestionIndex] = e.target.value.trim();
+            saveAnswers();
+            updateQuestionGrid();
+        });
+        answerContainer.appendChild(input);
+    }
 }
-
-
 /*==================================================
             LẤY ĐÁP ÁN
 ==================================================*/
-
 function getQuestionOptions(question) {
-
-    if (
-        Array.isArray(question.options)
-    ) {
-
+    if (question.part === 1 && Array.isArray(question.options)) {
         return question.options;
-
     }
-
-
-    if (
-        Array.isArray(question.answers)
-    ) {
-
-        return question.answers;
-
-    }
-
-
-    const result = [];
-
-
-    if (question.A !== undefined) {
-
-        result.push(
-            question.A
-        );
-
-    }
-
-
-    if (question.B !== undefined) {
-
-        result.push(
-            question.B
-        );
-
-    }
-
-
-    if (question.C !== undefined) {
-
-        result.push(
-            question.C
-        );
-
-    }
-
-
-    if (question.D !== undefined) {
-
-        result.push(
-            question.D
-        );
-
-    }
-
-
-    return result;
-
+    return [];
 }
-
-
 /*==================================================
             CÂU TRẢ LỜI TỰ LUẬN
 ==================================================*/
@@ -1976,60 +1764,17 @@ async function finishTest() {
         /*==========================================
                 LƯU THÔNG TIN CÂU HỎI
         ==========================================*/
-
-        const resultQuestions =
-            questions.map(
-                (question, index) => {
-
-                    const correctAnswer =
-                        normalizeAnswer(
-                            question.correctAnswer ||
-                            question.answer ||
-                            question.correct ||
-                            ""
-                        );
-
-                    const userAnswer =
-                        answers[index] || "";
-
-
-                    return {
-
-                        question:
-                            question.question ||
-                            question.content ||
-                            question.text ||
-                            "",
-
-                        options:
-                            getQuestionOptions(
-                                question
-                            ),
-
-                        correctAnswer:
-                            correctAnswer,
-
-                        userAnswer:
-                            userAnswer,
-
-                        isCorrect:
-                            userAnswer !== "" &&
-                            normalizeAnswer(
-                                userAnswer
-                            ) === correctAnswer,
-
-                        part:
-                            question.part || 1,
-
-                        partQuestionIndex:
-                            question.partQuestionIndex || 1
-
-                    };
-
-                }
-            );
-
-
+const resultQuestions = questions.map((question, index) => {
+    return {
+        question: question.question || "",
+        options: question.options || [],
+        statements: question.statements || [],
+        correctAnswer: question.correctAnswer ?? question.answer ?? question.answers ?? "",
+        userAnswer: answers[index] ?? null,
+        part: question.part || 1,
+        partQuestionIndex: question.partQuestionIndex || 1
+    };
+});
         /*==========================================
                 DỮ LIỆU KẾT QUẢ
         ==========================================*/
@@ -2154,65 +1899,51 @@ async function finishTest() {
 /*==================================================
                 TÍNH ĐIỂM
 ==================================================*/
-
 function calculateScore() {
+    let totalScore = 0;
+    let totalCorrectCount = 0;
 
-    let correct = 0;
+    questions.forEach((q, idx) => {
+        const userAns = answers[idx];
 
-
-    questions.forEach(
-        (question, index) => {
-
-            const userAnswer =
-                answers[index];
-
-
-            const correctAnswer =
-                normalizeAnswer(
-                    question.correctAnswer ||
-                    question.answer ||
-                    question.correct ||
-                    ""
-                );
-
-
-            if (
-                userAnswer &&
-                normalizeAnswer(
-                    userAnswer
-                ) === correctAnswer
-            ) {
-
-                correct++;
-
+        if (q.part === 1) {
+            const correctLetter = normalizeAnswer(q.correctAnswer);
+            if (userAns && userAns === correctLetter) {
+                totalScore += Number(currentTest.part1?.points || 0.25);
+                totalCorrectCount++;
             }
+        } 
+        else if (q.part === 2) {
+            if (Array.isArray(userAns)) {
+                let matchCount = 0;
+                q.answers.forEach((correctVal, sIdx) => {
+                    if (userAns[sIdx] === correctVal) matchCount++;
+                });
 
+                const scores = currentTest.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 };
+                if (matchCount === 1) totalScore += Number(scores.one || 0.1);
+                else if (matchCount === 2) totalScore += Number(scores.two || 0.25);
+                else if (matchCount === 3) totalScore += Number(scores.three || 0.5);
+                else if (matchCount === 4) {
+                    totalScore += Number(scores.four || 1.0);
+                    totalCorrectCount++;
+                }
+            }
+        } 
+        else if (q.part === 3) {
+            const correctText = String(q.answer || "").trim().replace(",", ".");
+            const userText = String(userAns || "").trim().replace(",", ".");
+            if (userText !== "" && userText === correctText) {
+                totalScore += Number(currentTest.part3?.points || 0.25);
+                totalCorrectCount++;
+            }
         }
-    );
-
-
-    const score =
-        questions.length > 0
-
-            ? (
-                correct /
-                questions.length
-            ) * 10
-
-            : 0;
-
+    });
 
     return {
-
-        correct,
-
-        score:
-            Math.round(
-                score * 100
-            ) / 100
-
+        score: Math.round(totalScore * 100) / 100,
+        correct: totalCorrectCount
     };
-
 }
 /*==================================================
             NORMALIZE ANSWER
