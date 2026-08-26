@@ -273,7 +273,6 @@ async function loadTestsForLesson(lessonId, container) {
         console.error(err);
     }
 }
-
 /* XEM CHI TIẾT KẾT QUẢ & CÂU HỎI TÔ MÀU ĐÚNG/SAI */
 function renderTestResultDetail(test, result) {
     courseDetail.style.display = "none";
@@ -287,9 +286,10 @@ function renderTestResultDetail(test, result) {
     let wrongCount = 0;
     let unansweredCount = 0;
 
+    // 1. Thống kê số câu Đúng / Sai / Chưa làm
     questions.forEach((q, idx) => {
-        const userAns = userAnswers[idx];
-        const correctAns = q.correctAnswer || q.answer || q.key;
+        const userAns = normalizeAnswer(userAnswers[idx] || q.userAnswer);
+        const correctAns = normalizeAnswer(q.correctAnswer || q.answer || q.key);
 
         if (!userAns) {
             unansweredCount++;
@@ -338,10 +338,11 @@ function renderTestResultDetail(test, result) {
         <div class="review-container">
     `;
 
-    // Render danh sách từng câu hỏi và tô màu
+    // 2. Render danh sách từng câu hỏi và tô màu
     questions.forEach((q, idx) => {
-        const userAns = userAnswers[idx];
-        const correctAns = q.correctAnswer || q.answer || q.key;
+        // Chuẩn hóa đáp án để so sánh chính xác giữa dạng Số ('1') và Chữ ('B')
+        const userAns = normalizeAnswer(userAnswers[idx] || q.userAnswer);
+        const correctAns = normalizeAnswer(q.correctAnswer || q.answer || q.key);
         const options = getOptions(q);
 
         let statusClass = "skipped";
@@ -372,10 +373,10 @@ function renderTestResultDetail(test, result) {
             let optionClass = "";
 
             if (userAns === letter) {
-                // Thí sinh có chọn đáp án này
+                // Thí sinh chọn đáp án này
                 optionClass = (letter === correctAns) ? "is-correct-selected" : "is-wrong-selected";
             } else if (letter === correctAns && userAns !== correctAns) {
-                // Đáp án đúng của đề khi thí sinh chọn sai/bỏ trống
+                // Đáp án đúng của đề khi thí sinh chọn sai hoặc bỏ trống
                 optionClass = "is-target-correct";
             }
 
@@ -396,7 +397,6 @@ function renderTestResultDetail(test, result) {
     html += `</div>`;
     resultDetailContent.innerHTML = html;
 }
-
 /* CÁC HÀM BỔ TRỢ TRÍCH XUẤT DỮ LIỆU CÂU HỎI */
 function extractQuestions(test) {
     const res = [];
@@ -459,4 +459,14 @@ function showEmpty() {
     resultLoading.style.display = "none";
     courseList.style.display = "none";
     resultEmpty.style.display = "flex";
+}
+// Hàm chuyển đổi đáp án (Số -> Chữ cái 'A', 'B', 'C', 'D')
+function normalizeAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    const str = String(ans).trim();
+    // Nếu là dạng chỉ số mảng (0, 1, 2, 3)
+    if (!isNaN(str) && str !== "") {
+        return String.fromCharCode(65 + parseInt(str, 10)); // 0 -> 'A', 1 -> 'B', 2 -> 'C', ...
+    }
+    return str.toUpperCase();
 }
