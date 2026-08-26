@@ -54,22 +54,25 @@ async function loadUser(uid) {
         console.error("Lỗi tải người dùng:", err);
     }
 }
-
 /* LẤY KẾT QUẢ THI ĐÃ NỘP & KHÓA HỌC */
 async function loadResultsAndCourses() {
     try {
         showLoading();
 
-        // 1. Tải kết quả thi của học sinh từ collection test_results
-        const resultsRef = collection(db, "test_results");
+        // 1. Sửa tên collection từ "test_results" thành "results"
+        const resultsRef = collection(db, "results");
         const qResults = query(resultsRef, where("userId", "==", currentUser.uid));
         const resultsSnap = await getDocs(qResults);
 
         testResultsMap = {};
         resultsSnap.forEach(docSnap => {
             const data = docSnap.data();
-            // Lưu lại kết quả mới nhất nếu thi nhiều lần
-            if (!testResultsMap[data.testId] || data.createdAt?.seconds > testResultsMap[data.testId].createdAt?.seconds) {
+            
+            // 2. Sửa createdAt thành submittedAt theo đúng Firestore
+            const newTime = data.submittedAt?.seconds || 0;
+            const currentTime = testResultsMap[data.testId]?.submittedAt?.seconds || 0;
+
+            if (!testResultsMap[data.testId] || newTime > currentTime) {
                 testResultsMap[data.testId] = { id: docSnap.id, ...data };
             }
         });
@@ -103,7 +106,6 @@ async function loadResultsAndCourses() {
         showEmpty();
     }
 }
-
 /* RENDER KHÓA HỌC */
 function renderCourses() {
     courseResultList.innerHTML = "";
