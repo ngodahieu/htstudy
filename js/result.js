@@ -278,25 +278,46 @@ function renderTestResultDetail(test, result) {
     courseDetail.style.display = "none";
     testResultDetail.style.display = "block";
 
-    // Trích xuất câu hỏi từ đề
     const questions = extractQuestions(test);
-    const userAnswers = result.answers || {}; // Dạng {0: 'A', 1: 'B'}
+    const userAnswers = result.answers || {};
 
     let correctCount = 0;
     let wrongCount = 0;
     let unansweredCount = 0;
 
-    // 1. Thống kê số câu Đúng / Sai / Chưa làm
+    // 1. Thống kê theo từng loại câu hỏi
     questions.forEach((q, idx) => {
-        const userAns = normalizeAnswer(userAnswers[idx] || q.userAnswer);
-        const correctAns = normalizeAnswer(q.correctAnswer || q.answer || q.key);
+        const uAns = userAnswers[idx];
 
-        if (!userAns) {
-            unansweredCount++;
-        } else if (userAns === correctAns) {
-            correctCount++;
-        } else {
-            wrongCount++;
+        if (q.part === 1) {
+            const userAns = typeof uAns === 'string' ? uAns.toUpperCase() : "";
+            const correctAns = String(q.correctAnswer || q.answer || "").toUpperCase();
+            if (!userAns) unansweredCount++;
+            else if (userAns === correctAns) correctCount++;
+            else wrongCount++;
+        } 
+        else if (q.part === 2) {
+            // Phần II: uAns là object {0: true, 1: false, ...}
+            if (!uAns || typeof uAns !== 'object') {
+                unansweredCount++;
+            } else {
+                let isFullCorrect = true;
+                let hasAnswered = false;
+                (q.statements || []).forEach((_, stIdx) => {
+                    if (uAns[stIdx] !== undefined && uAns[stIdx] !== null) hasAnswered = true;
+                    if (uAns[stIdx] !== q.answers[stIdx]) isFullCorrect = false;
+                });
+                if (!hasAnswered) unansweredCount++;
+                else if (isFullCorrect) correctCount++;
+                else wrongCount++;
+            }
+        } 
+        else if (q.part === 3) {
+            const userAns = normalizeTextAnswer(uAns);
+            const correctAns = normalizeTextAnswer(q.answer);
+            if (!userAns) unansweredCount++;
+            else if (userAns === correctAns) correctCount++;
+            else wrongCount++;
         }
     });
 
@@ -314,7 +335,7 @@ function renderTestResultDetail(test, result) {
                 <div class="stat-box correct">
                     <i class="fa-solid fa-circle-check"></i>
                     <div class="stat-info">
-                        <span>Số câu đúng</span>
+                        <span>Số câu đúng tuyệt đối</span>
                         <strong>${correctCount} câu</strong>
                     </div>
                 </div>
@@ -338,60 +359,115 @@ function renderTestResultDetail(test, result) {
         <div class="review-container">
     `;
 
-    // 2. Render danh sách từng câu hỏi và tô màu
+    // 2. Render danh sách chi tiết câu hỏi
     questions.forEach((q, idx) => {
-        // Chuẩn hóa đáp án để so sánh chính xác giữa dạng Số ('1') và Chữ ('B')
-        const userAns = normalizeAnswer(userAnswers[idx] || q.userAnswer);
-        const correctAns = normalizeAnswer(q.correctAnswer || q.answer || q.key);
-        const options = getOptions(q);
+        const uAns = userAnswers[idx];
 
-        let statusClass = "skipped";
-        let statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống`;
+        // RENDER PHẦN I (Trắc nghiệm 4 lựa chọn)
+        if (q.part === 1) {
+            const userAns = typeof uAns === 'string' ? uAns.toUpperCase() : "";
+            const correctAns = normalizeAnswer(q.correctAnswer || q.answer);
+            const options = Array.isArray(q.options) ? q.options : [];
 
-        if (userAns) {
-            if (userAns === correctAns) {
-                statusClass = "correct";
-                statusText = `<i class="fa-solid fa-check"></i> Trả lời đúng`;
-            } else {
-                statusClass = "wrong";
-                statusText = `<i class="fa-solid fa-xmark"></i> Trả lời sai`;
-            }
-        }
+            let statusClass = "skipped";
+            let statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống`;
 
-        html += `
-            <div class="review-item">
-                <div class="review-header">
-                    <span class="review-question-title">Câu ${idx + 1}</span>
-                    <span class="review-status-badge ${statusClass}">${statusText}</span>
-                </div>
-                <div class="review-question-body">${q.question || q.content || ''}</div>
-                <div class="review-options">
-        `;
-
-        options.forEach((optText, optIdx) => {
-            const letter = String.fromCharCode(65 + optIdx);
-            let optionClass = "";
-
-            if (userAns === letter) {
-                // Thí sinh chọn đáp án này
-                optionClass = (letter === correctAns) ? "is-correct-selected" : "is-wrong-selected";
-            } else if (letter === correctAns && userAns !== correctAns) {
-                // Đáp án đúng của đề khi thí sinh chọn sai hoặc bỏ trống
-                optionClass = "is-target-correct";
+            if (userAns) {
+                if (userAns === correctAns) {
+                    statusClass = "correct";
+                    statusText = `<i class="fa-solid fa-check"></i> Trả lời đúng`;
+                } else {
+                    statusClass = "wrong";
+                    statusText = `<i class="fa-solid fa-xmark"></i> Trả lời sai`;
+                }
             }
 
             html += `
-                <div class="review-option ${optionClass}">
-                    <span class="opt-letter">${letter}</span>
-                    <span class="opt-text">${optText}</span>
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-question-title">Câu ${idx + 1} (Phần I)</span>
+                        <span class="review-status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="review-question-body">${q.question || ''}</div>
+                    <div class="review-options">
+            `;
+
+            options.forEach((optText, optIdx) => {
+                const letter = String.fromCharCode(65 + optIdx);
+                let optionClass = "";
+
+                if (userAns === letter) {
+                    optionClass = (letter === correctAns) ? "is-correct-selected" : "is-wrong-selected";
+                } else if (letter === correctAns && userAns !== correctAns) {
+                    optionClass = "is-target-correct";
+                }
+
+                html += `
+                    <div class="review-option ${optionClass}">
+                        <span class="opt-letter">${letter}</span>
+                        <span class="opt-text">${optText}</span>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+        }
+
+        // RENDER PHẦN II (Đúng / Sai)
+        else if (q.part === 2) {
+            const statements = q.statements || [];
+            const correctAnswers = q.answers || [];
+            const userSubAns = (typeof uAns === 'object' && uAns !== null) ? uAns : {};
+
+            html += `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-question-title">Câu ${idx + 1} (Phần II - Đúng/Sai)</span>
+                    </div>
+                    <div class="review-question-body">${q.question || ''}</div>
+                    <div class="review-tf-list" style="margin-top:10px;">
+            `;
+
+            statements.forEach((stText, stIdx) => {
+                const label = String.fromCharCode(97 + stIdx); // a, b, c, d
+                const userVal = userSubAns[stIdx];
+                const correctVal = correctAnswers[stIdx];
+
+                let stStatus = userVal === undefined ? "Bỏ trống" : (userVal === correctVal ? "Đúng" : "Sai");
+                let colorStyle = userVal === correctVal ? "color:#4ade80;" : (userVal === undefined ? "color:#facc15;" : "color:#f87171;");
+
+                html += `
+                    <div style="padding: 6px 0; border-bottom: 1px dashed #334155;">
+                        <strong>${label}) ${stText}</strong><br>
+                        <small>Bạn chọn: <b>${userVal === true ? "Đúng" : userVal === false ? "Sai" : "Chưa chọn"}</b> | Đáp án đúng: <b>${correctVal ? "Đúng" : "Sai"}</b> 
+                        (<span style="${colorStyle}">${stStatus}</span>)</small>
+                    </div>
+                `;
+            });
+            html += `</div></div>`;
+        }
+
+        // RENDER PHẦN III (Trả lời ngắn)
+        else if (q.part === 3) {
+            const userAns = normalizeTextAnswer(uAns);
+            const correctAns = normalizeTextAnswer(q.answer);
+            const isCorrect = userAns && userAns === correctAns;
+
+            html += `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-question-title">Câu ${idx + 1} (Phần III - Trả lời ngắn)</span>
+                        <span class="review-status-badge ${!userAns ? 'skipped' : (isCorrect ? 'correct' : 'wrong')}">
+                            ${!userAns ? 'Bỏ trống' : (isCorrect ? 'Đúng' : 'Sai')}
+                        </span>
+                    </div>
+                    <div class="review-question-body">${q.question || ''}</div>
+                    <div style="margin-top:10px; padding:8px; background:#1e293b; border-radius:6px;">
+                        <div>Câu trả lời của bạn: <strong>${uAns || 'Chưa trả lời'}</strong></div>
+                        <div style="color:#4ade80;">Đáp án đúng: <strong>${q.answer}</strong></div>
+                    </div>
                 </div>
             `;
-        });
-
-        html += `
-                </div>
-            </div>
-        `;
+        }
     });
 
     html += `</div>`;
@@ -400,14 +476,21 @@ function renderTestResultDetail(test, result) {
 /* CÁC HÀM BỔ TRỢ TRÍCH XUẤT DỮ LIỆU CÂU HỎI */
 function extractQuestions(test) {
     const res = [];
-    [test.part1, test.part2, test.part3].forEach(part => {
-        if (!part) return;
-        if (Array.isArray(part)) res.push(...part);
-        else if (part.questions && Array.isArray(part.questions)) res.push(...part.questions);
-    });
+    if (test.part1?.questions) {
+        test.part1.questions.forEach(q => res.push({ ...q, part: 1 }));
+    }
+    if (test.part2?.questions) {
+        test.part2.questions.forEach(q => res.push({ ...q, part: 2 }));
+    }
+    if (test.part3?.questions) {
+        test.part3.questions.forEach(q => res.push({ ...q, part: 3 }));
+    }
     return res;
 }
-
+function normalizeTextAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    return String(ans).trim().replace(',', '.').toLowerCase();
+}
 function getOptions(q) {
     if (Array.isArray(q.options)) return q.options;
     if (Array.isArray(q.answers)) return q.answers;
