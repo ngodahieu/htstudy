@@ -480,7 +480,13 @@ const closeNotification = document.getElementById("closeNotification");
 
 const avatar = document.querySelector(".avatar");
 const userMenu = document.getElementById("userMenu");
+const userGuide = document.getElementById("userGuide");
 
+if (userGuide) {
+    userGuide.addEventListener("click", () => {
+        alert("Chọn khóa học → xem danh sách bài kiểm tra → bấm 'Xem kết quả' để xem điểm số và chi tiết câu đúng/sai.");
+    });
+}
 const logoutBtn = document.getElementById("logoutBtn");
 const myCoursesBtn = document.getElementById("myCoursesBtn");
 const manageBtn = document.getElementById("manageBtn");
