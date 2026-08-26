@@ -1071,7 +1071,33 @@ if (testChapter) {
         testLesson.disabled = lessons.length === 0;
     });
 }
+// ====================================
+//        XỬ LÝ XEM TRƯỚC CÔNG THỨC
+// ====================================
+function updateFormulaPreview(inputEl, previewEl) {
+    if (!inputEl || !previewEl) return;
+    const val = inputEl.value;
+    if (!val || !val.trim()) {
+        previewEl.innerHTML = `<span class="preview-placeholder">Xem trước: <i>(Trống)</i></span>`;
+        return;
+    }
+    
+    // Tự động chuyển đổi công thức hóa học / văn bản
+    let formatted = formatChemistryText(val);
 
+    // Render KaTeX cho công thức Toán / Lí nếu có thư viện KaTeX
+    if (window.katex) {
+        try {
+            formatted = formatted.replace(/\$(.*?)\$/g, (match, formula) => {
+                return katex.renderToString(formula, { throwOnError: false });
+            });
+        } catch (e) {
+            console.error("Lỗi render KaTeX:", e);
+        }
+    }
+
+    previewEl.innerHTML = `<span class="preview-label">Xem trước:</span> <span class="preview-content">${formatted}</span>`;
+}
 // ====================================
 //        RENDER PHẦN I
 // ====================================
@@ -1109,7 +1135,8 @@ function renderPart1Questions() {
             </div>
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
-                <textarea class="part1-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(question.question)}</textarea>
+                <textarea class="part1-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi (VD: H2SO4, Fe2(SO4)3, $E=mc^2$)...">${escapeHtmlTeacher(question.question)}</textarea>
+                <div class="formula-preview part1-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
                 <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
@@ -1126,11 +1153,14 @@ function renderPart1Questions() {
                 ${question.options
                     .map(
                         (option, optionIndex) => `
-                        <div class="option-row">
-                            <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${
-                            Number(question.correctAnswer) === optionIndex ? "checked" : ""
-                        }>
-                            <input type="text" class="part1-option" data-index="${index}" data-option="${optionIndex}" value="${escapeHtmlTeacher(option)}" placeholder="Đáp án ${String.fromCharCode(65 + optionIndex)}">
+                        <div class="option-row-wrapper">
+                            <div class="option-row">
+                                <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${
+                                Number(question.correctAnswer) === optionIndex ? "checked" : ""
+                            }>
+                                <input type="text" class="part1-option" data-index="${index}" data-option="${optionIndex}" value="${escapeHtmlTeacher(option)}" placeholder="Đáp án ${String.fromCharCode(65 + optionIndex)}">
+                            </div>
+                            <div class="formula-preview part1-opt-preview-${index}-${optionIndex} opt-preview"></div>
                         </div>`
                     )
                     .join("")}
@@ -1138,12 +1168,26 @@ function renderPart1Questions() {
             <small class="auto-text">Chọn ● để đánh dấu đáp án đúng.</small>
         `;
         part1Questions.appendChild(box);
+
+        // Khởi tạo xem trước câu hỏi
+        const qInput = box.querySelector(`.part1-question`);
+        const qPreview = box.querySelector(`.part1-q-preview-${index}`);
+        updateFormulaPreview(qInput, qPreview);
+
+        // Khởi tạo xem trước cho các đáp án
+        question.options.forEach((_, optIdx) => {
+            const optInput = box.querySelector(`.part1-option[data-option="${optIdx}"]`);
+            const optPreview = box.querySelector(`.part1-opt-preview-${index}-${optIdx}`);
+            updateFormulaPreview(optInput, optPreview);
+        });
     });
 
     part1Questions.querySelectorAll(".part1-question").forEach((input) => {
         input.addEventListener("input", (event) => {
             const idx = Number(event.target.dataset.index);
             part1QuestionData[idx].question = event.target.value;
+            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1152,6 +1196,8 @@ function renderPart1Questions() {
             const idx = Number(event.target.dataset.index);
             const optionIdx = Number(event.target.dataset.option);
             part1QuestionData[idx].options[optionIdx] = event.target.value;
+            const preview = event.target.closest(".option-row-wrapper").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1186,7 +1232,6 @@ function renderPart1Questions() {
         });
     });
 }
-
 // ====================================
 //        RENDER PHẦN II
 // ====================================
@@ -1225,6 +1270,7 @@ function renderPart2Questions() {
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
                 <textarea class="part2-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(question.question)}</textarea>
+                <div class="formula-preview part2-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
                 <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
@@ -1241,25 +1287,42 @@ function renderPart2Questions() {
                 ${question.statements
                     .map(
                         (statement, statementIndex) => `
-                        <div class="tf-row">
-                            <div class="tf-label">${String.fromCharCode(97 + statementIndex)}.</div>
-                            <input type="text" class="part2-statement" data-index="${index}" data-statement="${statementIndex}" value="${escapeHtmlTeacher(statement)}" placeholder="Nhập ý ${String.fromCharCode(97 + statementIndex)}...">
-                            <select class="part2-answer" data-index="${index}" data-statement="${statementIndex}">
-                                <option value="true" ${question.answers[statementIndex] === true ? "selected" : ""}>Đúng</option>
-                                <option value="false" ${question.answers[statementIndex] === false ? "selected" : ""}>Sai</option>
-                            </select>
+                        <div class="tf-row-wrapper">
+                            <div class="tf-row">
+                                <div class="tf-label">${String.fromCharCode(97 + statementIndex)}.</div>
+                                <input type="text" class="part2-statement" data-index="${index}" data-statement="${statementIndex}" value="${escapeHtmlTeacher(statement)}" placeholder="Nhập ý ${String.fromCharCode(97 + statementIndex)}...">
+                                <select class="part2-answer" data-index="${index}" data-statement="${statementIndex}">
+                                    <option value="true" ${question.answers[statementIndex] === true ? "selected" : ""}>Đúng</option>
+                                    <option value="false" ${question.answers[statementIndex] === false ? "selected" : ""}>Sai</option>
+                                </select>
+                            </div>
+                            <div class="formula-preview part2-st-preview-${index}-${statementIndex} opt-preview"></div>
                         </div>`
                     )
                     .join("")}
             </div>
         `;
         part2Questions.appendChild(box);
+
+        // Khởi tạo xem trước câu hỏi
+        const qInput = box.querySelector(`.part2-question`);
+        const qPreview = box.querySelector(`.part2-q-preview-${index}`);
+        updateFormulaPreview(qInput, qPreview);
+
+        // Khởi tạo xem trước mệnh đề
+        question.statements.forEach((_, stIdx) => {
+            const stInput = box.querySelector(`.part2-statement[data-statement="${stIdx}"]`);
+            const stPreview = box.querySelector(`.part2-st-preview-${index}-${stIdx}`);
+            updateFormulaPreview(stInput, stPreview);
+        });
     });
 
     part2Questions.querySelectorAll(".part2-question").forEach((input) => {
         input.addEventListener("input", (event) => {
             const idx = Number(event.target.dataset.index);
             part2QuestionData[idx].question = event.target.value;
+            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1268,6 +1331,8 @@ function renderPart2Questions() {
             const idx = Number(event.target.dataset.index);
             const stIdx = Number(event.target.dataset.statement);
             part2QuestionData[idx].statements[stIdx] = event.target.value;
+            const preview = event.target.closest(".tf-row-wrapper").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1302,7 +1367,6 @@ function renderPart2Questions() {
         });
     });
 }
-
 // ====================================
 //        RENDER PHẦN III
 // ====================================
@@ -1317,7 +1381,6 @@ if (addPart3QuestionBtn) {
         updateTestTotal();
     });
 }
-
 function renderPart3Questions() {
     if (!part3Questions) return;
     if (!part3QuestionData.length) {
@@ -1340,6 +1403,7 @@ function renderPart3Questions() {
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
                 <textarea class="part3-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(question.question)}</textarea>
+                <div class="formula-preview part3-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
                 <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
@@ -1355,15 +1419,27 @@ function renderPart3Questions() {
             <div class="form-group">
                 <label>Đáp án đúng</label>
                 <input type="text" class="part3-answer" data-index="${index}" value="${escapeHtmlTeacher(question.answer)}" placeholder="Ví dụ 0,25">
+                <div class="formula-preview part3-ans-preview-${index} opt-preview"></div>
             </div>
         `;
         part3Questions.appendChild(box);
+
+        // Khởi tạo xem trước
+        const qInput = box.querySelector(`.part3-question`);
+        const qPreview = box.querySelector(`.part3-q-preview-${index}`);
+        updateFormulaPreview(qInput, qPreview);
+
+        const ansInput = box.querySelector(`.part3-answer`);
+        const ansPreview = box.querySelector(`.part3-ans-preview-${index}`);
+        updateFormulaPreview(ansInput, ansPreview);
     });
 
     part3Questions.querySelectorAll(".part3-question").forEach((input) => {
         input.addEventListener("input", (event) => {
             const idx = Number(event.target.dataset.index);
             part3QuestionData[idx].question = event.target.value;
+            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1371,6 +1447,8 @@ function renderPart3Questions() {
         input.addEventListener("input", (event) => {
             const idx = Number(event.target.dataset.index);
             part3QuestionData[idx].answer = event.target.value;
+            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
+            updateFormulaPreview(event.target, preview);
         });
     });
 
@@ -1397,7 +1475,6 @@ function renderPart3Questions() {
         });
     });
 }
-
 // ====================================
 //        TÍNH TỔNG ĐIỂM & ĐỔI TRẠNG THÁI
 // ====================================
