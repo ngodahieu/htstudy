@@ -470,3 +470,77 @@ function normalizeAnswer(ans) {
     }
     return str.toUpperCase();
 }
+/*==================================================
+        XỬ LÝ UI: THÔNG BÁO, AVATAR & USER MENU
+==================================================*/
+
+const notificationBtn = document.querySelector(".notification-btn");
+const notificationPanel = document.getElementById("notificationPanel");
+const closeNotification = document.getElementById("closeNotification");
+
+const avatar = document.querySelector(".avatar");
+const userMenu = document.getElementById("userMenu");
+
+const logoutBtn = document.getElementById("logoutBtn");
+const myCoursesBtn = document.getElementById("myCoursesBtn");
+const manageBtn = document.getElementById("manageBtn");
+
+// 1. Toggle Thông báo
+if (notificationBtn && notificationPanel) {
+    notificationBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!auth.currentUser) {
+            alert("Bạn cần đăng nhập để xem thông báo.");
+            return;
+        }
+        notificationPanel.classList.toggle("active");
+    });
+}
+
+if (closeNotification) {
+    closeNotification.addEventListener("click", () => {
+        notificationPanel.classList.remove("active");
+    });
+}
+
+// 2. Toggle Menu User
+if (avatar && userMenu) {
+    avatar.addEventListener("click", (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle("active");
+    });
+}
+
+// 3. Đóng panel khi click ra ngoài
+document.addEventListener("click", (e) => {
+    if (notificationPanel && !notificationPanel.contains(e.target) && !notificationBtn.contains(e.target)) {
+        notificationPanel.classList.remove("active");
+    }
+    if (userMenu && !userMenu.contains(e.target) && !avatar.contains(e.target)) {
+        userMenu.classList.remove("active");
+    }
+});
+
+// 4. Xử lý các nút điều hướng trong User Menu
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "index.html";
+    });
+}
+
+if (myCoursesBtn) {
+    myCoursesBtn.addEventListener("click", () => {
+        window.location.href = "my-courses.html";
+    });
+}
+
+if (manageBtn) {
+    manageBtn.addEventListener("click", () => {
+        if (currentRole === "Admin") {
+            window.location.href = "dashboard/admin.html";
+        } else if (currentRole === "Giáo viên") {
+            window.location.href = "dashboard/teacher.html";
+        }
+    });
+}
