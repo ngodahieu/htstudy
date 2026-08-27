@@ -2244,6 +2244,7 @@ const singleResultDetailBody = document.getElementById("singleResultDetailBody")
 const closeSingleResultModal = document.getElementById("closeSingleResultModal");
 
 async function openStudentTestChapters(courseId) {
+    if (!studentTestResultModal || !studentTestResultBody) return;
     testResultNavStep = 1;
     if (backTestResultBtn) backTestResultBtn.style.display = "none";
     if (studentTestResultModal) studentTestResultModal.style.display = "flex";
@@ -2251,8 +2252,8 @@ async function openStudentTestChapters(courseId) {
 
     try {
         const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
-        let chapters = [];
-        snapshot.forEach(docSnap => chapters.push({ id: docSnap.id, ...docSnap.data() }));
+        const chapters = [];
+        snapshot.forEach((docSnap) => chapters.push({ id: docSnap.id, ...docSnap.data() }));
         chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
         if (!chapters.length) {
@@ -2429,6 +2430,111 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
         studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
     }
 }
+// ==========================================================
+// HÀM QUAN TRỌNG: HIỂN THỊ ĐẦY ĐỦ CÂU HỎI VÀ ĐÁP ÁN KHI ẤN XEM CHI TIẾT
+// ==========================================================
+async function openSingleResultDetailModal(resultId) {
+    if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
+    singleResultDetailBody.innerHTML = `<div class="empty">Đang tải chi tiết bài làm...</div>`;
+    studentSingleResultDetailModal.style.display = "flex";
+
+    try {
+        const resDoc = await getDoc(doc(db, "examResults", resultId));
+        if (!resDoc.exists()) {
+            singleResultDetailBody.innerHTML = `<div class="empty">Không tìm thấy dữ liệu bài làm.</div>`;
+            return;
+        }
+        const resData = resDoc.data();
+        
+        // Lấy thông tin chi tiết bài kiểm tra gốc để có danh sách câu hỏi chuẩn
+        const testDoc = await getDoc(doc(db, "courses", resData.courseId, "tests", resData.testId));
+        if (!testDoc.exists()) {
+            singleResultDetailBody.innerHTML = `<div class="empty">Không tìm thấy thông tin bài kiểm tra gốc.</div>`;
+            return;
+        }
+        const testData = testDoc.data();
+        const questions = extractQuestions(testData); // Trích xuất tất cả câu hỏi Phần I, II, III
+        const studentAnswers = resData.answers || {}; // Đáp án học sinh đã chọn theo từng câu/index
+
+        let html = `
+            <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                <h3 style="margin: 0 0 5px 0;">${escapeHtmlTeacher(testData.title)}</h3>
+                <p style="margin: 0; color: #555;">Học sinh: <b>${escapeHtmlTeacher(resData.studentName || currentSelectedStudent?.name || "")}</b></p>
+                <p style="margin: 4px 0 0 0;">Điểm số: <b style="color: #28a745; font-size: 1.1rem;">${resData.score ?? 0}</b> / ${testData.totalPoints ?? 0}</p>
+            </div>
+            <div class="detailed-questions-list" style="display: flex; flexDirection: column; gap: 15px;">
+        `;
+
+        questions.forEach((q, idx) => {
+            const qKey = `q_${idx}`;
+            const studentAns = studentAnswers[qKey] !== undefined ? studentAnswers[qKey] : studentAnswers[idx];
+            
+            html += `<div style="background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #e0e0e0;">`;
+            html += `<p style="font-weight: bold; margin-top: 0;">Câu ${idx + 1} (Phần ${q.part}): ${formatChemistryText(q.question || "")}</p>`;
+            
+            if (q.image) {
+                html += `<div style="margin: 8px 0;"><img src="${q.image}" style="max-width: 100%; max-height: 200px; border-radius: 4px;"></div>`;
+            }
+
+            // Hiển thị chi tiết tùy theo từng phần câu hỏi
+            if (q.part === 1) {
+                const options = q.options || [];
+                html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 4px;">`;
+                options.forEach((opt, optIdx) => {
+                    const optLetter = String.fromCharCode(65 + optIdx);
+                    let isStudentChoice = (String(studentAns).toUpperCase() === optLetter) || (Number(studentAns) === optIdx);
+                    let isCorrect = (String(q.correctAnswer).toUpperCase() === optLetter) || (Number(q.correctAnswer) === optIdx);
+
+                    let style = "padding: 4px 8px; border-radius: 4px;";
+                    if (isCorrect) style += " background-color: #d4edda; color: #155724; font-weight: bold;";
+                    if (isStudentChoice && !isCorrect) style += " background-color: #f8d7da; color: #721c24; text-decoration: line-through;";
+
+                    html += `<div style="${style}">${optLetter}. ${formatChemistryText(opt)} ${isStudentChoice ? ' 👈 (Học sinh chọn)' : ''} ${isCorrect ? ' ✔ (Đáp án đúng)' : ''}</div>`;
+                });
+                html += `</div>`;
+            } else if (q.part === 2) {
+                const statements = q.statements || [];
+                const correctAnsArr = q.answers || [];
+                const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
+
+                html += `<div style="margin-left: 10px; display: flex; flexDirection: column; gap: 4px;">`;
+                statements.forEach((st, stIdx) => {
+                    const stLetter = String.fromCharCode(97 + stIdx);
+                    const sAns = studentAnsArr[stIdx];
+                    const cAns = correctAnsArr[stIdx];
+                    const isMatch = sAns === cAns;
+
+                    html += `
+                        <div style="padding: 4px 8px; border-radius: 4px; background: ${isMatch ? '#e2f0d9' : '#fce4d6'};">
+                            <b>${stLetter})</b> ${formatChemistryText(st)} <br>
+                            <span style="font-size: 0.85rem; color: #555;">
+                                Học sinh chọn: <b>${sAns === true ? 'Đúng' : sAns === false ? 'Sai' : 'Chưa chọn'}</b> | 
+                                Đáp án đúng: <b>${cAns === true ? 'Đúng' : 'Sai'}</b>
+                            </span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.part === 3) {
+                html += `
+                    <div style="margin-left: 10px; font-size: 0.95rem;">
+                        <p style="margin: 4px 0;">Học sinh trả lời: <b>${escapeHtmlTeacher(String(studentAns || "(Trống)"))}</b></p>
+                        <p style="margin: 4px 0; color: #28a745;">Đáp án chuẩn: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b></p>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+        });
+
+        html += `</div>`;
+        singleResultDetailBody.innerHTML = html;
+    } catch (error) {
+        console.error("Lỗi khi tải chi tiết bài làm:", error);
+        singleResultDetailBody.innerHTML = `<div class="empty">Không thể tải nội dung chi tiết bài làm.</div>`;
+    }
+}
+
 if (backTestResultBtn) {
     backTestResultBtn.addEventListener("click", () => {
         if (testResultNavStep === 4) {
