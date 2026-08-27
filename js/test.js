@@ -4,7 +4,7 @@
 ==================================================*/
 
 import { auth, db } from "./firebase.js";
-
+import { formatChemicalFormula, formatChemistryText } from "./chemistry.js";
 import {
     onAuthStateChanged,
     signOut
