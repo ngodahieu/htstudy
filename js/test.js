@@ -1765,7 +1765,8 @@ async function finishTest() {
 
             courseId:
                 currentCourseId,
-
+            userEmail: currentUser.email || "",
+            userName: currentUser.displayName || "Học sinh",
             testId:
                 currentTestId,
 
