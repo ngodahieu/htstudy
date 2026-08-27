@@ -2462,7 +2462,7 @@ async function openSingleResultDetailModal(resultId) {
                 <p style="margin: 0; color: #555;">Học sinh: <b>${escapeHtmlTeacher(resData.studentName || currentSelectedStudent?.name || "")}</b></p>
                 <p style="margin: 4px 0 0 0;">Điểm số: <b style="color: #28a745; font-size: 1.1rem;">${resData.score ?? 0}</b> / ${testData.totalPoints ?? 0}</p>
             </div>
-            <div class="detailed-questions-list" style="display: flex; flexDirection: column; gap: 15px;">
+            <div class="detailed-questions-list" style="display: flex; flex-direction: column; gap: 15px;">
         `;
 
         questions.forEach((q, idx) => {
@@ -2497,7 +2497,7 @@ async function openSingleResultDetailModal(resultId) {
                 const correctAnsArr = q.answers || [];
                 const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
 
-                html += `<div style="margin-left: 10px; display: flex; flexDirection: column; gap: 4px;">`;
+                html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 4px;">`;
                 statements.forEach((st, stIdx) => {
                     const stLetter = String.fromCharCode(97 + stIdx);
                     const sAns = studentAnsArr[stIdx];
