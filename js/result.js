@@ -29,7 +29,9 @@ const resultDetailContent = document.getElementById("resultDetailContent");
 const backToCourses = document.getElementById("backToCourses");
 const backToLessons = document.getElementById("backToLessons");
 
-/* LOAD USER & HEADER */
+/*==================================================
+                LOAD USER & HEADER
+==================================================*/
 async function loadUser(uid) {
     try {
         const userSnap = await getDoc(doc(db, "users", uid));
@@ -45,21 +47,33 @@ async function loadUser(uid) {
         const headerAvatar = document.querySelector(".avatar img");
         if (headerAvatar) headerAvatar.src = avatarUrl;
 
-        document.getElementById("userBox").style.display = "block";
-        document.getElementById("userMenuList").style.display = "block";
-        document.getElementById("userName").textContent = user.name || "Học sinh";
-        document.getElementById("userStudentId").textContent = user.memberId || "";
-        document.getElementById("userRole").textContent = currentRole;
+        const userBox = document.getElementById("userBox");
+        if (userBox) userBox.style.display = "block";
+
+        const userMenuList = document.getElementById("userMenuList");
+        if (userMenuList) userMenuList.style.display = "block";
+
+        const userName = document.getElementById("userName");
+        if (userName) userName.textContent = user.name || "Học sinh";
+
+        const userStudentId = document.getElementById("userStudentId");
+        if (userStudentId) userStudentId.textContent = user.memberId || "";
+
+        const userRole = document.getElementById("userRole");
+        if (userRole) userRole.textContent = currentRole;
     } catch (err) {
         console.error("Lỗi tải người dùng:", err);
     }
 }
-/* LẤY KẾT QUẢ THI ĐÃ NỘP & KHÓA HỌC */
+
+/*==================================================
+        LẤY KẾT QUẢ THI ĐÃ NỘP & KHÓA HỌC
+==================================================*/
 async function loadResultsAndCourses() {
     try {
         showLoading();
 
-        // 1. Sửa tên collection từ "test_results" thành "results"
+        // 1. Lấy tất cả bài làm của user từ collection "results"
         const resultsRef = collection(db, "results");
         const qResults = query(resultsRef, where("userId", "==", currentUser.uid));
         const resultsSnap = await getDocs(qResults);
@@ -68,7 +82,7 @@ async function loadResultsAndCourses() {
         resultsSnap.forEach(docSnap => {
             const data = docSnap.data();
             
-            // 2. Sửa createdAt thành submittedAt theo đúng Firestore
+            // Lấy kết quả nộp bài mới nhất
             const newTime = data.submittedAt?.seconds || 0;
             const currentTime = testResultsMap[data.testId]?.submittedAt?.seconds || 0;
 
@@ -106,8 +120,12 @@ async function loadResultsAndCourses() {
         showEmpty();
     }
 }
-/* RENDER KHÓA HỌC */
+
+/*==================================================
+                RENDER KHÓA HỌC
+==================================================*/
 function renderCourses() {
+    if (!courseResultList) return;
     courseResultList.innerHTML = "";
     coursesData.forEach(course => {
         courseResultList.innerHTML += `
@@ -134,14 +152,18 @@ function renderCourses() {
     });
 }
 
-/* OPEN COURSE DETAIL */
+/*==================================================
+            OPEN COURSE DETAIL
+==================================================*/
 async function openCourseDetail(courseId) {
     currentCourseId = courseId;
-    courseList.style.display = "none";
-    testResultDetail.style.display = "none";
-    courseDetail.style.display = "block";
+    if (courseList) courseList.style.display = "none";
+    if (testResultDetail) testResultDetail.style.display = "none";
+    if (courseDetail) courseDetail.style.display = "block";
 
-    courseDetailContent.innerHTML = `<div class="exam-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải chương...</div>`;
+    if (courseDetailContent) {
+        courseDetailContent.innerHTML = `<div class="exam-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải chương...</div>`;
+    }
 
     try {
         const chapterSnap = await getDocs(collection(db, "courses", courseId, "chapters"));
@@ -155,8 +177,12 @@ async function openCourseDetail(courseId) {
     }
 }
 
-/* RENDER CHƯƠNG & BÀI HỌC */
+/*==================================================
+            RENDER CHƯƠNG & BÀI HỌC
+==================================================*/
 function renderChapters() {
+    if (!courseDetailContent) return;
+
     let html = `<div class="course-hierarchy">`;
     chaptersData.forEach((chapter, idx) => {
         html += `
@@ -180,9 +206,13 @@ function renderChapters() {
     chaptersData.forEach(chapter => loadLessons(chapter));
 }
 
-/* LOAD BÀI HỌC VÀ BÀI KIỂM TRA */
+/*==================================================
+        LOAD BÀI HỌC VÀ BÀI KIỂM TRA
+==================================================*/
 async function loadLessons(chapter) {
     const container = document.getElementById(`lesson-list-${chapter.id}`);
+    if (!container) return;
+
     try {
         const lessonSnap = await getDocs(collection(db, "courses", currentCourseId, "chapters", chapter.id, "lessons"));
         lessonsData = [];
@@ -226,7 +256,9 @@ async function loadLessons(chapter) {
     }
 }
 
-/* BÀI KIỂM TRA TRONG BÀI HỌC */
+/*==================================================
+        BÀI KIỂM TRA TRONG BÀI HỌC
+==================================================*/
 async function loadTestsForLesson(lessonId, container) {
     container.innerHTML = `<div class="exam-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải...</div>`;
     try {
@@ -253,7 +285,7 @@ async function loadTestsForLesson(lessonId, container) {
                         <span><i class="fa-solid fa-list-ol"></i> ${test.questionCount || 0} câu</span>
                         <span>
                             ${result 
-                                ? `<strong style="color:#4ade80;"><i class="fa-solid fa-circle-check"></i> Đã làm: ${result.score || 0} điểm</strong>` 
+                                ? `<strong style="color:#4ade80;"><i class="fa-solid fa-circle-check"></i> Đã làm: ${result.score ?? 0} điểm</strong>` 
                                 : `<span style="color:#facc15;"><i class="fa-solid fa-clock"></i> Chưa làm</span>`}
                         </span>
                     </div>
@@ -273,10 +305,137 @@ async function loadTestsForLesson(lessonId, container) {
         console.error(err);
     }
 }
-/* XEM CHI TIẾT KẾT QUẢ & CÂU HỎI TÔ MÀU ĐÚNG/SAI */
+
+/*==================================================
+    CÁC HÀM XỬ LÝ DỮ LIỆU CÂU HỎI & CHUẨN HÓA (KHỚP TEST.JS)
+==================================================*/
+
+// Trích xuất danh sách câu hỏi kèm điểm số đã thiết lập ở Teacher / Test
+function extractQuestions(test) {
+    const result = [];
+    
+    if (test.part1?.questions) {
+        test.part1.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 1,
+                points: Number(q.points ?? test.part1?.points ?? 0.5),
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    if (test.part2?.questions) {
+        test.part2.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 2,
+                scores: test.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 },
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    if (test.part3?.questions) {
+        test.part3.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 3,
+                points: Number(q.points ?? test.part3?.points ?? 0.5),
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    return result;
+}
+
+// Chuẩn hóa đáp án trắc nghiệm A, B, C, D (xử lý số index 0, 1, 2, 3 -> 'A', 'B', 'C', 'D')
+function normalizeAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    const str = String(ans).trim();
+    if (!isNaN(str) && str !== "") {
+        return String.fromCharCode(65 + parseInt(str, 10));
+    }
+    return str.toUpperCase();
+}
+
+// Chuẩn hóa đáp án tự luận / điền số
+function normalizeTextAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    return String(ans).trim().replace(',', '.').toLowerCase();
+}
+
+// Format văn bản câu hỏi / hóa học
+function formatQuestionText(value) {
+    if (value === null || value === undefined) return "";
+    let text = String(value);
+    if (typeof formatChemistryText === "function") {
+        text = formatChemistryText(text);
+    }
+    return text;
+}
+
+// Tính điểm từng câu hỏi khớp 100% với logic test.js và teacher
+function calculateQuestionScore(q, uAns, test) {
+    let maxPoint = 0;
+    let earnedPoint = 0;
+    let isCorrect = false;
+
+    if (q.part === 1) {
+        maxPoint = Number(q.points ?? test.part1?.points ?? 0.5);
+        const userAns = uAns ? normalizeAnswer(uAns) : "";
+        const correctAns = normalizeAnswer(q.correctAnswer ?? q.answer ?? q.correct);
+        if (userAns && userAns === correctAns) {
+            earnedPoint = maxPoint;
+            isCorrect = true;
+        }
+    } 
+    else if (q.part === 2) {
+        const scores = q.scores || test.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 };
+        maxPoint = Number(scores.four ?? 1.0);
+        
+        if (uAns && (typeof uAns === 'object' || Array.isArray(uAns))) {
+            let matchCount = 0;
+            const correctAnswers = q.answers || [];
+            correctAnswers.forEach((correctVal, sIdx) => {
+                if (uAns[sIdx] === correctVal) {
+                    matchCount++;
+                }
+            });
+
+            if (matchCount === 1) earnedPoint = Number(scores.one ?? 0.1);
+            else if (matchCount === 2) earnedPoint = Number(scores.two ?? 0.25);
+            else if (matchCount === 3) earnedPoint = Number(scores.three ?? 0.5);
+            else if (matchCount === 4) {
+                earnedPoint = Number(scores.four ?? 1.0);
+                isCorrect = true;
+            }
+        }
+    } 
+    else if (q.part === 3) {
+        maxPoint = Number(q.points ?? test.part3?.points ?? 0.5);
+        const userAns = normalizeTextAnswer(uAns);
+        const correctAns = normalizeTextAnswer(q.answer ?? q.correctAnswer);
+        if (userAns !== "" && userAns === correctAns) {
+            earnedPoint = maxPoint;
+            isCorrect = true;
+        }
+    }
+
+    return {
+        maxPoint,
+        earnedPoint: Math.round(earnedPoint * 100) / 100,
+        isCorrect
+    };
+}
+
+/*==================================================
+        XEM CHI TIẾT KẾT QUẢ & HIỂN THỊ ĐIỂM
+==================================================*/
 function renderTestResultDetail(test, result) {
-    courseDetail.style.display = "none";
-    testResultDetail.style.display = "block";
+    if (courseDetail) courseDetail.style.display = "none";
+    if (testResultDetail) testResultDetail.style.display = "block";
 
     const questions = extractQuestions(test);
     const userAnswers = result.answers || {};
@@ -284,42 +443,43 @@ function renderTestResultDetail(test, result) {
     let correctCount = 0;
     let wrongCount = 0;
     let unansweredCount = 0;
+    let calculatedScore = 0;
 
-    // 1. Thống kê theo từng loại câu hỏi
+    // Thống kê điểm số và số câu đúng/sai/chưa làm
     questions.forEach((q, idx) => {
         const uAns = userAnswers[idx];
+        const qScore = calculateQuestionScore(q, uAns, test);
+        calculatedScore += qScore.earnedPoint;
 
         if (q.part === 1) {
-            const userAns = typeof uAns === 'string' ? uAns.toUpperCase() : "";
-            const correctAns = String(q.correctAnswer || q.answer || "").toUpperCase();
+            const userAns = uAns ? normalizeAnswer(uAns) : "";
             if (!userAns) unansweredCount++;
-            else if (userAns === correctAns) correctCount++;
+            else if (qScore.isCorrect) correctCount++;
             else wrongCount++;
         } 
         else if (q.part === 2) {
-            // Phần II: uAns là object {0: true, 1: false, ...}
-            if (!uAns || typeof uAns !== 'object') {
+            if (!uAns || (typeof uAns !== 'object' && !Array.isArray(uAns))) {
                 unansweredCount++;
             } else {
-                let isFullCorrect = true;
                 let hasAnswered = false;
                 (q.statements || []).forEach((_, stIdx) => {
                     if (uAns[stIdx] !== undefined && uAns[stIdx] !== null) hasAnswered = true;
-                    if (uAns[stIdx] !== q.answers[stIdx]) isFullCorrect = false;
                 });
                 if (!hasAnswered) unansweredCount++;
-                else if (isFullCorrect) correctCount++;
+                else if (qScore.isCorrect) correctCount++;
                 else wrongCount++;
             }
         } 
         else if (q.part === 3) {
             const userAns = normalizeTextAnswer(uAns);
-            const correctAns = normalizeTextAnswer(q.answer);
             if (!userAns) unansweredCount++;
-            else if (userAns === correctAns) correctCount++;
+            else if (qScore.isCorrect) correctCount++;
             else wrongCount++;
         }
     });
+
+    // Lấy điểm hiển thị (ưu tiên lấy từ kết quả Firestore hoặc điểm tự tính toán)
+    const finalDisplayScore = result.score !== undefined ? result.score : Math.round(calculatedScore * 100) / 100;
 
     let html = `
         <div class="result-stats-card">
@@ -329,7 +489,7 @@ function renderTestResultDetail(test, result) {
                     <i class="fa-solid fa-award"></i>
                     <div class="stat-info">
                         <span>Điểm số</span>
-                        <strong>${result.score || 0} / 10</strong>
+                        <strong>${finalDisplayScore} / 10</strong>
                     </div>
                 </div>
                 <div class="stat-box correct">
@@ -359,26 +519,27 @@ function renderTestResultDetail(test, result) {
         <div class="review-container">
     `;
 
-    // 2. Render danh sách chi tiết câu hỏi
+    // Render danh sách chi tiết các câu hỏi
     questions.forEach((q, idx) => {
         const uAns = userAnswers[idx];
+        const qScore = calculateQuestionScore(q, uAns, test);
 
         // RENDER PHẦN I (Trắc nghiệm 4 lựa chọn)
         if (q.part === 1) {
-            const userAns = typeof uAns === 'string' ? uAns.toUpperCase() : "";
-            const correctAns = normalizeAnswer(q.correctAnswer || q.answer);
+            const userAns = uAns ? normalizeAnswer(uAns) : "";
+            const correctAns = normalizeAnswer(q.correctAnswer ?? q.answer ?? q.correct);
             const options = Array.isArray(q.options) ? q.options : [];
 
             let statusClass = "skipped";
-            let statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống`;
+            let statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống (+0/${qScore.maxPoint} đ)`;
 
             if (userAns) {
-                if (userAns === correctAns) {
+                if (qScore.isCorrect) {
                     statusClass = "correct";
-                    statusText = `<i class="fa-solid fa-check"></i> Trả lời đúng`;
+                    statusText = `<i class="fa-solid fa-check"></i> Trả lời đúng (+${qScore.earnedPoint}/${qScore.maxPoint} đ)`;
                 } else {
                     statusClass = "wrong";
-                    statusText = `<i class="fa-solid fa-xmark"></i> Trả lời sai`;
+                    statusText = `<i class="fa-solid fa-xmark"></i> Trả lời sai (+0/${qScore.maxPoint} đ)`;
                 }
             }
 
@@ -388,7 +549,7 @@ function renderTestResultDetail(test, result) {
                         <span class="review-question-title">Câu ${idx + 1} (Phần I)</span>
                         <span class="review-status-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="review-question-body">${q.question || ''}</div>
+                    <div class="review-question-body">${formatQuestionText(q.question || '')}</div>
                     <div class="review-options">
             `;
 
@@ -405,7 +566,7 @@ function renderTestResultDetail(test, result) {
                 html += `
                     <div class="review-option ${optionClass}">
                         <span class="opt-letter">${letter}</span>
-                        <span class="opt-text">${optText}</span>
+                        <span class="opt-text">${formatQuestionText(optText)}</span>
                     </div>
                 `;
             });
@@ -418,12 +579,33 @@ function renderTestResultDetail(test, result) {
             const correctAnswers = q.answers || [];
             const userSubAns = (typeof uAns === 'object' && uAns !== null) ? uAns : {};
 
+            let statusClass = "wrong";
+            let statusText = `<i class="fa-solid fa-xmark"></i> Sai (+0/${qScore.maxPoint} đ)`;
+
+            if (qScore.isCorrect) {
+                statusClass = "correct";
+                statusText = `<i class="fa-solid fa-check"></i> Đúng hoàn toàn (+${qScore.earnedPoint}/${qScore.maxPoint} đ)`;
+            } else if (qScore.earnedPoint > 0) {
+                statusClass = "correct";
+                statusText = `<i class="fa-solid fa-check-double"></i> Đúng một phần (+${qScore.earnedPoint}/${qScore.maxPoint} đ)`;
+            } else {
+                let hasAnswered = false;
+                statements.forEach((_, stIdx) => {
+                    if (userSubAns[stIdx] !== undefined && userSubAns[stIdx] !== null) hasAnswered = true;
+                });
+                if (!hasAnswered) {
+                    statusClass = "skipped";
+                    statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống (+0/${qScore.maxPoint} đ)`;
+                }
+            }
+
             html += `
                 <div class="review-item">
                     <div class="review-header">
                         <span class="review-question-title">Câu ${idx + 1} (Phần II - Đúng/Sai)</span>
+                        <span class="review-status-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="review-question-body">${q.question || ''}</div>
+                    <div class="review-question-body">${formatQuestionText(q.question || '')}</div>
                     <div class="review-tf-list" style="margin-top:10px;">
             `;
 
@@ -432,12 +614,12 @@ function renderTestResultDetail(test, result) {
                 const userVal = userSubAns[stIdx];
                 const correctVal = correctAnswers[stIdx];
 
-                let stStatus = userVal === undefined ? "Bỏ trống" : (userVal === correctVal ? "Đúng" : "Sai");
-                let colorStyle = userVal === correctVal ? "color:#4ade80;" : (userVal === undefined ? "color:#facc15;" : "color:#f87171;");
+                let stStatus = (userVal === undefined || userVal === null) ? "Bỏ trống" : (userVal === correctVal ? "Đúng" : "Sai");
+                let colorStyle = userVal === correctVal ? "color:#4ade80;" : ((userVal === undefined || userVal === null) ? "color:#facc15;" : "color:#f87171;");
 
                 html += `
                     <div style="padding: 6px 0; border-bottom: 1px dashed #334155;">
-                        <strong>${label}) ${stText}</strong><br>
+                        <strong>${label}) ${formatQuestionText(stText)}</strong><br>
                         <small>Bạn chọn: <b>${userVal === true ? "Đúng" : userVal === false ? "Sai" : "Chưa chọn"}</b> | Đáp án đúng: <b>${correctVal ? "Đúng" : "Sai"}</b> 
                         (<span style="${colorStyle}">${stStatus}</span>)</small>
                     </div>
@@ -449,21 +631,32 @@ function renderTestResultDetail(test, result) {
         // RENDER PHẦN III (Trả lời ngắn)
         else if (q.part === 3) {
             const userAns = normalizeTextAnswer(uAns);
-            const correctAns = normalizeTextAnswer(q.answer);
-            const isCorrect = userAns && userAns === correctAns;
+            const correctAnsStr = String(q.answer ?? q.correctAnswer ?? "");
+            const isCorrect = qScore.isCorrect;
+
+            let statusClass = "skipped";
+            let statusText = `<i class="fa-solid fa-circle-minus"></i> Bỏ trống (+0/${qScore.maxPoint} đ)`;
+
+            if (userAns !== "") {
+                if (isCorrect) {
+                    statusClass = "correct";
+                    statusText = `<i class="fa-solid fa-check"></i> Trả lời đúng (+${qScore.earnedPoint}/${qScore.maxPoint} đ)`;
+                } else {
+                    statusClass = "wrong";
+                    statusText = `<i class="fa-solid fa-xmark"></i> Trả lời sai (+0/${qScore.maxPoint} đ)`;
+                }
+            }
 
             html += `
                 <div class="review-item">
                     <div class="review-header">
                         <span class="review-question-title">Câu ${idx + 1} (Phần III - Trả lời ngắn)</span>
-                        <span class="review-status-badge ${!userAns ? 'skipped' : (isCorrect ? 'correct' : 'wrong')}">
-                            ${!userAns ? 'Bỏ trống' : (isCorrect ? 'Đúng' : 'Sai')}
-                        </span>
+                        <span class="review-status-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="review-question-body">${q.question || ''}</div>
+                    <div class="review-question-body">${formatQuestionText(q.question || '')}</div>
                     <div style="margin-top:10px; padding:8px; background:#1e293b; border-radius:6px;">
-                        <div>Câu trả lời của bạn: <strong>${uAns || 'Chưa trả lời'}</strong></div>
-                        <div style="color:#4ade80;">Đáp án đúng: <strong>${q.answer}</strong></div>
+                        <div>Câu trả lời của bạn: <strong>${escapeHTML(uAns || 'Chưa trả lời')}</strong></div>
+                        <div style="color:#4ade80;">Đáp án đúng: <strong>${escapeHTML(correctAnsStr)}</strong></div>
                     </div>
                 </div>
             `;
@@ -471,53 +664,72 @@ function renderTestResultDetail(test, result) {
     });
 
     html += `</div>`;
-    resultDetailContent.innerHTML = html;
-}
-/* CÁC HÀM BỔ TRỢ TRÍCH XUẤT DỮ LIỆU CÂU HỎI */
-function extractQuestions(test) {
-    const res = [];
-    if (test.part1?.questions) {
-        test.part1.questions.forEach(q => res.push({ ...q, part: 1 }));
+    if (resultDetailContent) {
+        resultDetailContent.innerHTML = html;
+        renderMath();
     }
-    if (test.part2?.questions) {
-        test.part2.questions.forEach(q => res.push({ ...q, part: 2 }));
-    }
-    if (test.part3?.questions) {
-        test.part3.questions.forEach(q => res.push({ ...q, part: 3 }));
-    }
-    return res;
 }
-function normalizeTextAnswer(ans) {
-    if (ans === undefined || ans === null) return "";
-    return String(ans).trim().replace(',', '.').toLowerCase();
-}
-function getOptions(q) {
-    if (Array.isArray(q.options)) return q.options;
-    if (Array.isArray(q.answers)) return q.answers;
-    const res = [];
-    if (q.A !== undefined) res.push(q.A);
-    if (q.B !== undefined) res.push(q.B);
-    if (q.C !== undefined) res.push(q.C);
-    if (q.D !== undefined) res.push(q.D);
-    return res;
+
+/*==================================================
+                HÀM BỔ TRỢ & RENDER MATH
+==================================================*/
+function renderMath() {
+    if (window.katex && document.querySelectorAll) {
+        try {
+            const elements = document.querySelectorAll(".review-question-body, .opt-text");
+            elements.forEach(el => {
+                if (el.innerHTML.includes("$")) {
+                    el.innerHTML = el.innerHTML.replace(/\$(.*?)\$/g, (match, formula) => {
+                        return katex.renderToString(formula, { throwOnError: false });
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Lỗi render Math:", e);
+        }
+    }
 }
 
 function escapeHTML(str) {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* EVENT NAVIGATION BACK */
-backToCourses.addEventListener("click", () => {
-    courseDetail.style.display = "none";
-    courseList.style.display = "block";
-});
+function showLoading() {
+    if (resultLoading) resultLoading.style.display = "flex";
+    if (courseList) courseList.style.display = "none";
+}
 
-backToLessons.addEventListener("click", () => {
-    testResultDetail.style.display = "none";
-    courseDetail.style.display = "block";
-});
+function hideLoading() {
+    if (resultLoading) resultLoading.style.display = "none";
+    if (courseList) courseList.style.display = "block";
+}
 
-/* AUTH STATE CHECK */
+function showEmpty() {
+    if (resultLoading) resultLoading.style.display = "none";
+    if (courseList) courseList.style.display = "none";
+    if (resultEmpty) resultEmpty.style.display = "flex";
+}
+
+/*==================================================
+                EVENT NAVIGATION BACK
+==================================================*/
+if (backToCourses) {
+    backToCourses.addEventListener("click", () => {
+        if (courseDetail) courseDetail.style.display = "none";
+        if (courseList) courseList.style.display = "block";
+    });
+}
+
+if (backToLessons) {
+    backToLessons.addEventListener("click", () => {
+        if (testResultDetail) testResultDetail.style.display = "none";
+        if (courseDetail) courseDetail.style.display = "block";
+    });
+}
+
+/*==================================================
+                AUTH STATE CHECK
+==================================================*/
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.replace("index.html");
@@ -528,35 +740,9 @@ onAuthStateChanged(auth, async (user) => {
     await loadResultsAndCourses();
 });
 
-function showLoading() {
-    resultLoading.style.display = "flex";
-    courseList.style.display = "none";
-}
-
-function hideLoading() {
-    resultLoading.style.display = "none";
-    courseList.style.display = "block";
-}
-
-function showEmpty() {
-    resultLoading.style.display = "none";
-    courseList.style.display = "none";
-    resultEmpty.style.display = "flex";
-}
-// Hàm chuyển đổi đáp án (Số -> Chữ cái 'A', 'B', 'C', 'D')
-function normalizeAnswer(ans) {
-    if (ans === undefined || ans === null) return "";
-    const str = String(ans).trim();
-    // Nếu là dạng chỉ số mảng (0, 1, 2, 3)
-    if (!isNaN(str) && str !== "") {
-        return String.fromCharCode(65 + parseInt(str, 10)); // 0 -> 'A', 1 -> 'B', 2 -> 'C', ...
-    }
-    return str.toUpperCase();
-}
 /*==================================================
         XỬ LÝ UI: THÔNG BÁO, AVATAR & USER MENU
 ==================================================*/
-
 const notificationBtn = document.querySelector(".notification-btn");
 const notificationPanel = document.getElementById("notificationPanel");
 const closeNotification = document.getElementById("closeNotification");
@@ -570,6 +756,7 @@ if (userGuide) {
         alert("Chọn khóa học → xem danh sách bài kiểm tra → bấm 'Xem kết quả' để xem điểm số và chi tiết câu đúng/sai.");
     });
 }
+
 const logoutBtn = document.getElementById("logoutBtn");
 const myCoursesBtn = document.getElementById("myCoursesBtn");
 const manageBtn = document.getElementById("manageBtn");
@@ -586,7 +773,7 @@ if (notificationBtn && notificationPanel) {
     });
 }
 
-if (closeNotification) {
+if (closeNotification && notificationPanel) {
     closeNotification.addEventListener("click", () => {
         notificationPanel.classList.remove("active");
     });
@@ -602,10 +789,10 @@ if (avatar && userMenu) {
 
 // 3. Đóng panel khi click ra ngoài
 document.addEventListener("click", (e) => {
-    if (notificationPanel && !notificationPanel.contains(e.target) && !notificationBtn.contains(e.target)) {
+    if (notificationPanel && !notificationPanel.contains(e.target) && notificationBtn && !notificationBtn.contains(e.target)) {
         notificationPanel.classList.remove("active");
     }
-    if (userMenu && !userMenu.contains(e.target) && !avatar.contains(e.target)) {
+    if (userMenu && !userMenu.contains(e.target) && avatar && !avatar.contains(e.target)) {
         userMenu.classList.remove("active");
     }
 });
