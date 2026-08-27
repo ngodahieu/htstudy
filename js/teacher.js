@@ -2839,3 +2839,352 @@ async function uploadVideo() {
         alert("Có lỗi upload video.");
     }
 }
+// ====================================
+//        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
+// ====================================
+const studentTestResultModal = document.getElementById("studentTestResultModal");
+const studentTestResultBody = document.getElementById("studentTestResultBody");
+const closeStudentTestResultBtn = document.getElementById("closeStudentTestResultBtn");
+const backTestResultBtn = document.getElementById("backTestResultBtn");
+
+const studentSingleResultDetailModal = document.getElementById("studentSingleResultDetailModal");
+const singleResultDetailBody = document.getElementById("singleResultDetailBody");
+const closeSingleResultModal = document.getElementById("closeSingleResultModal");
+
+let currentSelectedStudent = null; // Lưu thông tin học sinh đang xem
+let testResultNavStep = 1;         // 1: Chương, 2: Bài học, 3: Bài kiểm tra, 4: Danh sách kết quả
+let selectedChapterForTest = null;
+let selectedLessonForTest = null;
+let selectedTestObj = null;
+
+// Cập nhật lại hàm render danh sách tài khoản học sinh để thêm nút "Kết quả kiểm tra"
+// (Thay thế hoặc tích hợp vào hàm renderStudentAccountList hiện tại của bạn)
+function renderStudentAccountList(accounts) {
+    if (!studentAccountList) return;
+
+    if (!accounts.length) {
+        studentAccountList.innerHTML = `
+            <div class="empty">
+                <i class="fa-solid fa-user-slash"></i>
+                <h3>Chưa có học sinh nào</h3>
+                <p>Khóa học này chưa được cấp tài khoản cho học sinh nào.</p>
+            </div>`;
+        return;
+    }
+
+    studentAccountList.innerHTML = "";
+    accounts.forEach((acc) => {
+        const card = document.createElement("div");
+        card.className = "chapter-card student-account-card";
+        card.style.display = "flex";
+        card.style.justifyContent = "space-between";
+        card.style.alignItems = "center";
+
+        card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="${acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg"}" 
+                     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" alt="Avatar">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">
+                        ${escapeHtmlTeacher(acc.name || "Chưa đặt tên")} 
+                        <span style="font-size: 0.85rem; color: #007bff; font-weight: normal;">(${escapeHtmlTeacher(acc.memberId || "Chưa có Mã")})</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #666; font-size: 0.9rem;">
+                        📧 ${escapeHtmlTeacher(acc.email || "Không có email")}
+                    </p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="primary-btn detail-student-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-info"></i> Chi tiết
+                </button>
+                <button class="primary-btn test-result-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem; background-color: #28a745;">
+                    <i class="fa-solid fa-square-poll-vertical"></i> Kết quả kiểm tra
+                </button>
+            </div>
+        `;
+
+        // Sự kiện nút Chi tiết cũ
+        card.querySelector(".detail-student-btn").addEventListener("click", () => {
+            openStudentDetailModal(acc);
+        });
+
+        // Sự kiện nút Kế bên nút chi tiết: Kết quả kiểm tra
+        card.querySelector(".test-result-btn").addEventListener("click", () => {
+            currentSelectedStudent = acc;
+            openStudentTestChapters(currentStudentCourseId);
+        });
+
+        studentAccountList.appendChild(card);
+    });
+}
+
+// BƯỚC 1: Hiển thị danh sách Chương của khóa học
+async function openStudentTestChapters(courseId) {
+    testResultNavStep = 1;
+    if (backTestResultBtn) backTestResultBtn.style.display = "none";
+    if (studentTestResultModal) studentTestResultModal.style.display = "flex";
+    if (studentTestResultBody) {
+        studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách chương...</div>`;
+    }
+
+    try {
+        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
+        let chapters = [];
+        snapshot.forEach(docSnap => {
+            chapters.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+        if (!chapters.length) {
+            studentTestResultBody.innerHTML = `<div class="empty">Khóa học này chưa có chương nào.</div>`;
+            return;
+        }
+
+        let html = `<h4 style="margin-bottom: 12px;">Học sinh: ${escapeHtmlTeacher(currentSelectedStudent.name)}</h4>`;
+        html += `<p style="margin-bottom: 15px; color: #666;">Chọn chương để tiếp tục:</p>`;
+        chapters.forEach(ch => {
+            html += `
+                <div class="chapter-card select-chapter-item" data-id="${ch.id}" data-title="${escapeHtmlTeacher(ch.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <strong>Chương ${ch.order || ""}: ${escapeHtmlTeacher(ch.title)}</strong>
+                </div>
+            `;
+        });
+        studentTestResultBody.innerHTML = html;
+
+        // Gắn sự kiện chọn chương
+        studentTestResultBody.querySelectorAll(".select-chapter-item").forEach(item => {
+            item.addEventListener("click", () => {
+                selectedChapterForTest = { id: item.dataset.id, title: item.dataset.title };
+                openStudentTestLessons(courseId, selectedChapterForTest.id);
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải dữ liệu chương.</div>`;
+    }
+}
+
+// BƯỚC 2: Hiển thị danh sách Bài học thuộc chương
+async function openStudentTestLessons(courseId, chapterId) {
+    testResultNavStep = 2;
+    if (backTestResultBtn) backTestResultBtn.style.display = "block";
+    studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách bài học...</div>`;
+
+    try {
+        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters", chapterId, "lessons"));
+        let lessons = [];
+        snapshot.forEach(docSnap => {
+            lessons.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        lessons.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+
+        if (!lessons.length) {
+            studentTestResultBody.innerHTML = `<div class="empty">Chương này chưa có bài học nào.</div>`;
+            return;
+        }
+
+        let html = `<h4 style="margin-bottom: 12px;">Chương: ${selectedChapterForTest.title}</h4>`;
+        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài học:</p>`;
+        lessons.forEach(ls => {
+            html += `
+                <div class="chapter-card select-lesson-item" data-id="${ls.id}" data-title="${escapeHtmlTeacher(ls.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <strong>Bài ${ls.order || ""}: ${escapeHtmlTeacher(ls.title)}</strong>
+                </div>
+            `;
+        });
+        studentTestResultBody.innerHTML = html;
+
+        studentTestResultBody.querySelectorAll(".select-lesson-item").forEach(item => {
+            item.addEventListener("click", () => {
+                selectedLessonForTest = { id: item.dataset.id, title: item.dataset.title };
+                openStudentTestsList(courseId, chapterId, selectedLessonForTest.id);
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải dữ liệu bài học.</div>`;
+    }
+}
+
+// BƯỚC 3: Hiển thị danh sách Bài kiểm tra thuộc bài học
+async function openStudentTestsList(courseId, chapterId, lessonId) {
+    testResultNavStep = 3;
+    studentTestResultBody.innerHTML = `<div class="empty">Đang tải bài kiểm tra...</div>`;
+
+    try {
+        const snapshot = await getDocs(collection(db, "courses", courseId, "tests"));
+        let tests = [];
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            if (data.chapterId === chapterId && data.lessonId === lessonId) {
+                tests.push({ id: docSnap.id, ...data });
+            }
+        });
+
+        if (!tests.length) {
+            studentTestResultBody.innerHTML = `<div class="empty">Bài học này chưa có bài kiểm tra nào.</div>`;
+            return;
+        }
+
+        let html = `<h4 style="margin-bottom: 12px;">Bài: ${selectedLessonForTest.title}</h4>`;
+        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài kiểm tra để xem kết quả của học sinh:</p>`;
+        tests.forEach(t => {
+            html += `
+                <div class="chapter-card select-test-item" data-id="${t.id}" data-title="${escapeHtmlTeacher(t.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
+                    <strong><i class="fa-solid fa-file-circle-check"></i> ${escapeHtmlTeacher(t.title)}</strong>
+                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #555;">Thời gian: ${t.duration || 15} phút | Tổng điểm: ${t.totalPoints || 0}</p>
+                </div>
+            `;
+        });
+        studentTestResultBody.innerHTML = html;
+
+        studentTestResultBody.querySelectorAll(".select-test-item").forEach(item => {
+            item.addEventListener("click", () => {
+                selectedTestObj = { id: item.dataset.id, title: item.dataset.title };
+                openStudentSubmissionsList(courseId, selectedTestObj.id, currentSelectedStudent.id);
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải danh sách bài kiểm tra.</div>`;
+    }
+}
+
+// BƯỚC 4: Hiển thị danh sách kết quả làm bài của học sinh (Có nút xem chi tiết và cho học sinh xem kết quả)
+async function openStudentSubmissionsList(courseId, testId, studentId) {
+    testResultNavStep = 4;
+    studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
+
+    try {
+        // Truy vấn collection chứa kết quả nộp bài (thường lưu tại: tests/{testId}/submissions hoặc tương tự tùy cấu trúc DB của bạn)
+        // Ở đây giả định cấu trúc sub-collection: courses/{courseId}/tests/{testId}/submissions với điều kiện studentId == studentId
+        const q = query(
+            collection(db, "courses", courseId, "tests", testId, "submissions"),
+            where("studentId", "==", studentId)
+        );
+        const snapshot = await getDocs(q);
+        let submissions = [];
+        snapshot.forEach(docSnap => {
+            submissions.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        if (!submissions.length) {
+            studentTestResultBody.innerHTML = `
+                <h4 style="margin-bottom: 12px;">Bài kiểm tra: ${selectedTestObj.title}</h4>
+                <div class="empty">Học sinh này chưa làm bài kiểm tra này lần nào.</div>`;
+            return;
+        }
+
+        let html = `<h4 style="margin-bottom: 12px;">Kết quả bài kiểm tra: ${selectedTestObj.title}</h4>`;
+        html += `<p style="margin-bottom: 15px; color: #666;">Danh sách các lần làm bài:</p>`;
+
+        submissions.forEach((sub, idx) => {
+            const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
+            const isAllowedView = sub.allowStudentView === true; // Trạng thái cho học sinh xem kết quả
+            const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
+
+            html += `
+                <div style="padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9;">
+                    <div>
+                        <strong>Lần làm #${idx + 1}</strong> - Điểm: <span style="color: #d9534f; font-weight: bold;">${score} điểm</span>
+                        <br><small style="color: #666;">Nộp lúc: ${timeStr}</small>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 5px 10px; font-size: 0.85rem;">
+                            Xem chi tiết
+                        </button>
+                        <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 5px 10px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
+                            ${isAllowedView ? 'HS đang được xem' : 'Cho HS xem'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        studentTestResultBody.innerHTML = html;
+
+        // Sự kiện Xem chi tiết bài làm
+        studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const subId = btn.dataset.subId;
+                const subData = submissions.find(s => s.id === subId);
+                showSingleSubmissionDetail(subData);
+            });
+        });
+
+        // Sự kiện Nút cho học sinh xem kết quả (Bật/tắt cờ allowStudentView)
+        studentTestResultBody.querySelectorAll(".toggle-view-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const subId = btn.dataset.subId;
+                const currentStatus = btn.dataset.allowed === "true";
+                const newStatus = !currentStatus;
+
+                try {
+                    const subRef = doc(db, "courses", courseId, "tests", testId, "submissions", subId);
+                    await updateDoc(subRef, { allowStudentView: newStatus });
+                    
+                    btn.dataset.allowed = String(newStatus);
+                    btn.style.backgroundColor = newStatus ? '#28a745' : '#6c757d';
+                    btn.textContent = newStatus ? 'HS đang được xem' : 'Cho HS xem';
+                    alert(newStatus ? "Đã cho phép học sinh xem kết quả này." : "Đã ẩn kết quả đối với học sinh.");
+                } catch (err) {
+                    console.error(err);
+                    alert("Không thể cập nhật trạng thái: " + err.message);
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error(error);
+        studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
+    }
+}
+
+// Xử lý nút Quay lại trong modal Kết quả kiểm tra
+if (backTestResultBtn) {
+    backTestResultBtn.addEventListener("click", () => {
+        if (testResultNavStep === 4) {
+            testResultNavStep = 3;
+            if (selectedChapterForTest && selectedLessonForTest) {
+                openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
+            }
+        } else if (testResultNavStep === 3) {
+            testResultNavStep = 2;
+            if (selectedChapterForTest) {
+                openStudentTestChapters(currentStudentCourseId);
+                backTestResultBtn.style.display = "none";
+            }
+        } else if (testResultNavStep === 2) {
+            testResultNavStep = 1;
+            openStudentTestChapters(currentStudentCourseId);
+            backTestResultBtn.style.display = "none";
+        }
+    });
+}
+
+// Đóng modal kết quả kiểm tra
+if (closeStudentTestResultBtn) {
+    closeStudentTestResultBtn.addEventListener("click", () => {
+        if (studentTestResultModal) studentTestResultModal.style.display = "none";
+    });
+}
+
+// Hiển thị nội dung chi tiết bài làm cụ thể của học sinh
+function showSingleSubmissionDetail(subData) {
+    if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
+    
+    singleResultDetailBody.innerHTML = `
+        <p><strong>Tổng điểm:</strong> ${subData.score || subData.totalScore || 0}</p>
+        <p><strong>Thời gian nộp:</strong> ${subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A"}</p>
+        <hr style="margin: 10px 0;">
+        <p><i>Chi tiết câu trả lời của học sinh đã được ghi nhận trong hệ thống cơ sở dữ liệu.</i></p>
+    `;
+    studentSingleResultDetailModal.style.display = "flex";
+}
+
+if (closeSingleResultModal) {
+    closeSingleResultModal.addEventListener("click", () => {
+        if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
+    });
+}
