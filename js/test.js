@@ -602,12 +602,6 @@ async function loadTest() {
 
 initializeStorageKeys();
 
-/*
-    Nếu reload trang:
-    - Lấy lại đáp án
-    - Lấy lại câu đang làm
-*/
-
 answers =
     loadAnswers();
 
@@ -660,7 +654,7 @@ function extractQuestions(test) {
             result.push({
                 ...q,
                 part: 1,
-                points: q.points ?? test.part1.points ?? 0.5, // Lấy điểm chuẩn của Phần I
+                points: Number(q.points ?? test.part1?.points ?? 0.5),
                 partQuestionIndex: idx + 1
             });
         });
@@ -671,7 +665,7 @@ function extractQuestions(test) {
             result.push({
                 ...q,
                 part: 2,
-                scores: test.part2.scores,
+                scores: test.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 },
                 partQuestionIndex: idx + 1
             });
         });
@@ -682,7 +676,7 @@ function extractQuestions(test) {
             result.push({
                 ...q,
                 part: 3,
-                points: q.points ?? test.part3.points ?? 0.5,
+                points: Number(q.points ?? test.part3?.points ?? 0.5),
                 partQuestionIndex: idx + 1
             });
         });
@@ -826,19 +820,11 @@ function updateQuestionGrid() {
                 ).trim() !== "";
 
 
-            /*----------------------------------
-                XÓA TRẠNG THÁI CŨ
-            ----------------------------------*/
-
             button.classList.remove(
                 "current",
                 "answered"
             );
 
-
-            /*----------------------------------
-                ƯU TIÊN ANSWERED
-            ----------------------------------*/
 
             if (hasAnswer) {
 
@@ -905,10 +891,6 @@ renderAnswers(
 updateQuestionGrid();
 
 updateNavigation();
-
-/*------------------------------------------
-    RENDER CÔNG THỨC TOÁN / HÓA
-------------------------------------------*/
 
 renderMath();
 }
@@ -1180,10 +1162,6 @@ function startTimer() {
         ) || 0;
 
 
-    /*------------------------------------------
-        KHÔNG GIỚI HẠN THỜI GIAN
-    ------------------------------------------*/
-
     if (duration <= 0) {
 
         if (testTimer) {
@@ -1204,10 +1182,6 @@ function startTimer() {
 
     }
 
-
-    /*------------------------------------------
-        LẤY THỜI ĐIỂM KẾT THÚC ĐÃ LƯU
-    ------------------------------------------*/
 
     let endTime =
         null;
@@ -1242,11 +1216,6 @@ function startTimer() {
     }
 
 
-    /*------------------------------------------
-        NẾU CHƯA CÓ TIMER
-        → TẠO TIMER MỚI
-    ------------------------------------------*/
-
     if (
         !endTime ||
         !Number.isFinite(endTime)
@@ -1278,18 +1247,10 @@ function startTimer() {
     }
 
 
-    /*------------------------------------------
-        UPDATE NGAY
-    ------------------------------------------*/
-
     updateRemainingTime(
         endTime
     );
 
-
-    /*------------------------------------------
-        CHẠY ĐỒNG HỒ
-    ------------------------------------------*/
 
     timerInterval =
         setInterval(
@@ -1330,10 +1291,6 @@ function updateRemainingTime(endTime) {
     updateTimer();
 
 
-    /*------------------------------------------
-        HẾT GIỜ
-    ------------------------------------------*/
-
     if (
         remainingSeconds <= 0
     ) {
@@ -1342,10 +1299,6 @@ function updateRemainingTime(endTime) {
             timerInterval
         );
 
-
-        /*--------------------------------------
-            XÓA TIMER CŨ
-        --------------------------------------*/
 
         try {
 
@@ -1639,9 +1592,6 @@ function clearTestStorage() {
 /*==================================================
                 FINISH TEST
 ==================================================*/
-/*==================================================
-                FINISH TEST
-==================================================*/
 
 async function finishTest() {
 
@@ -1689,17 +1639,8 @@ async function finishTest() {
 
     try {
 
-        /*==========================================
-                TÍNH ĐIỂM
-        ==========================================*/
-
         const scoreData =
             calculateScore();
-
-
-        /*==========================================
-                PHÂN TÍCH CÂU ĐÚNG / SAI / BỎ TRỐNG
-        ==========================================*/
 
         let wrong = 0;
 
@@ -1711,11 +1652,6 @@ async function finishTest() {
 
                 const userAnswer =
                     answers[index];
-
-
-                /*------------------------------
-                    CHƯA TRẢ LỜI
-                ------------------------------*/
 
                 if (
                     userAnswer === undefined ||
@@ -1729,11 +1665,6 @@ async function finishTest() {
 
                 }
 
-
-                /*------------------------------
-                    ĐÁP ÁN ĐÚNG
-                ------------------------------*/
-
                 const correctAnswer =
                     normalizeAnswer(
                         question.correctAnswer ||
@@ -1741,11 +1672,6 @@ async function finishTest() {
                         question.correct ||
                         ""
                     );
-
-
-                /*------------------------------
-                    ĐÁP ÁN SAI
-                ------------------------------*/
 
                 if (
                     normalizeAnswer(
@@ -1760,24 +1686,17 @@ async function finishTest() {
             }
         );
 
-
-        /*==========================================
-                LƯU THÔNG TIN CÂU HỎI
-        ==========================================*/
-const resultQuestions = questions.map((question, index) => {
-    return {
-        question: question.question || "",
-        options: question.options || [],
-        statements: question.statements || [],
-        correctAnswer: question.correctAnswer ?? question.answer ?? question.answers ?? "",
-        userAnswer: answers[index] ?? null,
-        part: question.part || 1,
-        partQuestionIndex: question.partQuestionIndex || 1
-    };
-});
-        /*==========================================
-                DỮ LIỆU KẾT QUẢ
-        ==========================================*/
+        const resultQuestions = questions.map((question, index) => {
+            return {
+                question: question.question || "",
+                options: question.options || [],
+                statements: question.statements || [],
+                correctAnswer: question.correctAnswer ?? question.answer ?? question.answers ?? "",
+                userAnswer: answers[index] ?? null,
+                part: question.part || 1,
+                partQuestionIndex: question.partQuestionIndex || 1
+            };
+        });
 
         const resultData = {
 
@@ -1826,11 +1745,6 @@ const resultQuestions = questions.map((question, index) => {
             resultData
         );
 
-
-        /*==========================================
-                LƯU FIRESTORE
-        ==========================================*/
-
         await addDoc(
             collection(
                 db,
@@ -1839,17 +1753,7 @@ const resultQuestions = questions.map((question, index) => {
             resultData
         );
 
-
-        /*==========================================
-                XÓA TRẠNG THÁI BÀI ĐANG LÀM
-        ==========================================*/
-
         clearTestStorage();
-
-
-        /*==========================================
-                QUAY VỀ TRANG CHỦ
-        ==========================================*/
 
         window.location.href =
             "index.html";
@@ -1896,6 +1800,7 @@ const resultQuestions = questions.map((question, index) => {
     }
 
 }
+
 /*==================================================
                 TÍNH ĐIỂM
 ==================================================*/
@@ -1909,23 +1814,26 @@ function calculateScore() {
         if (q.part === 1) {
             const correctLetter = normalizeAnswer(q.correctAnswer);
             if (userAns && userAns === correctLetter) {
-                totalScore += Number(currentTest.part1?.points || 0.25);
+                const point = Number(q.points ?? currentTest.part1?.points ?? 0.5);
+                totalScore += point;
                 totalCorrectCount++;
             }
         } 
         else if (q.part === 2) {
             if (Array.isArray(userAns)) {
                 let matchCount = 0;
-                q.answers.forEach((correctVal, sIdx) => {
-                    if (userAns[sIdx] === correctVal) matchCount++;
-                });
+                if (Array.isArray(q.answers)) {
+                    q.answers.forEach((correctVal, sIdx) => {
+                        if (userAns[sIdx] === correctVal) matchCount++;
+                    });
+                }
 
-                const scores = currentTest.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 };
-                if (matchCount === 1) totalScore += Number(scores.one || 0.1);
-                else if (matchCount === 2) totalScore += Number(scores.two || 0.25);
-                else if (matchCount === 3) totalScore += Number(scores.three || 0.5);
+                const scores = q.scores || currentTest.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 };
+                if (matchCount === 1) totalScore += Number(scores.one ?? 0.1);
+                else if (matchCount === 2) totalScore += Number(scores.two ?? 0.25);
+                else if (matchCount === 3) totalScore += Number(scores.three ?? 0.5);
                 else if (matchCount === 4) {
-                    totalScore += Number(scores.four || 1.0);
+                    totalScore += Number(scores.four ?? 1.0);
                     totalCorrectCount++;
                 }
             }
@@ -1934,7 +1842,8 @@ function calculateScore() {
             const correctText = String(q.answer || "").trim().replace(",", ".");
             const userText = String(userAns || "").trim().replace(",", ".");
             if (userText !== "" && userText === correctText) {
-                totalScore += Number(currentTest.part3?.points || 0.25);
+                const point = Number(q.points ?? currentTest.part3?.points ?? 0.5);
+                totalScore += point;
                 totalCorrectCount++;
             }
         }
@@ -1945,6 +1854,7 @@ function calculateScore() {
         correct: totalCorrectCount
     };
 }
+
 /*==================================================
             NORMALIZE ANSWER
 ==================================================*/
@@ -1953,16 +1863,15 @@ function normalizeAnswer(value) {
     if (value === undefined || value === null) return "";
     const str = String(value).trim();
     
-    // Nếu đáp án dạng số chỉ số mảng ("0", "1", "2", "3") -> Đổi thành ('A', 'B', 'C', 'D')
     if (!isNaN(str) && str !== "") {
         return String.fromCharCode(65 + parseInt(str, 10));
     }
     
     return str.toUpperCase();
 }
+
 /*==================================================
         FORMAT QUESTION / ANSWER
-        TỰ ĐỘNG NHẬN DIỆN CÔNG THỨC HÓA / TOÁN
 ==================================================*/
 
 function formatQuestionText(value) {
@@ -1972,351 +1881,56 @@ function formatQuestionText(value) {
 
     let text = String(value);
 
-    /* Nếu chuỗi đã chứa mã LaTeX/MathJax chuẩn thì giữ nguyên */
-    if (
-        text.includes("\\(") ||
-        text.includes("\\[") ||
-        text.includes("$$")
-    ) {
-        return text;
+    if (typeof formatChemistryText === "function") {
+        text = formatChemistryText(text);
     }
-
-    /* Escape HTML bảo mật */
-    text = escapeHTML(text);
-
-    /* Chuyển đổi công thức hóa học (CnH2nO2, Ca(OH)2,...) */
-    text = convertChemicalFormulas(text);
-
-    /* Chuyển đổi công thức toán học/vật lý (lũy thừa, dấu so sánh,...) */
-    text = convertMathFormulas(text);
-
-    /* Xử lý xuống dòng */
-    text = text.replace(/\n/g, "<br>");
-
     return text;
 }
-
-
-/*==================================================
-        CHUYỂN CÔNG THỨC HÓA HỌC
-==================================================*/
-
-function convertChemicalFormulas(text) {
-    if (!text) return "";
-
-    /* 1. Chuẩn hóa ký hiệu so sánh & mũi tên (xử lý cả dạng đã bị escapeHTML) */
-    text = text
-        .replace(/&gt;=/g, "≥")
-        .replace(/&lt;=/g, "≤")
-        .replace(/&gt;/g, ">")
-        .replace(/&lt;/g, "<")
-        .replace(/&amp;/g, "&")
-        .replace(/>=/g, "≥")
-        .replace(/<=/g, "≤")
-        .replace(/!=|&ne;/g, "≠")
-        .replace(/-&gt;|->/g, "→")
-        .replace(/&lt;=&gt;|<=>/g, "⇄");
-
-    /* 2. Danh sách nguyên tố hóa học phổ biến trong THPT */
-    const chemElements = [
-        "He","Li","Be","Ne","Na","Mg","Al","Si","Ar","Ca","Sc","Ti","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr","Rb","Sr","Zr","Nb","Mo","Ag","Cd","In","Sn","Sb","Te","Xe","Ba","La","Ce","Pt","Au","Hg","Pb","Bi","Rn","Ra","U","Cl",
-        "C","H","O","N","S","P","F","I","K","B","V"
-    ];
-
-    const elementPattern = "(?:" + chemElements.join("|") + "|\\))";
-
-    /* Pattern nhận diện chỉ số dưới: 2n+2, 2n-2, 2n+1, 2n-6, 2n, n, m, x, y, các số thuần túy... */
-    const subscriptPattern = "(?:2n[+-]\\d+|n[+-]\\d+|\\d+n|2n|[nmxykab]|[0-9]+)";
-
-    /* Regex khớp: Nguyên tố/Ngoặc đóng + chỉ số (không theo sau bởi chữ cái viết thường) */
-    const chemRegex = new RegExp(
-        `(${elementPattern})(${subscriptPattern})(?![a-z])`,
-        "g"
-    );
-
-    /* Lặp thay thế để bọc <sub> cho các công thức liên tiếp như CnH2nO2 */
-    let previous;
-    do {
-        previous = text;
-        text = text.replace(chemRegex, (match, elem, sub) => {
-            if (sub.includes("<sub") || elem.includes("sub>")) return match;
-            return `${elem}<sub class="chemical-subscript">${sub}</sub>`;
-        });
-    } while (text !== previous);
-
-    return text;
-}
-
-
-/*==================================================
-        CHUYỂN CÔNG THỨC TOÁN / VẬT LÝ
-==================================================*/
-
-function convertMathFormulas(text) {
-    if (!text) return "";
-
-    /* Xử lý số mũ / lũy thừa x^2, x^(2n), 10^-3, a^n */
-    text = text.replace(/(?<![A-Za-z0-9\\])([A-Za-z0-9]+)\^([A-Za-z0-9+\-]+)/g, "$1<sup>$2</sup>");
-
-    /* Ký hiệu cộng trừ ± */
-    text = text.replace(/\+-|\+\/-/g, "±");
-
-    return text;
-}
-/*==================================================
-            RENDER MATHJAX
-==================================================*/
 
 function renderMath() {
-
-    if (
-        typeof MathJax === "undefined"
-    ) {
-
-        return;
-
+    if (window.katex && document.querySelectorAll) {
+        try {
+            const elements = document.querySelectorAll("#questionContent, .answer-text, .tf-stmt-text");
+            elements.forEach(el => {
+                if (el.innerHTML.includes("$")) {
+                    el.innerHTML = el.innerHTML.replace(/\$(.*?)\$/g, (match, formula) => {
+                        return katex.renderToString(formula, { throwOnError: false });
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Lỗi render Math:", e);
+        }
     }
-
-    if (
-        typeof MathJax.typesetPromise !== "function"
-    ) {
-
-        return;
-
-    }
-
-    MathJax.typesetPromise([
-        questionContent,
-        answerContainer
-    ])
-    .catch(error => {
-
-        console.error(
-            "Lỗi render MathJax:",
-            error
-        );
-
-    });
-
 }
-/*==================================================
-                LOADING
-==================================================*/
 
 function showLoading() {
-
-    if (testLoading) {
-
-        testLoading.style.display =
-            "flex";
-
-    }
-
-
-    if (testContainer) {
-
-        testContainer.style.display =
-            "none";
-
-    }
-
-
-    if (testError) {
-
-        testError.style.display =
-            "none";
-
-    }
-
+    if (testLoading) testLoading.style.display = "flex";
+    if (testContainer) testContainer.style.display = "none";
+    if (testError) testError.style.display = "none";
 }
-
-
-/*==================================================
-                HIDE LOADING
-==================================================*/
 
 function hideLoading() {
+    if (testLoading) testLoading.style.display = "none";
+    if (testContainer) testContainer.style.display = "block";
+    if (testError) testError.style.display = "none";
+}
 
-    if (testLoading) {
-
-        testLoading.style.display =
-            "none";
-
-    }
-
-
-    if (testContainer) {
-
-        testContainer.style.display =
-            "block";
-
-    }
-
-
+function showError(msg) {
+    if (testLoading) testLoading.style.display = "none";
+    if (testContainer) testContainer.style.display = "none";
     if (testError) {
-
-        testError.style.display =
-            "none";
-
+        testError.style.display = "block";
+        testError.textContent = msg;
     }
-
 }
 
-
-/*==================================================
-                ERROR
-==================================================*/
-
-function showError(message) {
-
-    clearInterval(
-        timerInterval
-    );
-
-
-    if (testLoading) {
-
-        testLoading.style.display =
-            "none";
-
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        loadUser(user.uid);
+        loadTest();
+    } else {
+        window.location.href = "index.html";
     }
-
-
-    if (testContainer) {
-
-        testContainer.style.display =
-            "none";
-
-    }
-
-
-    if (testError) {
-
-        testError.style.display =
-            "flex";
-
-
-        testError.innerHTML =
-            `
-            <i class="fa-solid fa-triangle-exclamation"></i>
-
-            <h3>
-                Không thể tải bài kiểm tra
-            </h3>
-
-            <p>
-                ${escapeHTML(message)}
-            </p>
-
-            <button
-                type="button"
-                id="backExamBtn"
-            >
-                <i class="fa-solid fa-arrow-left"></i>
-                Quay lại
-            </button>
-            `;
-
-
-        const backExamBtn =
-            document.getElementById(
-                "backExamBtn"
-            );
-
-
-        if (backExamBtn) {
-
-            backExamBtn.addEventListener(
-                "click",
-                () => {
-
-                    window.location.href =
-                        `exam.html`;
-
-                }
-            );
-
-        }
-
-    }
-
-}
-
-/*==================================================
-                ESCAPE HTML
-==================================================*/
-
-function escapeHTML(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/*==================================================
-                AUTH
-==================================================*/
-
-onAuthStateChanged(
-    auth,
-    async (user) => {
-
-        currentUser =
-            user;
-
-
-        if (!user) {
-
-            window.location.replace(
-                "index.html"
-            );
-
-            return;
-
-        }
-
-
-        await loadUser(
-            user.uid
-        );
-
-
-        await loadTest();
-
-    }
-);
+});
