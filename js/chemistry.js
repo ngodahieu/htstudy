@@ -1,15 +1,15 @@
 /*==================================================
             H&T STUDY - CHEMISTRY.JS
-    MODULE XỬ LÝ ĐỊNH DẠNG HÓA HỌC VÀ TOÁN HỌC (FIXED)
+    MODULE XỬ LÝ ĐỊNH DẠNG HÓA HỌC VÀ TOÁN HỌC (FIXED ALL)
 ==================================================*/
 
-// 1. Bảng ánh xạ chỉ số dưới (Subscripts)
+// 1. Bảng ánh xạ chỉ số dưới (Subscripts) cho cả số và biến hữu cơ
 const SUB_MAP = {
     "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
     "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
     "+": "₊", "-": "₋", "=": "₌", "(": "₍", ")": "₎",
     "k": "ₖ", "m": "ₘ", "n": "ₙ", "p": "ₚ", "t": "ₜ",
-    "x": "ₓ", "y": "ᵧ", "z": "z"
+    "x": "ₓ", "y": "ᵧ", "z": "z", "a": "ₐ", "b": "♭"
 };
 
 // 2. Bảng ánh xạ điện tích / chỉ số trên (Superscripts)
@@ -22,7 +22,7 @@ const SUPER_MAP = {
 const toSubscript = (str) => str.split("").map(c => SUB_MAP[c] || c).join("");
 const toSuperscript = (str) => str.split("").map(c => SUPER_MAP[c] || c).join("");
 
-// Danh sách các nguyên tố 2 chữ cái phổ biến để tránh nuốt chữ (VD: Na, Ca, Fe, Cl...)
+// Danh sách các nguyên tố 2 chữ cái để bảo vệ không bị nuốt chữ (VD: Na, Ca, Fe, Cl...)
 const TWO_LETTER = "Na|Ca|Ba|Mg|Al|Fe|Cu|Ag|Pb|Hg|Br|Cl|Si|Cr|Ni|Li|Be|He|Ne|Ar|Kr|Xe|Rb|Sr|Cs|Pt|Au|Cd|Co|Bi|Sb|As|Se|Te|Zn|Mn|Sn|Rn|In";
 
 /**
@@ -50,10 +50,10 @@ export function formatChemicalFormula(text) {
     const chargeRegex = new RegExp(`(${TWO_LETTER}|[A-Z]|[\)\}])(\\d*[\\+\\-])(?![0-9a-zA-Z\\+\\-])`, "g");
     formatted = formatted.replace(chargeRegex, (_, elem, charge) => elem + toSuperscript(charge));
 
-    // 5. Định dạng chỉ số dưới cho Nguyên tố + Số / Biểu thức Hữu cơ (VD: C2H5, CnH2nO2, CnH2n+2...)
-    const ELEMENT_OR_BRACKET = `(?:${TWO_LETTER}|[A-Z]|[\)\}])`;
-    const SUB_EXPR = `(?:\\d+|\\d*[nmxyzkpt](?:[\\+\\-]\\d+)?)`;
-    const subRegex = new RegExp(`(${ELEMENT_OR_BRACKET})(${SUB_EXPR})`, "g");
+    // 5. Định dạng chỉ số dưới (Ưu tiên khớp toàn bộ biểu thức hữu cơ 2n, 2n+2, 2n-2, n trước rồi mới đến số đơn)
+    const ELEM_REGEX = `(?:${TWO_LETTER}|[A-Z]|[\)\}])`;
+    const SUB_EXPR = `(?:\\d*[a-z]+(?:[\\+\\-]\\d+)?|\\d+)`;
+    const subRegex = new RegExp(`(${ELEM_REGEX})(${SUB_EXPR})`, "g");
 
     formatted = formatted.replace(subRegex, (_, elem, sub) => {
         return elem + toSubscript(sub);
