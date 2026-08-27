@@ -3,7 +3,7 @@
     MODULE XỬ LÝ ĐỊNH DẠNG HÓA HỌC VÀ TOÁN HỌC CHUẨN
 ==================================================*/
 
-// 1. Bảng ánh xạ chỉ số dưới (Chỉ giữ lại các biến chỉ số hữu cơ chuẩn: n, m, x, y, z, k, p, t)
+// 1. Bảng ánh xạ chỉ số dưới (Subscripts)
 const SUB_MAP = {
     "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
     "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
@@ -46,7 +46,6 @@ export function formatChemicalFormula(text) {
     formatted = formatted.replace(/(\d+)\s*(?:[oO]|°|\^o)\s*C\b/g, "$1°C");
 
     // Bước 3: Chuyển dấu chấm tinh thể ngậm nước (VD: CuSO4.5H2O -> CuSO₄·5H₂O)
-    // Ràng buộc nghiêm ngặt: Phía trước là chữ hoa/số và phía sau là số hệ số (tránh dính vào dấu chấm câu văn bản)
     formatted = formatted.replace(/([A-Z0-9\)\}\]])\s*[\.\*]\s*(\d+\s*[A-Z])/g, "$1·$2");
 
     // Bước 4: Xử lý số mũ / điện tích dạng explicit '^' (VD: Fe^3+, SO4^2-)
@@ -57,17 +56,18 @@ export function formatChemicalFormula(text) {
     const chargeRegex = new RegExp(`(${CHARGE_TARGET})(\\d*[\\+\\-])(?![0-9a-zA-Z\\+\\-])`, "g");
     formatted = formatted.replace(chargeRegex, (_, elem, charge) => elem + toSuperscript(charge));
 
-    // Bước 6: Hạ chỉ số dưới cho SỐ THUỒNG trong công thức (VD: CH3COOH -> CH₃COOH, C2H5 -> C₂H₅, NaOH -> NaOH)
-    const ELEM_OR_BRACKET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
-    const numSubRegex = new RegExp(`(${ELEM_OR_BRACKET})(\\d+)`, "g");
-    formatted = formatted.replace(numSubRegex, (_, elem, num) => elem + toSubscript(num));
-
-    // Bước 7: Hạ chỉ số dưới cho BIỂU THỨC HỮU CƠ (VD: CnH2nO, CnH2n+2, CxHyOz)
+    // Bước 6: ƯU TIÊN hạ chỉ số dưới cho BIỂU THỨC ẨN SỐ HỮU CƠ TRƯỚC (VD: CnH2nO -> CₙH₂ₙO, CnH2n+2 -> CₙH₂ₙ₊₂)
     const ORGANIC_ELEM = `(?:C|H|O|N|R|X|[\)\}])`;
-    const ORGANIC_INDEX = `(?:\\d*[nmxyzkpt](?:[\\+\\-]\\d+)?|\\d+)`;
-    const organicSubRegex = new RegExp(`(${ORGANIC_ELEM})(${ORGANIC_INDEX})(?![a-z])`, "g");
+    const ORGANIC_VAR_INDEX = `(?:\\d*[nmxyzkpt](?:[\\+\\-]\\d+)?)`;
+    const organicSubRegex = new RegExp(`(${ORGANIC_ELEM})(${ORGANIC_VAR_INDEX})(?![a-z])`, "g");
 
     formatted = formatted.replace(organicSubRegex, (_, elem, sub) => elem + toSubscript(sub));
+
+    // Bước 7: Hạ chỉ số dưới cho SỐ THUỒNG ĐƠN LẺ còn lại (VD: CH3COOH -> CH₃COOH, O2 -> O₂)
+    const ELEM_OR_BRACKET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
+    const numSubRegex = new RegExp(`(${ELEM_OR_BRACKET})(\\d+)`, "g");
+
+    formatted = formatted.replace(numSubRegex, (_, elem, num) => elem + toSubscript(num));
 
     return formatted;
 }
