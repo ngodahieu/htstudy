@@ -2272,13 +2272,15 @@ async function openStudentTestsList(courseId, chapterId, lessonId) {
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải bài kiểm tra...</div>`;
 
     try {
-        const snapshot = await getDocs(collection(db, "courses", courseId, "tests"));
+        const q = query(
+            collection(db, "courses", courseId, "tests"),
+            where("chapterId", "==", chapterId),
+            where("lessonId", "==", lessonId)
+        );
+        const snapshot = await getDocs(q);
         let tests = [];
         snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            if (data.chapterId === chapterId && data.lessonId === lessonId) {
-                tests.push({ id: docSnap.id, ...data });
-            }
+            tests.push({ id: docSnap.id, ...docSnap.data() });
         });
 
         if (!tests.length) {
@@ -2417,15 +2419,27 @@ if (closeStudentTestResultBtn) {
 
 function showSingleSubmissionDetail(subData) {
     if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
+    
+    const timeStr = subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A";
+    const answersObj = subData.answers || {};
+    
+    let answersHtml = `<ul style="padding-left: 20px; max-height: 300px; overflow-y: auto;">`;
+    for (const [qId, ans] of Object.entries(answersObj)) {
+        answersHtml << `<li><strong>Câu hỏi ID (${qId}):</strong> Đáp án học sinh chọn: <span style="color: #007bff; font-weight: bold;">${JSON.stringify(ans)}</span></li>`;
+    }
+    answersHtml += `</ul>`;
+
     singleResultDetailBody.innerHTML = `
-        <p><strong>Tổng điểm:</strong> ${subData.score || subData.totalScore || 0}</p>
-        <p><strong>Thời gian nộp:</strong> ${subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A"}</p>
-        <hr style="margin: 10px 0;">
-        <p><i>Chi tiết câu trả lời của học sinh đã được ghi nhận trong cơ sở dữ liệu.</i></p>
+        <div style="text-align: left;">
+            <p><strong>Tổng điểm:</strong> <span style="color: #d9534f; font-weight: bold;">${subData.score || subData.totalScore || 0} điểm</span></p>
+            <p><strong>Thời gian nộp:</strong> ${timeStr}</p>
+            <hr style="margin: 10px 0;">
+            <p><strong>Chi tiết đáp án học sinh đã làm:</strong></p>
+            ${answersHtml}
+        </div>
     `;
     studentSingleResultDetailModal.style.display = "flex";
 }
-
 if (closeSingleResultModal) {
     closeSingleResultModal.addEventListener("click", () => {
         if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
