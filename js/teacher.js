@@ -204,7 +204,62 @@ let part3QuestionData = [];
 
 let uploadedPdfLink = "";
 let uploadedVideoLink = "";
+/*==================================================
+        HÀM TRÍCH XUẤT VÀ TÍNH ĐIỂM (BỔ SUNG)
+==================================================*/
 
+function extractQuestions(test) {
+    const result = [];
+    
+    if (test.part1?.questions) {
+        test.part1.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 1,
+                points: Number(q.points ?? test.part1?.points ?? 0.5),
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    if (test.part2?.questions) {
+        test.part2.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 2,
+                scores: test.part2?.scores || { one: 0.1, two: 0.25, three: 0.5, four: 1.0 },
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    if (test.part3?.questions) {
+        test.part3.questions.forEach((q, idx) => {
+            result.push({
+                ...q,
+                part: 3,
+                points: Number(q.points ?? test.part3?.points ?? 0.5),
+                partQuestionIndex: idx + 1
+            });
+        });
+    }
+
+    return result;
+}
+
+function normalizeAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    const str = String(ans).trim();
+    if (!isNaN(str) && str !== "") {
+        return String.fromCharCode(65 + parseInt(str, 10));
+    }
+    return str.toUpperCase();
+}
+
+function normalizeTextAnswer(ans) {
+    if (ans === undefined || ans === null) return "";
+    return String(ans).trim().replace(',', '.').toLowerCase();
+}
 // ====================================
 //        HELPER FUNCTIONS
 // ====================================
@@ -2316,16 +2371,20 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
 
     try {
-        const colRef = collection(db, "courses", courseId, "tests", testId, "submissions");
-        const snapshot = await getDocs(colRef);
-        let submissions = [];
+        // Lấy thông tin đề thi để chuẩn hóa số câu hỏi
+        const testRef = doc(db, "courses", courseId, "tests", testId);
+        const testSnap = await getDoc(testRef);
+        const testData = testSnap.exists() ? { id: testSnap.id, ...testSnap.data() } : {};
+        const questions = extractQuestions(testData);
 
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            // Sửa lại từ biến studentId (chưa khai báo) thành userId được truyền vào hàm
-            if (data.userId === userId) {
-                submissions.push({ id: docSnap.id, ...data });
-            }
+        // Truy vấn kết quả (hỗ trợ tìm theo collection results hoặc subcollection tùy thiết kế)
+        const resultsRef = collection(db, "results");
+        const qResults = query(resultsRef, where("courseId", "==", courseId), where("testId", "==", testId), where("userId", "==", userId));
+        const resultsSnap = await getDocs(qResults);
+
+        let submissions = [];
+        resultsSnap.forEach(docSnap => {
+            submissions.push({ id: docSnap.id, ...docSnap.data() });
         });
 
         if (!submissions.length) {
@@ -2337,7 +2396,8 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
 
         let html = `<h4 style="margin-bottom: 12px;">Kết quả bài kiểm tra: ${selectedTestObj.title}</h4>`;
         html += `<p style="margin-bottom: 15px; color: #666;">Danh sách các lần làm bài:</p>`;
-submissions.forEach((sub, idx) => {
+        
+        submissions.forEach((sub, idx) => {
             const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
             const isAllowedView = sub.allowStudentView === true;
             const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
@@ -2350,13 +2410,11 @@ submissions.forEach((sub, idx) => {
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fa-solid fa-eye"></i> Xem chi tiết</button>
-                        <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 6px 12px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
-                            ${isAllowedView ? '<i class="fa-solid fa-check"></i> HS đang xem' : '<i class="fa-solid fa-lock"></i> Cho HS xem'}
-                        </button>
                     </div>
                 </div>
             `;
         });
+        
         studentTestResultBody.innerHTML = html;
 
         studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
@@ -2366,27 +2424,8 @@ submissions.forEach((sub, idx) => {
             });
         });
 
-        studentTestResultBody.querySelectorAll(".toggle-view-btn").forEach(btn => {
-            btn.addEventListener("click", async () => {
-                const subId = btn.dataset.subId;
-                const newStatus = btn.dataset.allowed !== "true";
-
-                try {
-                    const subRef = doc(db, "courses", courseId, "tests", testId, "submissions", subId);
-                    await updateDoc(subRef, { allowStudentView: newStatus });
-                    
-                    btn.dataset.allowed = String(newStatus);
-                    btn.style.backgroundColor = newStatus ? '#28a745' : '#6c757d';
-                    btn.textContent = newStatus ? 'HS đang được xem' : 'Cho HS xem';
-                    alert(newStatus ? "Đã cho phép học sinh xem kết quả này." : "Đã ẩn kết quả đối với học sinh.");
-                } catch (err) {
-                    console.error(err);
-                    alert("Không thể cập nhật trạng thái: " + err.message);
-                }
-            });
-        });
     } catch (error) {
-        console.error(error);
+        console.error("Lỗi khi tải kết quả:", error);
         studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
     }
 }
