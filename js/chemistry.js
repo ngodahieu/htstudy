@@ -1,15 +1,15 @@
 /*==================================================
-            H&T STUDY - CHEMISTRY.JS
-    MODULE XỬ LÝ ĐỊNH DẠNG HÓA HỌC VÀ TOÁN HỌC (FIXED ALL)
+            H&T STUDY - CHEMISTRY.JS (PRO MAX)
+    MODULE XỬ LÝ ĐỊNH DẠNG HÓA HỌC VÀ TOÁN HỌC CHUẨN
 ==================================================*/
 
-// 1. Bảng ánh xạ chỉ số dưới (Subscripts) cho cả số và biến hữu cơ
+// 1. Bảng ánh xạ chỉ số dưới (Chỉ giữ lại các biến chỉ số hữu cơ chuẩn: n, m, x, y, z, k, p, t)
 const SUB_MAP = {
     "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
     "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
     "+": "₊", "-": "₋", "=": "₌", "(": "₍", ")": "₎",
-    "k": "ₖ", "m": "ₘ", "n": "ₙ", "p": "ₚ", "t": "ₜ",
-    "x": "ₓ", "y": "ᵧ", "z": "z", "a": "ₐ", "b": "♭"
+    "n": "ₙ", "m": "ₘ", "x": "ₓ", "y": "ᵧ", "z": "z",
+    "k": "ₖ", "p": "ₚ", "t": "ₜ"
 };
 
 // 2. Bảng ánh xạ điện tích / chỉ số trên (Superscripts)
@@ -22,42 +22,50 @@ const SUPER_MAP = {
 const toSubscript = (str) => str.split("").map(c => SUB_MAP[c] || c).join("");
 const toSuperscript = (str) => str.split("").map(c => SUPER_MAP[c] || c).join("");
 
-// Danh sách các nguyên tố 2 chữ cái để bảo vệ không bị nuốt chữ (VD: Na, Ca, Fe, Cl...)
-const TWO_LETTER = "Na|Ca|Ba|Mg|Al|Fe|Cu|Ag|Pb|Hg|Br|Cl|Si|Cr|Ni|Li|Be|He|Ne|Ar|Kr|Xe|Rb|Sr|Cs|Pt|Au|Cd|Co|Bi|Sb|As|Se|Te|Zn|Mn|Sn|Rn|In";
+// Danh sách bảo vệ các nguyên tố 2 chữ cái (Không bao giờ hạ nhỏ chữ cái thứ 2)
+const TWO_LETTER_ELEMENTS = "Na|Ca|Ba|Mg|Al|Fe|Cu|Ag|Pb|Hg|Br|Cl|Si|Cr|Ni|Li|Be|He|Ne|Ar|Kr|Xe|Rb|Sr|Cs|Pt|Au|Cd|Co|Bi|Sb|As|Se|Te|Zn|Mn|Sn|Rn|In";
 
 /**
  * Định dạng công thức hóa học tự động (Vô cơ & Hữu cơ)
+ * @param {string} text 
+ * @returns {string}
  */
 export function formatChemicalFormula(text) {
     if (!text) return "";
 
     let formatted = String(text);
 
-    // 1. Chuyển đổi mũi tên phản ứng và dấu so sánh (->, =>, <=>, >=, <=)
+    // Bước 1: Chuyển đổi toán tử so sánh & Mũi tên phản ứng
     formatted = formatted
         .replace(/<[-=]>|<=>/g, "⇌")
         .replace(/[-=]>[->]?/g, "→")
         .replace(/>=/g, "≥")
         .replace(/<=/g, "≤");
 
-    // 2. Chuyển dấu chấm tinh thể ngậm nước (VD: CuSO4.5H2O -> CuSO₄·5H₂O)
+    // Bước 2: Chuyển dấu chấm tinh thể ngậm nước (VD: CuSO4.5H2O -> CuSO₄·5H₂O)
     formatted = formatted.replace(/([A-Za-z0-9\)\}\]])\s*[\.\*]\s*(\d*\s*[A-Z])/g, "$1·$2");
 
-    // 3. Xử lý số mũ / điện tích dạng explicit '^' (VD: Fe^3+, SO4^2-)
+    // Bước 3: Xử lý số mũ / điện tích dạng explicit '^' (VD: Fe^3+, SO4^2-)
     formatted = formatted.replace(/\^([0-9\+\-]+)/g, (_, match) => toSuperscript(match));
 
-    // 4. Xử lý điện tích ion viết liền (VD: Fe3+ -> Fe³⁺, SO42- -> SO₄²⁻, Na+ -> Na⁺)
-    const chargeRegex = new RegExp(`(${TWO_LETTER}|[A-Z]|[\)\}])(\\d*[\\+\\-])(?![0-9a-zA-Z\\+\\-])`, "g");
+    // Bước 4: Xử lý điện tích ion viết liền (VD: Fe3+ -> Fe³⁺, SO42- -> SO₄²⁻, Na+ -> Na⁺)
+    const CHARGE_TARGET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
+    const chargeRegex = new RegExp(`(${CHARGE_TARGET})(\\d*[\\+\\-])(?![0-9a-zA-Z\\+\\-])`, "g");
     formatted = formatted.replace(chargeRegex, (_, elem, charge) => elem + toSuperscript(charge));
 
-    // 5. Định dạng chỉ số dưới (Ưu tiên khớp toàn bộ biểu thức hữu cơ 2n, 2n+2, 2n-2, n trước rồi mới đến số đơn)
-    const ELEM_REGEX = `(?:${TWO_LETTER}|[A-Z]|[\)\}])`;
-    const SUB_EXPR = `(?:\\d*[a-z]+(?:[\\+\\-]\\d+)?|\\d+)`;
-    const subRegex = new RegExp(`(${ELEM_REGEX})(${SUB_EXPR})`, "g");
+    // Bước 5: Hạ chỉ số dưới cho SỐ THUỒNG trong công thức (VD: CH3COOH -> CH₃COOH, C2H5 -> C₂H₅, NaOH -> NaOH)
+    const ELEM_OR_BRACKET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
+    const numSubRegex = new RegExp(`(${ELEM_OR_BRACKET})(\\d+)`, "g");
+    formatted = formatted.replace(numSubRegex, (_, elem, num) => elem + toSubscript(num));
 
-    formatted = formatted.replace(subRegex, (_, elem, sub) => {
-        return elem + toSubscript(sub);
-    });
+    // Bước 6: Hạ chỉ số dưới cho BIỂU THỨC HỮU CƠ (VD: CnH2nO, CnH2n+2, CxHyOz)
+    // Ràng buộc nghiêm ngặt: Phải đứng sau nguyên tố hữu cơ (C, H, O, N, R, X) và KHÔNG được theo sau bởi chữ cái thường [a-z]
+    // Giúp bảo vệ tuyệt đối các từ tiếng Anh/Tiếng Việt như Ethyl, Methyl, Anken...
+    const ORGANIC_ELEM = `(?:C|H|O|N|R|X|[\)\}])`;
+    const ORGANIC_INDEX = `(?:\\d*[nmxyzkpt](?:[\\+\\-]\\d+)?|\\d+)`;
+    const organicSubRegex = new RegExp(`(${ORGANIC_ELEM})(${ORGANIC_INDEX})(?![a-z])`, "g");
+
+    formatted = formatted.replace(organicSubRegex, (_, elem, sub) => elem + toSubscript(sub));
 
     return formatted;
 }
