@@ -1519,6 +1519,36 @@ Upload Word
         </div>
     </div>
 </div>
+<!-- ==================================================
+     MODAL KẾT QUẢ KIỂM TRA HỌC SINH
+================================================== -->
+<div id="studentTestResultModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 700px;">
+        <h2><i class="fa-solid fa-square-poll-vertical"></i> Kết Quả Kiểm Tra Của Học Sinh</h2>
+        <div id="studentTestResultBody" style="margin: 20px 0; max-height: 450px; overflow-y: auto;">
+            <!-- Nội dung sẽ thay đổi linh hoạt theo các bước: Chọn Chương -> Bài -> Bài Kiểm Tra -> Danh Sách Kết Quả -->
+        </div>
+        <div class="modal-buttons" style="justify-content: space-between;">
+            <button type="button" id="backTestResultBtn" class="back-btn" style="display: none;">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại
+            </button>
+            <button type="button" id="closeStudentTestResultBtn" class="primary-btn" style="margin-left: auto;">
+                <i class="fa-solid fa-xmark"></i> Đóng
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XEM CHI TIẾT 1 BÀI LÀM CỦA HỌC SINH -->
+<div id="studentSingleResultDetailModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <h2>Chi Tiết Bài Làm Học Sinh</h2>
+        <div id="singleResultDetailBody" style="margin: 20px 0; max-height: 400px; overflow-y: auto;"></div>
+        <div class="modal-buttons" style="justify-content: center;">
+            <button type="button" id="closeSingleResultModal" class="primary-btn">Thoát</button>
+        </div>
+    </div>
+</div>
 <script>
 window.MathJax = {
     tex: {
