@@ -486,13 +486,28 @@ async function openStudentAccountsView(courseId, courseName) {
 
     await loadStudentAccountsForCourse(courseId);
 }
-
 async function loadStudentAccountsForCourse(courseId) {
     if (studentAccountList) {
         studentAccountList.innerHTML = `<div class="empty">Đang tải danh sách học sinh...</div>`;
     }
 
     try {
+        // Bước 1: Lấy danh sách UID học sinh đã đăng ký khóa học này từ collection "enrollments"
+        const enrollmentRef = doc(db, "enrollments", courseId);
+        const enrollmentSnap = await getDoc(enrollmentRef);
+        
+        let studentUids = [];
+        if (enrollmentSnap.exists()) {
+            const enrollData = enrollmentSnap.data();
+            // Trường hợp lưu theo cấu trúc như ảnh 2 (enrollments -> courseId -> mảng courses của user)
+            // Hoặc nếu cấu trúc ngược lại là enrollment chứa mảng userIds, ta xử lý linh hoạt:
+            if (Array.isArray(enrollData.userIds)) {
+                studentUids = enrollData.userIds;
+            }
+        }
+
+        // Kiểm tra thêm trường hợp dữ liệu lưu trong doc của enrollment chính là mảng hoặc object chứa danh sách
+        // Hoặc quét qua collection "users" mà trong đó user có mảng courses chứa courseId (như đoạn code cũ của bạn)
         const q = query(
             collection(db, "users"),
             where("role", "==", "Học sinh")
@@ -503,20 +518,57 @@ async function loadStudentAccountsForCourse(courseId) {
 
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            if (data.courses && Array.isArray(data.courses) && data.courses.includes(courseId)) {
-                currentStudentAccounts.push({
-                    id: docSnap.id,
-                    ...data
-                });
-            } else if (data.courseId === courseId) {
-                currentStudentAccounts.push({
-                    id: docSnap.id,
+            const userId = docSnap.id;
+            
+            // Kiểm tra điều kiện thuộc khóa học bằng nhiều cách để tránh lệch dữ liệu:
+            // 1. Nếu uid nằm trong danh sách enrollments
+            // 2. Hoặc trong doc user có mảng courses chứa courseId
+            // 3. Hoặc trong doc user có trường courseId trùng khớp
+            // 4. Hoặc ngược lại: trong enrollments có mảng courses chứa courseId (như ảnh 2)
+            const inUserCourses = Array.isArray(data.courses) && data.courses.includes(courseId);
+            const inUserCourseId = data.courseId === courseId;
+            const inEnrollmentArray = studentUids.includes(userId);
+
+            // Kiểm tra ngược lại ảnh 2: xem trong bảng enrollments/<userId> có chứa courseId không
+            // (Dựa vào ảnh 2: collection là enrollments -> doc là UID học sinh -> field là courses chứa mảng courseId)
+            // Ta sẽ check thêm bằng cách lấy trực tiếp doc(db, "enrollments", userId) nếu cần, 
+            // nhưng tối ưu nhất là kiểm tra ngay các trường ở user hoặc query collection enrollments.
+            
+            // Nếu bạn lưu theo cấu trúc ở Ảnh 2 (mỗi học sinh 1 document trong enrollments):
+            // Ta có thể check trực tiếp bên dưới bằng cách query collection enrollments.
+        });
+
+        // ĐÂY LÀ ĐOẠN TỐI ƯU DỰA TRÊN CẤU TRÚC ẢNH 1 & ẢNH 2 CỦA BẠN:
+        // Ảnh 2 thể hiện: collection `enrollments` -> doc `OYXiNyg4KXPZqv...` (UID học sinh) -> field `courses` (mảng chứa ID khóa học).
+        let validAccounts = [];
+        for (const docSnap of snapshot.docs) {
+            const data = docSnap.data();
+            const uid = docSnap.id;
+            
+            // Kiểm tra xem học sinh này có courseId trong bảng enrollments không
+            const userEnrollRef = doc(db, "enrollments", uid);
+            const userEnrollSnap = await getDoc(userEnrollRef);
+            
+            let isEnrolled = false;
+            if (userEnrollSnap.exists()) {
+                const enrollData = userEnrollSnap.data();
+                if (Array.isArray(enrollData.courses) && enrollData.courses.includes(courseId)) {
+                    isEnrolled = true;
+                }
+            }
+            
+            // Hoặc kiểm tra phòng hờ trong bảng users
+            if (isEnrolled || (Array.isArray(data.courses) && data.courses.includes(data.courses.includes(courseId))) || data.courseId === courseId) {
+                validAccounts.push({
+                    id: uid,
                     ...data
                 });
             }
-        });
+        }
 
+        currentStudentAccounts = validAccounts;
         renderStudentAccountList(currentStudentAccounts);
+
     } catch (error) {
         console.error("Lỗi khi tải danh sách học sinh:", error);
         if (studentAccountList) {
@@ -524,7 +576,6 @@ async function loadStudentAccountsForCourse(courseId) {
         }
     }
 }
-
 function renderStudentAccountList(accounts) {
     if (!studentAccountList) return;
 
