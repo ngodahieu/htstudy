@@ -3,6 +3,7 @@
 ==================================================*/
 
 import { auth, db } from "./firebase.js";
+import { formatChemicalFormula, formatChemistryText } from "./chemistry.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
