@@ -2309,19 +2309,23 @@ async function openStudentTestsList(courseId, chapterId, lessonId) {
         studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải danh sách bài kiểm tra.</div>`;
     }
 }
-
 async function openStudentSubmissionsList(courseId, testId, studentId) {
     testResultNavStep = 4;
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
 
     try {
-        const q = query(
-            collection(db, "courses", courseId, "tests", testId, "submissions"),
-            where("studentId", "==", studentId)
-        );
-        const snapshot = await getDocs(q);
+        // Truy vấn linh hoạt để tìm theo cả studentId lẫn userId
+        const colRef = collection(db, "courses", courseId, "tests", testId, "submissions");
+        const snapshot = await getDocs(colRef);
         let submissions = [];
-        snapshot.forEach(docSnap => submissions.push({ id: docSnap.id, ...docSnap.data() }));
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            // Kiểm tra khớp ID học sinh ở bất kỳ trường nào (studentId hoặc userId)
+            if (data.studentId === studentId || data.userId === studentId) {
+                submissions.push({ id: docSnap.id, ...data });
+            }
+        });
 
         if (!submissions.length) {
             studentTestResultBody.innerHTML = `
@@ -2387,7 +2391,6 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
         studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
     }
 }
-
 if (backTestResultBtn) {
     backTestResultBtn.addEventListener("click", () => {
         if (testResultNavStep === 4) {
