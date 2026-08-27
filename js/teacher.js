@@ -2314,18 +2314,18 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
 
     try {
-        // Truy vấn linh hoạt để tìm theo cả studentId lẫn userId
         const colRef = collection(db, "courses", courseId, "tests", testId, "submissions");
         const snapshot = await getDocs(colRef);
         let submissions = [];
 
-snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    // Chỉ kiểm tra duy nhất trường userId
-    if (data.userId === studentId) {
-        submissions.push({ id: docSnap.id, ...data });
-    }
-});
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            // Sửa lại từ biến studentId (chưa khai báo) thành userId được truyền vào hàm
+            if (data.userId === userId) {
+                submissions.push({ id: docSnap.id, ...data });
+            }
+        });
+
         if (!submissions.length) {
             studentTestResultBody.innerHTML = `
                 <h4 style="margin-bottom: 12px;">Bài kiểm tra: ${selectedTestObj.title}</h4>
