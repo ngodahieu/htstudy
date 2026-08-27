@@ -42,25 +42,27 @@ export function formatChemicalFormula(text) {
         .replace(/>=/g, "≥")
         .replace(/<=/g, "≤");
 
-    // Bước 2: Chuyển dấu chấm tinh thể ngậm nước (VD: CuSO4.5H2O -> CuSO₄·5H₂O)
-    formatted = formatted.replace(/([A-Za-z0-9\)\}\]])\s*[\.\*]\s*(\d*\s*[A-Z])/g, "$1·$2");
+    // Bước 2: Tự động chuẩn hóa ký hiệu nhiệt độ độ C (VD: 70oC, 70 oC, 70degC -> 70°C)
+    formatted = formatted.replace(/(\d+)\s*(?:[oO]|°|\^o)\s*C\b/g, "$1°C");
 
-    // Bước 3: Xử lý số mũ / điện tích dạng explicit '^' (VD: Fe^3+, SO4^2-)
+    // Bước 3: Chuyển dấu chấm tinh thể ngậm nước (VD: CuSO4.5H2O -> CuSO₄·5H₂O)
+    // Ràng buộc nghiêm ngặt: Phía trước là chữ hoa/số và phía sau là số hệ số (tránh dính vào dấu chấm câu văn bản)
+    formatted = formatted.replace(/([A-Z0-9\)\}\]])\s*[\.\*]\s*(\d+\s*[A-Z])/g, "$1·$2");
+
+    // Bước 4: Xử lý số mũ / điện tích dạng explicit '^' (VD: Fe^3+, SO4^2-)
     formatted = formatted.replace(/\^([0-9\+\-]+)/g, (_, match) => toSuperscript(match));
 
-    // Bước 4: Xử lý điện tích ion viết liền (VD: Fe3+ -> Fe³⁺, SO42- -> SO₄²⁻, Na+ -> Na⁺)
+    // Bước 5: Xử lý điện tích ion viết liền (VD: Fe3+ -> Fe³⁺, SO42- -> SO₄²⁻, Na+ -> Na⁺)
     const CHARGE_TARGET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
     const chargeRegex = new RegExp(`(${CHARGE_TARGET})(\\d*[\\+\\-])(?![0-9a-zA-Z\\+\\-])`, "g");
     formatted = formatted.replace(chargeRegex, (_, elem, charge) => elem + toSuperscript(charge));
 
-    // Bước 5: Hạ chỉ số dưới cho SỐ THUỒNG trong công thức (VD: CH3COOH -> CH₃COOH, C2H5 -> C₂H₅, NaOH -> NaOH)
+    // Bước 6: Hạ chỉ số dưới cho SỐ THUỒNG trong công thức (VD: CH3COOH -> CH₃COOH, C2H5 -> C₂H₅, NaOH -> NaOH)
     const ELEM_OR_BRACKET = `(?:${TWO_LETTER_ELEMENTS}|[A-Z]|[\)\}])`;
     const numSubRegex = new RegExp(`(${ELEM_OR_BRACKET})(\\d+)`, "g");
     formatted = formatted.replace(numSubRegex, (_, elem, num) => elem + toSubscript(num));
 
-    // Bước 6: Hạ chỉ số dưới cho BIỂU THỨC HỮU CƠ (VD: CnH2nO, CnH2n+2, CxHyOz)
-    // Ràng buộc nghiêm ngặt: Phải đứng sau nguyên tố hữu cơ (C, H, O, N, R, X) và KHÔNG được theo sau bởi chữ cái thường [a-z]
-    // Giúp bảo vệ tuyệt đối các từ tiếng Anh/Tiếng Việt như Ethyl, Methyl, Anken...
+    // Bước 7: Hạ chỉ số dưới cho BIỂU THỨC HỮU CƠ (VD: CnH2nO, CnH2n+2, CxHyOz)
     const ORGANIC_ELEM = `(?:C|H|O|N|R|X|[\)\}])`;
     const ORGANIC_INDEX = `(?:\\d*[nmxyzkpt](?:[\\+\\-]\\d+)?|\\d+)`;
     const organicSubRegex = new RegExp(`(${ORGANIC_ELEM})(${ORGANIC_INDEX})(?![a-z])`, "g");
