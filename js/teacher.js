@@ -593,6 +593,10 @@ function renderStudentAccountList(accounts) {
     accounts.forEach((acc) => {
         const card = document.createElement("div");
         card.className = "chapter-card student-account-card";
+        card.style.display = "flex";
+        card.style.justifyContent = "space-between";
+        card.style.alignItems = "center";
+
         card.innerHTML = `
             <div style="display: flex; align-items: center; gap: 15px;">
                 <img src="${acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg"}" 
@@ -607,11 +611,21 @@ function renderStudentAccountList(accounts) {
                     </p>
                 </div>
             </div>
+            <div>
+                <button class="primary-btn detail-student-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-circle-info"></i> Chi tiết
+                </button>
+            </div>
         `;
+
+        // Gắn sự kiện khi click nút Chi tiết
+        card.querySelector(".detail-student-btn").addEventListener("click", () => {
+            openStudentDetailModal(acc);
+        });
+
         studentAccountList.appendChild(card);
     });
 }
-
 // Nút quay lại & Tìm kiếm trong danh sách học sinh
 if (studentBackToSubjectBtn) {
     studentBackToSubjectBtn.addEventListener("click", () => {
@@ -645,7 +659,49 @@ if (searchStudentAccount) {
         renderStudentAccountList(filtered);
     });
 }
+// ====================================
+//        MODAL CHI TIẾT HỌC SINH
+// ====================================
+const studentDetailModal = document.getElementById("studentDetailModal");
+const studentDetailBody = document.getElementById("studentDetailBody");
+const closeStudentDetailBtn = document.getElementById("closeStudentDetailBtn");
 
+function openStudentDetailModal(acc) {
+    if (!studentDetailModal || !studentDetailBody) return;
+
+    const avatarSrc = acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg";
+    
+    // Lưu ý: Đảm bảo trong Firestore tài khoản học sinh có trường 'password' hoặc 'rawPassword' để hiển thị. 
+    // Nếu lưu mã hóa dạng hash thì không hiện được mật khẩu gốc, bạn cần lưu sẵn mật khẩu thường lúc tạo tài khoản.
+    const passwordText = acc.password || acc.rawPassword || "Không hiển thị (Mật khẩu đã mã hóa)";
+
+    studentDetailBody.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+            <img src="${avatarSrc}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #007bff;" alt="Avatar">
+            <div style="text-align: left; width: 100%; padding: 0 20px;">
+                <p><strong>Họ và tên:</strong> ${escapeHtmlTeacher(acc.name || "Chưa cập nhật")}</p>
+                <p><strong>Mã học sinh:</strong> ${escapeHtmlTeacher(acc.memberId || "Chưa có")}</p>
+                <p><strong>Email / Tài khoản:</strong> ${escapeHtmlTeacher(acc.email || "Không có")}</p>
+            </div>
+        </div>
+    `;
+
+    studentDetailModal.style.display = "flex";
+}
+
+// Sự kiện nút thoát / đóng modal
+if (closeStudentDetailBtn) {
+    closeStudentDetailBtn.addEventListener("click", () => {
+        if (studentDetailModal) studentDetailModal.style.display = "none";
+    });
+}
+
+// Đóng modal khi bấm ra ngoài vùng nội dung modal
+window.addEventListener("click", (event) => {
+    if (event.target === studentDetailModal) {
+        studentDetailModal.style.display = "none";
+    }
+});
 // ====================================
 //        TEST NAVIGATION UTILS
 // ====================================
