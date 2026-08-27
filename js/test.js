@@ -788,63 +788,40 @@ function renderQuestionGrid() {
 
 }
 /*==================================================
+        KIỂM TRA CÂU HỎI ĐÃ ĐƯỢC TRẢ LỜI CHƯA
+==================================================*/
+function isQuestionAnswered(ans) {
+    if (ans === undefined || ans === null) return false;
+    
+    // Đối với Phần II (mảng [dapAnA, dapAnB, dapAnC, dapAnD])
+    if (Array.isArray(ans)) {
+        return ans.some(val => val === true || val === false);
+    }
+    
+    // Đối với Phần I & III
+    return String(ans).trim() !== "";
+}
+
+/*==================================================
             UPDATE QUESTION GRID
 ==================================================*/
-
 function updateQuestionGrid() {
+    if (!questionGrid) return;
 
-    if (!questionGrid) {
+    const buttons = questionGrid.querySelectorAll(".question-number");
 
-        return;
+    buttons.forEach((button, index) => {
+        const isCurrent = index === currentQuestionIndex;
+        const hasAnswer = isQuestionAnswered(answers[index]);
 
-    }
+        button.classList.remove("current", "answered");
 
-
-    const buttons =
-        questionGrid.querySelectorAll(
-            ".question-number"
-        );
-
-
-    buttons.forEach(
-        (button, index) => {
-
-            const isCurrent =
-                index === currentQuestionIndex;
-
-            const hasAnswer =
-                answers[index] !== undefined &&
-                answers[index] !== null &&
-                String(
-                    answers[index]
-                ).trim() !== "";
-
-
-            button.classList.remove(
-                "current",
-                "answered"
-            );
-
-
-            if (hasAnswer) {
-
-                button.classList.add(
-                    "answered"
-                );
-
-            }
-
-            else if (isCurrent) {
-
-                button.classList.add(
-                    "current"
-                );
-
-            }
-
+        if (hasAnswer) {
+            button.classList.add("answered");
+        } else if (isCurrent) {
+            button.classList.add("current");
         }
-    );
-
+    });
 }
 /*==================================================
                 RENDER QUESTION
@@ -894,8 +871,6 @@ updateNavigation();
 
 renderMath();
 }
-
-
 /*==================================================
                 RENDER ANSWERS
 ==================================================*/
@@ -930,14 +905,13 @@ function renderAnswers(question) {
 
     // PHẦN II: Đúng / Sai (4 mệnh đề a, b, c, d)
     else if (question.part === 2) {
-        if (!answers[currentQuestionIndex]) {
-            answers[currentQuestionIndex] = [null, null, null, null];
-        }
+        const currentAns = answers[currentQuestionIndex] || [null, null, null, null];
         const statements = question.statements || [];
+
         statements.forEach((stmt, sIdx) => {
             const row = document.createElement("div");
             row.className = "tf-answer-row";
-            const currentVal = answers[currentQuestionIndex][sIdx];
+            const currentVal = currentAns[sIdx];
 
             row.innerHTML = `
                 <div class="tf-stmt-text"><b>${String.fromCharCode(97 + sIdx)}.</b> ${formatQuestionText(stmt)}</div>
@@ -949,8 +923,24 @@ function renderAnswers(question) {
 
             row.querySelectorAll(".btn-tf").forEach(btn => {
                 btn.addEventListener("click", (e) => {
-                    const val = e.target.dataset.val === "true";
-                    answers[currentQuestionIndex][sIdx] = val;
+                    const val = e.currentTarget.dataset.val === "true";
+                    
+                    if (!answers[currentQuestionIndex]) {
+                        answers[currentQuestionIndex] = [null, null, null, null];
+                    }
+                    
+                    // Chọn lại cùng một giá trị thì hủy chọn
+                    if (answers[currentQuestionIndex][sIdx] === val) {
+                        answers[currentQuestionIndex][sIdx] = null;
+                    } else {
+                        answers[currentQuestionIndex][sIdx] = val;
+                    }
+
+                    // Nếu cả 4 ô đều null thì xóa luôn key
+                    if (!answers[currentQuestionIndex].some(v => v !== null)) {
+                        delete answers[currentQuestionIndex];
+                    }
+
                     saveAnswers();
                     renderQuestion();
                 });
@@ -959,20 +949,90 @@ function renderAnswers(question) {
         });
     }
 
-    // PHẦN III: Trả lời ngắn / Điền số
+    // PHẦN III: Trả lời ngắn theo dạng Phiếu tô 4 ô chuẩn THPTQG
     else if (question.part === 3) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "short-answer-input";
-        input.placeholder = "Nhập đáp án (ví dụ: 0,25)...";
-        input.value = answers[currentQuestionIndex] || "";
+        const currentAnsStr = answers[currentQuestionIndex] || "";
+        const currentChars = currentAnsStr.split("").slice(0, 4);
+        while (currentChars.length < 4) currentChars.push("");
 
-        input.addEventListener("input", (e) => {
-            answers[currentQuestionIndex] = e.target.value.trim();
-            saveAnswers();
-            updateQuestionGrid();
+        const sheet = document.createElement("div");
+        sheet.className = "short-answer-sheet";
+
+        // Thanh xem trước kết quả đã tô
+        let previewHtml = `
+            <div class="sheet-preview">
+                <span class="sheet-preview-title">Đáp án đã chọn:</span>
+                <div class="sheet-preview-boxes">
+                    ${currentChars.map(ch => `<div class="preview-box">${ch || "&nbsp;"}</div>`).join("")}
+                </div>
+                <button type="button" class="clear-sheet-btn" title="Xóa chọn"><i class="fa-solid fa-rotate-left"></i> Xóa</button>
+            </div>
+        `;
+
+        // Danh sách ký tự từng ô theo chuẩn THPT QG
+        const colsOptions = [
+            ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 1: có thể là dấu âm
+            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 2
+            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 3
+            ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]        // Ô 4
+        ];
+
+        let colsHtml = '<div class="sheet-columns">';
+        colsOptions.forEach((opts, colIdx) => {
+            colsHtml += `<div class="sheet-column">`;
+            colsHtml += `<span class="col-header">Ô ${colIdx + 1}</span>`;
+            opts.forEach(opt => {
+                const isSelected = currentChars[colIdx] === opt;
+                colsHtml += `
+                    <button type="button" 
+                            class="bubble-btn ${isSelected ? 'selected' : ''}" 
+                            data-col="${colIdx}" 
+                            data-val="${opt}">
+                        ${opt}
+                    </button>
+                `;
+            });
+            colsHtml += `</div>`;
         });
-        answerContainer.appendChild(input);
+        colsHtml += '</div>';
+
+        sheet.innerHTML = previewHtml + colsHtml;
+
+        // Xử lý sự kiện tô tròn
+        sheet.querySelectorAll(".bubble-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const col = parseInt(e.currentTarget.dataset.col, 10);
+                const val = e.currentTarget.dataset.val;
+
+                if (currentChars[col] === val) {
+                    currentChars[col] = ""; 
+                } else {
+                    currentChars[col] = val;
+                }
+
+                const finalStr = currentChars.join("").trim();
+                if (finalStr !== "") {
+                    answers[currentQuestionIndex] = finalStr;
+                } else {
+                    delete answers[currentQuestionIndex];
+                }
+
+                saveAnswers();
+                renderQuestion();
+            });
+        });
+
+        // Nút Xóa toàn bộ
+        const clearBtn = sheet.querySelector(".clear-sheet-btn");
+        if (clearBtn) {
+            clearBtn.addEventListener("click", () => {
+                delete answers[currentQuestionIndex];
+                saveAnswers();
+                renderQuestion();
+            });
+        }
+
+        answerContainer.appendChild(sheet);
     }
 }
 /*==================================================
