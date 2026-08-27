@@ -78,6 +78,29 @@ const testQuestionTotal = document.getElementById("testQuestionTotal");
 const testTotalPoint = document.getElementById("testTotalPoint");
 
 // ====================================
+//        STUDENT MANAGEMENT ELEMENTS
+// ====================================
+const studentPage = document.getElementById("studentPage");
+const studentSubjectView = document.getElementById("studentSubjectView");
+const studentCourseView = document.getElementById("studentCourseView");
+const studentAccountView = document.getElementById("studentAccountView");
+
+const studentSubjectList = document.getElementById("studentSubjectList");
+const studentCourseList = document.getElementById("studentCourseList");
+const studentAccountList = document.getElementById("studentAccountList");
+
+const studentSubjectTitle = document.getElementById("studentSubjectTitle");
+const studentCourseTitle = document.getElementById("studentCourseTitle");
+
+const studentBackToSubjectBtn = document.getElementById("studentBackToSubjectBtn");
+const studentBackToCourseBtn = document.getElementById("studentBackToCourseBtn");
+
+const searchStudentAccount = document.getElementById("searchStudentAccount");
+
+let currentStudentCourseId = "";
+let currentStudentAccounts = [];
+
+// ====================================
 //        TEST NAVIGATION
 // ====================================
 
@@ -132,7 +155,6 @@ if (menuHome) {
     });
 }
 
-const studentPage = document.getElementById("studentPage");
 const menuCourses = document.getElementById("menuCourses");
 const coursePage = document.getElementById("coursePage");
 const teacherCourseList = document.getElementById("teacherCourseList");
@@ -293,10 +315,12 @@ onAuthStateChanged(auth, async (user) => {
 //        MENU EVENT LISTENERS
 // ====================================
 if (menuStudents) {
-    menuStudents.addEventListener("click", () => {
+    menuStudents.addEventListener("click", async () => {
         setActiveMenu(menuStudents);
         hideAllPages();
         if (studentPage) studentPage.style.display = "block";
+        resetStudentViews();
+        await loadStudentSubjects();
     });
 }
 
@@ -326,6 +350,248 @@ if (menuTests) {
         if (testPage) testPage.style.display = "block";
         resetTestNavigation();
         await loadTestSubjects();
+    });
+}
+
+// ====================================
+//    LOGIC QUẢN LÝ HỌC SINH (STUDENTS)
+// ====================================
+function hideStudentViews() {
+    if (studentSubjectView) studentSubjectView.style.display = "none";
+    if (studentCourseView) studentCourseView.style.display = "none";
+    if (studentAccountView) studentAccountView.style.display = "none";
+}
+
+function resetStudentViews() {
+    hideStudentViews();
+    if (studentSubjectView) studentSubjectView.style.display = "block";
+}
+
+// Bước 1: Tải danh sách môn học cho phần quản lý học sinh
+async function loadStudentSubjects() {
+    hideStudentViews();
+    if (studentSubjectView) studentSubjectView.style.display = "block";
+    if (studentSubjectList) {
+        studentSubjectList.innerHTML = `<div class="empty">Đang tải môn học...</div>`;
+    }
+
+    try {
+        const q = query(
+            collection(db, "courses"),
+            where("teacherId", "==", currentTeacherId)
+        );
+
+        const snapshot = await getDocs(q);
+        const subjects = new Map();
+
+        snapshot.forEach((courseDoc) => {
+            const data = courseDoc.data();
+            const subject = data.subjectName || data.subject || "Chưa xác định";
+
+            if (!subjects.has(subject)) {
+                subjects.set(subject, []);
+            }
+            subjects.get(subject).push({
+                id: courseDoc.id,
+                ...data
+            });
+        });
+
+        if (!subjects.size) {
+            if (studentSubjectList) {
+                studentSubjectList.innerHTML = `
+                    <div class="empty">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <h3>Chưa có môn học</h3>
+                        <p>Bạn chưa được phân công môn học nào.</p>
+                    </div>`;
+            }
+            return;
+        }
+
+        if (studentSubjectList) studentSubjectList.innerHTML = "";
+
+        for (const [subject, courses] of subjects) {
+            const card = document.createElement("div");
+            card.className = "test-card";
+            card.innerHTML = `
+                <div class="test-card-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="test-card-content">
+                    <h3>${escapeHtmlTeacher(subject)}</h3>
+                    <p>${courses.length} khóa học</p>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            `;
+            card.addEventListener("click", () => {
+                openStudentSubject(subject, courses);
+            });
+            if (studentSubjectList) studentSubjectList.appendChild(card);
+        }
+    } catch (error) {
+        console.error("Lỗi khi tải môn học học sinh:", error);
+        if (studentSubjectList) {
+            studentSubjectList.innerHTML = `<div class="empty">Không thể tải danh sách môn học.</div>`;
+        }
+    }
+}
+
+// Bước 2: Hiển thị các khóa học thuộc môn học đã chọn
+function openStudentSubject(subject, courses) {
+    hideStudentViews();
+    if (studentCourseView) studentCourseView.style.display = "block";
+    if (studentSubjectTitle) studentSubjectTitle.textContent = subject;
+
+    courses.sort((a, b) => Number(a.grade || 0) - Number(b.grade || 0));
+
+    if (studentCourseList) {
+        studentCourseList.innerHTML = "";
+        if (!courses.length) {
+            studentCourseList.innerHTML = `<div class="empty">Chưa có khóa học nào.</div>`;
+            return;
+        }
+
+        courses.forEach((course) => {
+            const card = document.createElement("div");
+            card.className = "test-card";
+            card.innerHTML = `
+                <div class="test-card-icon">
+                    <i class="fa-solid fa-book"></i>
+                </div>
+                <div class="test-card-content">
+                    <h3>
+                        ${escapeHtmlTeacher(course.grade ? `Lớp ${course.grade}` : "")}
+                        ${escapeHtmlTeacher(course.name || "")}
+                    </h3>
+                    <p>${escapeHtmlTeacher(course.description || "Khóa học do bạn quản lý")}</p>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            `;
+            card.addEventListener("click", () => {
+                openStudentAccountsView(course.id, course.name || `Lớp ${course.grade || ""}`);
+            });
+            studentCourseList.appendChild(card);
+        });
+    }
+}
+
+// Bước 3: Xem danh sách học sinh thuộc khóa học
+async function openStudentAccountsView(courseId, courseName) {
+    currentStudentCourseId = courseId;
+    hideStudentViews();
+    if (studentAccountView) studentAccountView.style.display = "block";
+    if (studentCourseTitle) studentCourseTitle.textContent = courseName;
+    if (searchStudentAccount) searchStudentAccount.value = "";
+
+    await loadStudentAccountsForCourse(courseId);
+}
+
+async function loadStudentAccountsForCourse(courseId) {
+    if (studentAccountList) {
+        studentAccountList.innerHTML = `<div class="empty">Đang tải danh sách học sinh...</div>`;
+    }
+
+    try {
+        const q = query(
+            collection(db, "users"),
+            where("role", "==", "Học sinh")
+        );
+
+        const snapshot = await getDocs(q);
+        currentStudentAccounts = [];
+
+        snapshot.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.courses && Array.isArray(data.courses) && data.courses.includes(courseId)) {
+                currentStudentAccounts.push({
+                    id: docSnap.id,
+                    ...data
+                });
+            } else if (data.courseId === courseId) {
+                currentStudentAccounts.push({
+                    id: docSnap.id,
+                    ...data
+                });
+            }
+        });
+
+        renderStudentAccountList(currentStudentAccounts);
+    } catch (error) {
+        console.error("Lỗi khi tải danh sách học sinh:", error);
+        if (studentAccountList) {
+            studentAccountList.innerHTML = `<div class="empty">Không thể tải danh sách học sinh.</div>`;
+        }
+    }
+}
+
+function renderStudentAccountList(accounts) {
+    if (!studentAccountList) return;
+
+    if (!accounts.length) {
+        studentAccountList.innerHTML = `
+            <div class="empty">
+                <i class="fa-solid fa-user-slash"></i>
+                <h3>Chưa có học sinh nào</h3>
+                <p>Khóa học này chưa được cấp tài khoản cho học sinh nào.</p>
+            </div>`;
+        return;
+    }
+
+    studentAccountList.innerHTML = "";
+    accounts.forEach((acc) => {
+        const card = document.createElement("div");
+        card.className = "chapter-card student-account-card";
+        card.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="${acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg"}" 
+                     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" alt="Avatar">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.1rem;">
+                        ${escapeHtmlTeacher(acc.name || "Chưa đặt tên")} 
+                        <span style="font-size: 0.85rem; color: #007bff; font-weight: normal;">(${escapeHtmlTeacher(acc.memberId || "Chưa có Mã")})</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #666; font-size: 0.9rem;">
+                        📧 ${escapeHtmlTeacher(acc.email || "Không có email")}
+                    </p>
+                </div>
+            </div>
+        `;
+        studentAccountList.appendChild(card);
+    });
+}
+
+// Nút quay lại & Tìm kiếm trong danh sách học sinh
+if (studentBackToSubjectBtn) {
+    studentBackToSubjectBtn.addEventListener("click", () => {
+        hideStudentViews();
+        if (studentSubjectView) studentSubjectView.style.display = "block";
+    });
+}
+
+if (studentBackToCourseBtn) {
+    studentBackToCourseBtn.addEventListener("click", () => {
+        hideStudentViews();
+        if (studentCourseView) studentCourseView.style.display = "block";
+    });
+}
+
+if (searchStudentAccount) {
+    searchStudentAccount.addEventListener("input", (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        if (!term) {
+            renderStudentAccountList(currentStudentAccounts);
+            return;
+        }
+
+        const filtered = currentStudentAccounts.filter((acc) => {
+            const nameMatch = (acc.name || "").toLowerCase().includes(term);
+            const idMatch = (acc.memberId || "").toLowerCase().includes(term);
+            const emailMatch = (acc.email || "").toLowerCase().includes(term);
+            return nameMatch || idMatch || emailMatch;
+        });
+
+        renderStudentAccountList(filtered);
     });
 }
 
