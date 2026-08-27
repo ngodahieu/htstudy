@@ -215,80 +215,59 @@ Tài liệu
 </div>
 
 </div>
-<div
-id="studentPage"
-style="display:none;">
-
-    <div class="dashboard-header">
-
-        <h1>
-
-            Tạo tài khoản học sinh
-
-        </h1>
-
+<!-- MỤC QUẢN LÝ HỌC SINH -->
+<div id="studentPage" style="display: none;">
+    <!-- BƯỚC 1: DANH SÁCH MÔN HỌC -->
+    <div id="studentSubjectView" class="test-management-view">
+        <div class="test-view-header">
+            <div>
+                <span class="test-view-label">QUẢN LÝ HỌC SINH</span>
+                <h2>Danh Sách Môn Học</h2>
+                <p>Chọn môn học để xem các khóa học và tài khoản học sinh được cấp.</p>
+            </div>
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div id="studentSubjectList" class="test-card-grid"></div>
     </div>
 
-    <div class="dashboard-form">
-
-        <div class="form-group">
-
-            <label>
-
-                Họ và tên
-
-            </label>
-
-            <input
-            type="text"
-            id="studentName">
-
-        </div>
-
-        <div class="form-group">
-
-            <label>
-
-                Email
-
-            </label>
-
-            <input
-            type="email"
-            id="studentEmail">
-
-        </div>
-
-        <div class="form-group">
-
-    <label>
-
-        Mã học sinh
-
-    </label>
-
-    <input
-    type="text"
-    id="studentId"
-    readonly>
-
-    <small class="auto-text">
-
-        Hệ thống sẽ tự tạo mã học sinh.
-
-    </small>
-
-</div>
-
-        <button
-        id="createStudentBtn">
-
-            Tạo tài khoản
-
+    <!-- BƯỚC 2: DANH SÁCH KHÓA HỌC DẠNG TAB / DANH SÁCH -->
+    <div id="studentCourseView" class="test-management-view" style="display: none;">
+        <button id="studentBackToSubjectBtn" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại Môn học
         </button>
-
+        <div class="test-view-header">
+            <div>
+                <span class="test-view-label">MÔN HỌC</span>
+                <h2 id="studentSubjectTitle">Khóa Học Của Tôi</h2>
+                <p>Danh sách các khóa học bạn đang giảng dạy thuộc môn học này.</p>
+            </div>
+            <i class="fa-solid fa-book"></i>
+        </div>
+        <div id="studentCourseList" class="test-card-grid"></div>
     </div>
 
+    <!-- BƯỚC 3: DANH SÁCH TÀI KHOẢN HỌC SINH ĐƯỢC CẤP THUỘC KHÓA HỌC -->
+    <div id="studentAccountView" class="test-management-view" style="display: none;">
+        <button id="studentBackToCourseBtn" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại Khóa học
+        </button>
+        <div class="test-view-header">
+            <div>
+                <span class="test-view-label">KHÓA HỌC</span>
+                <h2 id="studentCourseTitle">Danh Sách Học Sinh Được Cấp Tài Khoản</h2>
+                <p>Tài khoản học sinh tham gia khóa học này.</p>
+            </div>
+            <i class="fa-solid fa-users"></i>
+        </div>
+
+        <!-- Ô Tìm Kiếm Học Sinh -->
+        <div class="account-toolbar">
+            <input type="text" id="searchStudentAccount" class="search-box" placeholder="🔍 Tìm kiếm theo tên hoặc Mã học sinh (HT27...)...">
+        </div>
+
+        <!-- Danh sách tài khoản học sinh -->
+        <div id="studentAccountList" class="account-list"></div>
+    </div>
 </div>
     <div
 id="coursePage"
