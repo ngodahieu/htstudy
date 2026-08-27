@@ -2337,28 +2337,26 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
 
         let html = `<h4 style="margin-bottom: 12px;">Kết quả bài kiểm tra: ${selectedTestObj.title}</h4>`;
         html += `<p style="margin-bottom: 15px; color: #666;">Danh sách các lần làm bài:</p>`;
-
-        submissions.forEach((sub, idx) => {
+submissions.forEach((sub, idx) => {
             const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
             const isAllowedView = sub.allowStudentView === true;
             const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
 
             html += `
-                <div style="padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9;">
+                <div style="padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9;">
                     <div>
                         <strong>Lần làm #${idx + 1}</strong> - Điểm: <span style="color: #d9534f; font-weight: bold;">${score} điểm</span>
-                        <br><small style="color: #666;">Nộp lúc: ${timeStr}</small>
+                        <br><small style="color: #666;"><i class="fa-regular fa-clock"></i> Nộp lúc: ${timeStr}</small>
                     </div>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 5px 10px; font-size: 0.85rem;">Xem chi tiết</button>
-                        <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 5px 10px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
-                            ${isAllowedView ? 'HS đang được xem' : 'Cho HS xem'}
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 6px 12px; font-size: 0.85rem;"><i class="fa-solid fa-eye"></i> Xem chi tiết</button>
+                        <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 6px 12px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
+                            ${isAllowedView ? '<i class="fa-solid fa-check"></i> HS đang xem' : '<i class="fa-solid fa-lock"></i> Cho HS xem'}
                         </button>
                     </div>
                 </div>
             `;
         });
-
         studentTestResultBody.innerHTML = html;
 
         studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
@@ -2416,25 +2414,40 @@ if (closeStudentTestResultBtn) {
         if (studentTestResultModal) studentTestResultModal.style.display = "none";
     });
 }
-
 function showSingleSubmissionDetail(subData) {
     if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
     
     const timeStr = subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A";
     const answersObj = subData.answers || {};
     
-    let answersHtml = `<ul style="padding-left: 20px; max-height: 300px; overflow-y: auto;">`;
-    for (const [qId, ans] of Object.entries(answersObj)) {
-        answersHtml << `<li><strong>Câu hỏi ID (${qId}):</strong> Đáp án học sinh chọn: <span style="color: #007bff; font-weight: bold;">${JSON.stringify(ans)}</span></li>`;
+    // Lấy danh sách câu hỏi từ bài kiểm tra hiện tại nếu có, để hiển thị nội dung trực quan hơn
+    let answersHtml = `<div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">`;
+    
+    // Duyệt qua danh sách câu trả lời của học sinh
+    let index = 1;
+    for (const [qKey, ans] of Object.entries(answersObj)) {
+        let displayAns = ans;
+        
+        // Nếu là Phần II (mảng đúng sai), chuyển đổi thành dạng dễ đọc a, b, c, d
+        if (Array.isArray(ans)) {
+            displayAns = ans.map((val, idx) => `Ý ${String.fromCharCode(97 + idx)}: <b>${val ? "Đúng" : "Sai"}</b>`).join(" | ");
+        }
+
+        answersHtml += `
+            <div style="padding: 10px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff;">
+                <p style="margin: 0 0 4px 0; font-weight: bold; color: #333;">Câu ${index++} (ID: ${qKey})</p>
+                <p style="margin: 0; color: #555;">Học sinh chọn: <span style="color: #007bff; font-weight: bold;">${Array.isArray(ans) ? displayAns : escapeHtmlTeacher(String(ans))}</span></p>
+            </div>
+        `;
     }
-    answersHtml += `</ul>`;
+    answersHtml += `</div>`;
 
     singleResultDetailBody.innerHTML = `
         <div style="text-align: left;">
-            <p><strong>Tổng điểm:</strong> <span style="color: #d9534f; font-weight: bold;">${subData.score || subData.totalScore || 0} điểm</span></p>
+            <p><strong>Tổng điểm:</strong> <span style="color: #d9534f; font-weight: bold; font-size: 1.1rem;">${subData.score || subData.totalScore || 0} điểm</span></p>
             <p><strong>Thời gian nộp:</strong> ${timeStr}</p>
-            <hr style="margin: 10px 0;">
-            <p><strong>Chi tiết đáp án học sinh đã làm:</strong></p>
+            <hr style="margin: 12px 0;">
+            <p style="font-weight: bold; margin-bottom: 8px;">Chi tiết đáp án học sinh đã làm:</p>
             ${answersHtml}
         </div>
     `;
