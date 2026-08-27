@@ -16,7 +16,6 @@ import {
     serverTimestamp,
     orderBy,
     deleteDoc,
-    getCountFromServer,
     updateDoc,
     setDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -44,6 +43,7 @@ const menuStudents = document.getElementById("menuStudents");
 const menuHome = document.getElementById("menuHome");
 const menuNotifications = document.getElementById("menuNotifications");
 const menuTests = document.getElementById("menuTests");
+const menuCourses = document.getElementById("menuCourses");
 
 const testPage = document.getElementById("testPage");
 const testList = document.getElementById("testList");
@@ -96,26 +96,10 @@ const studentBackToSubjectBtn = document.getElementById("studentBackToSubjectBtn
 const studentBackToCourseBtn = document.getElementById("studentBackToCourseBtn");
 
 const searchStudentAccount = document.getElementById("searchStudentAccount");
-const studentTestResultModal = document.getElementById("studentTestResultModal");
-const studentTestResultBody = document.getElementById("studentTestResultBody");
-const closeStudentTestResultBtn = document.getElementById("closeStudentTestResultBtn");
-const backTestResultBtn = document.getElementById("backTestResultBtn");
 
-const studentSingleResultDetailModal = document.getElementById("studentSingleResultDetailModal");
-const singleResultDetailBody = document.getElementById("singleResultDetailBody");
-const closeSingleResultModal = document.getElementById("closeSingleResultModal");
-
-let currentStudentCourseId = "";
-let currentStudentAccounts = [];
-let currentSelectedStudent = null; 
-let testResultNavStep = 1;         
-let selectedChapterForTest = null;
-let selectedLessonForTest = null;
-let selectedTestObj = null;
 // ====================================
 //        TEST NAVIGATION
 // ====================================
-
 const testSubjectView = document.getElementById("testSubjectView");
 const testCourseView = document.getElementById("testCourseView");
 const testChapterView = document.getElementById("testChapterView");
@@ -136,38 +120,8 @@ const testBreadcrumbContent = document.getElementById("testBreadcrumbContent");
 const testBackBtn = document.getElementById("testBackBtn");
 
 // ====================================
-//        TEST STATE
+//        COURSE & LESSON ELEMENTS
 // ====================================
-
-let testCurrentSubject = null;
-let testCurrentCourseId = "";
-let testCurrentChapterId = "";
-let testCurrentLessonId = "";
-
-let editingTestId = "";
-let editingTestCourseId = "";
-const menuItems = document.querySelectorAll(".menu-item");
-
-function setActiveMenu(activeButton) {
-    menuItems.forEach((item) => {
-        item.classList.remove("active");
-    });
-    if (activeButton) activeButton.classList.add("active");
-}
-
-const dashboardHeader = document.getElementById("mainDashboardHeader");
-const dashboardCards = document.querySelector(".dashboard-cards");
-
-if (menuHome) {
-    menuHome.addEventListener("click", () => {
-        setActiveMenu(menuHome);
-        hideAllPages();
-        if (dashboardHeader) dashboardHeader.style.display = "block";
-        if (dashboardCards) dashboardCards.style.display = "grid";
-    });
-}
-
-const menuCourses = document.getElementById("menuCourses");
 const coursePage = document.getElementById("coursePage");
 const teacherCourseList = document.getElementById("teacherCourseList");
 const courseManagePage = document.getElementById("courseManagePage");
@@ -190,20 +144,13 @@ const pdfFile = document.getElementById("pdfFile");
 const imageFile = document.getElementById("imageFile");
 const documentFile = document.getElementById("documentFile");
 const changePdfBtn = document.getElementById("changePdfBtn");
-const uploadImageBtn = document.getElementById("uploadImageBtn");
-const uploadDocumentBtn = document.getElementById("uploadDocumentBtn");
-const videoFile = document.getElementById("videoFile");
 const uploadVideoBtn = document.getElementById("uploadVideoBtn");
 
+const videoFile = document.getElementById("videoFile");
 const videoResult = document.getElementById("videoResult");
 const pdfResult = document.getElementById("pdfResult");
-const imageResult = document.getElementById("imageResult");
-const documentResult = document.getElementById("documentResult");
 const saveLesson = document.getElementById("saveLesson");
 const cancelLesson = document.getElementById("cancelLesson");
-
-let currentChapterId = "";
-let editingLessonId = "";
 
 const chapterModal = document.getElementById("chapterModal");
 const chapterTitle = document.getElementById("chapterTitle");
@@ -211,9 +158,6 @@ const chapterDescription = document.getElementById("chapterDescription");
 const chapterOrder = document.getElementById("chapterOrder");
 const saveChapter = document.getElementById("saveChapter");
 const cancelChapter = document.getElementById("cancelChapter");
-
-let currentCourseId = "";
-let editingChapterId = "";
 
 const notificationPage = document.getElementById("notificationPage");
 const notificationType = document.getElementById("notificationType");
@@ -224,17 +168,50 @@ const notificationContent = document.getElementById("notificationContent");
 const createNotificationBtn = document.getElementById("createNotificationBtn");
 const notificationList = document.getElementById("notificationList");
 
-let currentTeacherId = "";
-let currentTeacherName = "";
+const dashboardHeader = document.getElementById("mainDashboardHeader");
+const dashboardCards = document.querySelector(".dashboard-cards");
+const menuItems = document.querySelectorAll(".menu-item");
 
 // ====================================
-//        TEST BUILDER STATE
+//        GLOBAL STATE VARIABLES
 // ====================================
+let currentTeacherId = "";
+let currentTeacherName = "";
+let currentStudentCourseId = "";
+let currentStudentAccounts = [];
+let currentSelectedStudent = null; 
+let testResultNavStep = 1;         
+let selectedChapterForTest = null;
+let selectedLessonForTest = null;
+let selectedTestObj = null;
+
+let testCurrentSubject = null;
+let testCurrentCourseId = "";
+let testCurrentChapterId = "";
+let testCurrentLessonId = "";
+
+let editingTestId = "";
+let editingTestCourseId = "";
+
+let currentChapterId = "";
+let editingLessonId = "";
+let currentCourseId = "";
+let editingChapterId = "";
 
 let part1QuestionData = [];
 let part2QuestionData = [];
 let part3QuestionData = [];
-let testImageCounter = 0;
+
+let uploadedPdfLink = "";
+let uploadedVideoLink = "";
+
+// ====================================
+//        HELPER FUNCTIONS
+// ====================================
+function setActiveMenu(activeButton) {
+    menuItems.forEach((item) => item.classList.remove("active"));
+    if (activeButton) activeButton.classList.add("active");
+}
 
 function hideAllPages() {
     if (dashboardHeader) dashboardHeader.style.display = "none";
@@ -247,16 +224,26 @@ function hideAllPages() {
     if (testPage) testPage.style.display = "none";
 }
 
+function escapeHtmlTeacher(value) {
+    if (value === null || value === undefined) return "";
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // ====================================
-//        SINH MÃ HỌC SINH
+//        SINH MÃ HỌC SINH & DASHBOARD
 // ====================================
 async function generateMemberId() {
     const snapshot = await getDocs(collection(db, "users"));
     let max = 0;
-    snapshot.forEach((doc) => {
-        const data = doc.data();
+    snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
         if (!data.memberId) return;
-        const number = parseInt(data.memberId.replace("HT27", ""));
+        const number = parseInt(data.memberId.replace("HT27", ""), 10);
         if (!isNaN(number) && number > max) {
             max = number;
         }
@@ -264,17 +251,12 @@ async function generateMemberId() {
     return "HT27" + String(max + 1).padStart(4, "0");
 }
 
-// ====================================
-//        DASHBOARD
-// ====================================
 async function loadDashboard() {
     const snapshot = await getDocs(collection(db, "users"));
     let student = 0;
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.role === "Học sinh") {
-            student++;
-        }
+    snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.role === "Học sinh") student++;
     });
     const studentCountEl = document.getElementById("studentCount");
     if (studentCountEl) studentCountEl.textContent = student;
@@ -313,10 +295,9 @@ onAuthStateChanged(auth, async (user) => {
     if (teacherName) teacherName.textContent = data.name;
     if (teacherRole) teacherRole.textContent = data.role;
     if (teacherAvatar) {
-        teacherAvatar.src =
-            data.avatar && data.avatar.trim() !== ""
-                ? data.avatar
-                : "../assets/avatars/default.jpg";
+        teacherAvatar.src = data.avatar && data.avatar.trim() !== ""
+            ? data.avatar
+            : "../assets/avatars/default.jpg";
     }
 
     if (studentIdInput) studentIdInput.value = await generateMemberId();
@@ -326,6 +307,15 @@ onAuthStateChanged(auth, async (user) => {
 // ====================================
 //        MENU EVENT LISTENERS
 // ====================================
+if (menuHome) {
+    menuHome.addEventListener("click", () => {
+        setActiveMenu(menuHome);
+        hideAllPages();
+        if (dashboardHeader) dashboardHeader.style.display = "block";
+        if (dashboardCards) dashboardCards.style.display = "grid";
+    });
+}
+
 if (menuStudents) {
     menuStudents.addEventListener("click", async () => {
         setActiveMenu(menuStudents);
@@ -379,7 +369,6 @@ function resetStudentViews() {
     if (studentSubjectView) studentSubjectView.style.display = "block";
 }
 
-// Bước 1: Tải danh sách môn học cho phần quản lý học sinh
 async function loadStudentSubjects() {
     hideStudentViews();
     if (studentSubjectView) studentSubjectView.style.display = "block";
@@ -388,25 +377,15 @@ async function loadStudentSubjects() {
     }
 
     try {
-        const q = query(
-            collection(db, "courses"),
-            where("teacherId", "==", currentTeacherId)
-        );
-
+        const q = query(collection(db, "courses"), where("teacherId", "==", currentTeacherId));
         const snapshot = await getDocs(q);
         const subjects = new Map();
 
         snapshot.forEach((courseDoc) => {
             const data = courseDoc.data();
             const subject = data.subjectName || data.subject || "Chưa xác định";
-
-            if (!subjects.has(subject)) {
-                subjects.set(subject, []);
-            }
-            subjects.get(subject).push({
-                id: courseDoc.id,
-                ...data
-            });
+            if (!subjects.has(subject)) subjects.set(subject, []);
+            subjects.get(subject).push({ id: courseDoc.id, ...data });
         });
 
         if (!subjects.size) {
@@ -427,18 +406,14 @@ async function loadStudentSubjects() {
             const card = document.createElement("div");
             card.className = "test-card";
             card.innerHTML = `
-                <div class="test-card-icon">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
+                <div class="test-card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <div class="test-card-content">
                     <h3>${escapeHtmlTeacher(subject)}</h3>
                     <p>${courses.length} khóa học</p>
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             `;
-            card.addEventListener("click", () => {
-                openStudentSubject(subject, courses);
-            });
+            card.addEventListener("click", () => openStudentSubject(subject, courses));
             if (studentSubjectList) studentSubjectList.appendChild(card);
         }
     } catch (error) {
@@ -449,7 +424,6 @@ async function loadStudentSubjects() {
     }
 }
 
-// Bước 2: Hiển thị các khóa học thuộc môn học đã chọn
 function openStudentSubject(subject, courses) {
     hideStudentViews();
     if (studentCourseView) studentCourseView.style.display = "block";
@@ -468,9 +442,7 @@ function openStudentSubject(subject, courses) {
             const card = document.createElement("div");
             card.className = "test-card";
             card.innerHTML = `
-                <div class="test-card-icon">
-                    <i class="fa-solid fa-book"></i>
-                </div>
+                <div class="test-card-icon"><i class="fa-solid fa-book"></i></div>
                 <div class="test-card-content">
                     <h3>
                         ${escapeHtmlTeacher(course.grade ? `Lớp ${course.grade}` : "")}
@@ -488,7 +460,6 @@ function openStudentSubject(subject, courses) {
     }
 }
 
-// Bước 3: Xem danh sách học sinh thuộc khóa học
 async function openStudentAccountsView(courseId, courseName) {
     currentStudentCourseId = courseId;
     hideStudentViews();
@@ -498,66 +469,21 @@ async function openStudentAccountsView(courseId, courseName) {
 
     await loadStudentAccountsForCourse(courseId);
 }
+
 async function loadStudentAccountsForCourse(courseId) {
     if (studentAccountList) {
         studentAccountList.innerHTML = `<div class="empty">Đang tải danh sách học sinh...</div>`;
     }
 
     try {
-        // Bước 1: Lấy danh sách UID học sinh đã đăng ký khóa học này từ collection "enrollments"
-        const enrollmentRef = doc(db, "enrollments", courseId);
-        const enrollmentSnap = await getDoc(enrollmentRef);
-        
-        let studentUids = [];
-        if (enrollmentSnap.exists()) {
-            const enrollData = enrollmentSnap.data();
-            // Trường hợp lưu theo cấu trúc như ảnh 2 (enrollments -> courseId -> mảng courses của user)
-            // Hoặc nếu cấu trúc ngược lại là enrollment chứa mảng userIds, ta xử lý linh hoạt:
-            if (Array.isArray(enrollData.userIds)) {
-                studentUids = enrollData.userIds;
-            }
-        }
-
-        // Kiểm tra thêm trường hợp dữ liệu lưu trong doc của enrollment chính là mảng hoặc object chứa danh sách
-        // Hoặc quét qua collection "users" mà trong đó user có mảng courses chứa courseId (như đoạn code cũ của bạn)
-        const q = query(
-            collection(db, "users"),
-            where("role", "==", "Học sinh")
-        );
-
+        const q = query(collection(db, "users"), where("role", "==", "Học sinh"));
         const snapshot = await getDocs(q);
-        currentStudentAccounts = [];
-
-        snapshot.forEach((docSnap) => {
-            const data = docSnap.data();
-            const userId = docSnap.id;
-            
-            // Kiểm tra điều kiện thuộc khóa học bằng nhiều cách để tránh lệch dữ liệu:
-            // 1. Nếu uid nằm trong danh sách enrollments
-            // 2. Hoặc trong doc user có mảng courses chứa courseId
-            // 3. Hoặc trong doc user có trường courseId trùng khớp
-            // 4. Hoặc ngược lại: trong enrollments có mảng courses chứa courseId (như ảnh 2)
-            const inUserCourses = Array.isArray(data.courses) && data.courses.includes(courseId);
-            const inUserCourseId = data.courseId === courseId;
-            const inEnrollmentArray = studentUids.includes(userId);
-
-            // Kiểm tra ngược lại ảnh 2: xem trong bảng enrollments/<userId> có chứa courseId không
-            // (Dựa vào ảnh 2: collection là enrollments -> doc là UID học sinh -> field là courses chứa mảng courseId)
-            // Ta sẽ check thêm bằng cách lấy trực tiếp doc(db, "enrollments", userId) nếu cần, 
-            // nhưng tối ưu nhất là kiểm tra ngay các trường ở user hoặc query collection enrollments.
-            
-            // Nếu bạn lưu theo cấu trúc ở Ảnh 2 (mỗi học sinh 1 document trong enrollments):
-            // Ta có thể check trực tiếp bên dưới bằng cách query collection enrollments.
-        });
-
-        // ĐÂY LÀ ĐOẠN TỐI ƯU DỰA TRÊN CẤU TRÚC ẢNH 1 & ẢNH 2 CỦA BẠN:
-        // Ảnh 2 thể hiện: collection `enrollments` -> doc `OYXiNyg4KXPZqv...` (UID học sinh) -> field `courses` (mảng chứa ID khóa học).
         let validAccounts = [];
+
         for (const docSnap of snapshot.docs) {
             const data = docSnap.data();
             const uid = docSnap.id;
             
-            // Kiểm tra xem học sinh này có courseId trong bảng enrollments không
             const userEnrollRef = doc(db, "enrollments", uid);
             const userEnrollSnap = await getDoc(userEnrollRef);
             
@@ -569,18 +495,13 @@ async function loadStudentAccountsForCourse(courseId) {
                 }
             }
             
-            // Hoặc kiểm tra phòng hờ trong bảng users
-            if (isEnrolled || (Array.isArray(data.courses) && data.courses.includes(data.courses.includes(courseId))) || data.courseId === courseId) {
-                validAccounts.push({
-                    id: uid,
-                    ...data
-                });
+            if (isEnrolled || (Array.isArray(data.courses) && data.courses.includes(courseId)) || data.courseId === courseId) {
+                validAccounts.push({ id: uid, ...data });
             }
         }
 
         currentStudentAccounts = validAccounts;
         renderStudentAccountList(currentStudentAccounts);
-
     } catch (error) {
         console.error("Lỗi khi tải danh sách học sinh:", error);
         if (studentAccountList) {
@@ -588,6 +509,7 @@ async function loadStudentAccountsForCourse(courseId) {
         }
     }
 }
+
 function renderStudentAccountList(accounts) {
     if (!studentAccountList) return;
 
@@ -633,11 +555,7 @@ function renderStudentAccountList(accounts) {
             </div>
         `;
 
-        card.querySelector(".detail-student-btn").addEventListener("click", () => {
-            openStudentDetailModal(acc);
-        });
-
-        // Thêm sự kiện click nút Kết quả kiểm tra
+        card.querySelector(".detail-student-btn").addEventListener("click", () => openStudentDetailModal(acc));
         card.querySelector(".test-result-btn").addEventListener("click", () => {
             currentSelectedStudent = acc;
             openStudentTestChapters(currentStudentCourseId);
@@ -646,7 +564,7 @@ function renderStudentAccountList(accounts) {
         studentAccountList.appendChild(card);
     });
 }
-// Nút quay lại & Tìm kiếm trong danh sách học sinh
+
 if (studentBackToSubjectBtn) {
     studentBackToSubjectBtn.addEventListener("click", () => {
         hideStudentViews();
@@ -679,6 +597,7 @@ if (searchStudentAccount) {
         renderStudentAccountList(filtered);
     });
 }
+
 // ====================================
 //        MODAL CHI TIẾT HỌC SINH
 // ====================================
@@ -688,12 +607,7 @@ const closeStudentDetailBtn = document.getElementById("closeStudentDetailBtn");
 
 function openStudentDetailModal(acc) {
     if (!studentDetailModal || !studentDetailBody) return;
-
     const avatarSrc = acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg";
-    
-    // Lưu ý: Đảm bảo trong Firestore tài khoản học sinh có trường 'password' hoặc 'rawPassword' để hiển thị. 
-    // Nếu lưu mã hóa dạng hash thì không hiện được mật khẩu gốc, bạn cần lưu sẵn mật khẩu thường lúc tạo tài khoản.
-    const passwordText = acc.password || acc.rawPassword || "Không hiển thị (Mật khẩu đã mã hóa)";
 
     studentDetailBody.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
@@ -705,23 +619,21 @@ function openStudentDetailModal(acc) {
             </div>
         </div>
     `;
-
     studentDetailModal.style.display = "flex";
 }
 
-// Sự kiện nút thoát / đóng modal
 if (closeStudentDetailBtn) {
     closeStudentDetailBtn.addEventListener("click", () => {
         if (studentDetailModal) studentDetailModal.style.display = "none";
     });
 }
 
-// Đóng modal khi bấm ra ngoài vùng nội dung modal
 window.addEventListener("click", (event) => {
     if (event.target === studentDetailModal) {
         studentDetailModal.style.display = "none";
     }
 });
+
 // ====================================
 //        TEST NAVIGATION UTILS
 // ====================================
@@ -748,75 +660,38 @@ function resetTestNavigation() {
 }
 
 function updateTestBreadcrumb() {
-    let html = "";
-    html += `<span class="breadcrumb-item" data-level="subject">${escapeHtmlTeacher(
-        testCurrentSubject || "Môn học"
-    )}</span>`;
+    let html = `<span class="breadcrumb-item" data-level="subject">${escapeHtmlTeacher(testCurrentSubject || "Môn học")}</span>`;
 
     if (testCurrentCourseId) {
-        html += `<span class="breadcrumb-separator">/</span>
-                 <span class="breadcrumb-item" data-level="course">Khóa học</span>`;
+        html += `<span class="breadcrumb-separator">/</span><span class="breadcrumb-item" data-level="course">Khóa học</span>`;
     }
-
     if (testCurrentChapterId) {
-        html += `<span class="breadcrumb-separator">/</span>
-                 <span class="breadcrumb-item" data-level="chapter">Chương</span>`;
+        html += `<span class="breadcrumb-separator">/</span><span class="breadcrumb-item" data-level="chapter">Chương</span>`;
     }
-
     if (testCurrentLessonId) {
-        html += `<span class="breadcrumb-separator">/</span>
-                 <span class="breadcrumb-item">Bài học</span>`;
+        html += `<span class="breadcrumb-separator">/</span><span class="breadcrumb-item">Bài học</span>`;
     }
 
     if (testBreadcrumbContent) testBreadcrumbContent.innerHTML = html;
-    if (testBackBtn) {
-        testBackBtn.style.display = testCurrentSubject ? "flex" : "none";
-    }
+    if (testBackBtn) testBackBtn.style.display = testCurrentSubject ? "flex" : "none";
 }
 
-function escapeHtmlTeacher(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-// ====================================
-//        STEP 1: LOAD MÔN HỌC
-// ====================================
 async function loadTestSubjects() {
     hideTestViews();
     if (testSubjectView) testSubjectView.style.display = "block";
-    if (testSubjectList) {
-        testSubjectList.innerHTML = `<div class="empty">Đang tải môn học...</div>`;
-    }
+    if (testSubjectList) testSubjectList.innerHTML = `<div class="empty">Đang tải môn học...</div>`;
     if (testBackBtn) testBackBtn.style.display = "none";
 
     try {
-        const q = query(
-            collection(db, "courses"),
-            where("teacherId", "==", currentTeacherId)
-        );
-
+        const q = query(collection(db, "courses"), where("teacherId", "==", currentTeacherId));
         const snapshot = await getDocs(q);
         const subjects = new Map();
 
         snapshot.forEach((courseDoc) => {
             const data = courseDoc.data();
             const subject = data.subjectName || data.subject || "Chưa xác định";
-
-            if (!subjects.has(subject)) {
-                subjects.set(subject, []);
-            }
-            subjects.get(subject).push({
-                id: courseDoc.id,
-                ...data
-            });
+            if (!subjects.has(subject)) subjects.set(subject, []);
+            subjects.get(subject).push({ id: courseDoc.id, ...data });
         });
 
         if (!subjects.size) {
@@ -837,18 +712,14 @@ async function loadTestSubjects() {
             const card = document.createElement("div");
             card.className = "test-card";
             card.innerHTML = `
-                <div class="test-card-icon">
-                    <i class="fa-solid fa-book-open"></i>
-                </div>
+                <div class="test-card-icon"><i class="fa-solid fa-book-open"></i></div>
                 <div class="test-card-content">
                     <h3>${escapeHtmlTeacher(subject)}</h3>
                     <p>${courses.length} khóa học</p>
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             `;
-            card.addEventListener("click", () => {
-                openTestSubject(subject, courses);
-            });
+            card.addEventListener("click", () => openTestSubject(subject, courses));
             if (testSubjectList) testSubjectList.appendChild(card);
         }
     } catch (error) {
@@ -859,9 +730,6 @@ async function loadTestSubjects() {
     }
 }
 
-// ====================================
-//        STEP 2: OPEN MÔN HỌC
-// ====================================
 async function openTestSubject(subject, courses) {
     testCurrentSubject = subject;
     testCurrentCourseId = "";
@@ -875,14 +743,10 @@ async function openTestSubject(subject, courses) {
     updateTestBreadcrumb();
     if (testCourseList) testCourseList.innerHTML = "";
 
-    courses.sort(
-        (a, b) => Number(a.grade || 0) - Number(b.grade || 0)
-    );
+    courses.sort((a, b) => Number(a.grade || 0) - Number(b.grade || 0));
 
     if (!courses.length) {
-        if (testCourseList) {
-            testCourseList.innerHTML = `<div class="empty">Chưa có khóa học.</div>`;
-        }
+        if (testCourseList) testCourseList.innerHTML = `<div class="empty">Chưa có khóa học.</div>`;
         return;
     }
 
@@ -890,30 +754,21 @@ async function openTestSubject(subject, courses) {
         const card = document.createElement("div");
         card.className = "test-card";
         card.innerHTML = `
-            <div class="test-card-icon">
-                <i class="fa-solid fa-book"></i>
-            </div>
+            <div class="test-card-icon"><i class="fa-solid fa-book"></i></div>
             <div class="test-card-content">
                 <h3>
                     ${escapeHtmlTeacher(course.grade ? `Lớp ${course.grade}` : "")}
                     ${escapeHtmlTeacher(course.name || "")}
                 </h3>
-                <p>
-                    ${escapeHtmlTeacher(course.description || "Khóa học do bạn quản lý")}
-                </p>
+                <p>${escapeHtmlTeacher(course.description || "Khóa học do bạn quản lý")}</p>
             </div>
             <i class="fa-solid fa-chevron-right"></i>
         `;
-        card.addEventListener("click", () => {
-            openTestCourse(course.id, course.name || `Lớp ${course.grade || ""}`);
-        });
+        card.addEventListener("click", () => openTestCourse(course.id, course.name || `Lớp ${course.grade || ""}`));
         if (testCourseList) testCourseList.appendChild(card);
     });
 }
 
-// ====================================
-//        STEP 3: OPEN KHÓA HỌC
-// ====================================
 async function openTestCourse(courseId, courseName) {
     testCurrentCourseId = courseId;
     testCurrentChapterId = "";
@@ -924,21 +779,13 @@ async function openTestCourse(courseId, courseName) {
     if (testChapterViewTitle) testChapterViewTitle.textContent = courseName || "Chương";
 
     updateTestBreadcrumb();
-    if (testChapterList) {
-        testChapterList.innerHTML = `<div class="empty">Đang tải chương...</div>`;
-    }
+    if (testChapterList) testChapterList.innerHTML = `<div class="empty">Đang tải chương...</div>`;
 
     try {
-        const snapshot = await getDocs(
-            collection(db, "courses", courseId, "chapters")
-        );
-
+        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
         const chapters = [];
         snapshot.forEach((chapterDoc) => {
-            chapters.push({
-                id: chapterDoc.id,
-                ...chapterDoc.data()
-            });
+            chapters.push({ id: chapterDoc.id, ...chapterDoc.data() });
         });
 
         chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
@@ -966,22 +813,15 @@ async function openTestCourse(courseId, courseName) {
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             `;
-            card.addEventListener("click", () => {
-                openTestChapter(chapter.id, chapter.title);
-            });
+            card.addEventListener("click", () => openTestChapter(chapter.id, chapter.title));
             if (testChapterList) testChapterList.appendChild(card);
         });
     } catch (error) {
         console.error(error);
-        if (testChapterList) {
-            testChapterList.innerHTML = `<div class="empty">Không thể tải chương.</div>`;
-        }
+        if (testChapterList) testChapterList.innerHTML = `<div class="empty">Không thể tải chương.</div>`;
     }
 }
 
-// ====================================
-//        STEP 4: OPEN CHƯƠNG
-// ====================================
 async function openTestChapter(chapterId, chapterTitle) {
     testCurrentChapterId = chapterId;
     testCurrentLessonId = "";
@@ -991,28 +831,13 @@ async function openTestChapter(chapterId, chapterTitle) {
     if (testLessonViewTitle) testLessonViewTitle.textContent = chapterTitle || "Bài học";
 
     updateTestBreadcrumb();
-    if (testLessonList) {
-        testLessonList.innerHTML = `<div class="empty">Đang tải bài học...</div>`;
-    }
+    if (testLessonList) testLessonList.innerHTML = `<div class="empty">Đang tải bài học...</div>`;
 
     try {
-        const snapshot = await getDocs(
-            collection(
-                db,
-                "courses",
-                testCurrentCourseId,
-                "chapters",
-                chapterId,
-                "lessons"
-            )
-        );
-
+        const snapshot = await getDocs(collection(db, "courses", testCurrentCourseId, "chapters", chapterId, "lessons"));
         const lessons = [];
         snapshot.forEach((lessonDoc) => {
-            lessons.push({
-                id: lessonDoc.id,
-                ...lessonDoc.data()
-            });
+            lessons.push({ id: lessonDoc.id, ...lessonDoc.data() });
         });
 
         lessons.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
@@ -1040,25 +865,17 @@ async function openTestChapter(chapterId, chapterTitle) {
                 </div>
                 <i class="fa-solid fa-chevron-right"></i>
             `;
-            card.addEventListener("click", () => {
-                openTestLesson(lesson.id, lesson.title);
-            });
+            card.addEventListener("click", () => openTestLesson(lesson.id, lesson.title));
             if (testLessonList) testLessonList.appendChild(card);
         });
     } catch (error) {
         console.error(error);
-        if (testLessonList) {
-            testLessonList.innerHTML = `<div class="empty">Không thể tải bài học.</div>`;
-        }
+        if (testLessonList) testLessonList.innerHTML = `<div class="empty">Không thể tải bài học.</div>`;
     }
 }
 
-// ====================================
-//        STEP 5: OPEN BÀI HỌC
-// ====================================
 async function openTestLesson(lessonId, lessonTitle) {
     testCurrentLessonId = lessonId;
-
     hideTestViews();
     if (testListView) testListView.style.display = "block";
     if (testListViewTitle) testListViewTitle.textContent = lessonTitle || "Bài kiểm tra";
@@ -1067,38 +884,20 @@ async function openTestLesson(lessonId, lessonTitle) {
     await loadTestsForLesson();
 }
 
-// ====================================
-//        LOAD TEST THEO BÀI HỌC
-// ====================================
 async function loadTestsForLesson() {
-    if (testList) {
-        testList.innerHTML = `<div class="empty">Đang tải bài kiểm tra...</div>`;
-    }
+    if (testList) testList.innerHTML = `<div class="empty">Đang tải bài kiểm tra...</div>`;
 
     try {
-        const snapshot = await getDocs(
-            collection(db, "courses", testCurrentCourseId, "tests")
-        );
-
+        const snapshot = await getDocs(collection(db, "courses", testCurrentCourseId, "tests"));
         const tests = [];
         snapshot.forEach((testDoc) => {
             const data = testDoc.data();
-            if (
-                data.chapterId === testCurrentChapterId &&
-                data.lessonId === testCurrentLessonId
-            ) {
-                tests.push({
-                    id: testDoc.id,
-                    ...data
-                });
+            if (data.chapterId === testCurrentChapterId && data.lessonId === testCurrentLessonId) {
+                tests.push({ id: testDoc.id, ...data });
             }
         });
 
-        tests.sort((a, b) => {
-            const aTime = a.createdAt?.seconds || 0;
-            const bTime = b.createdAt?.seconds || 0;
-            return bTime - aTime;
-        });
+        tests.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
 
         if (!tests.length) {
             if (testList) {
@@ -1140,27 +939,17 @@ async function loadTestsForLesson() {
                 </div>
             `;
 
-            card.querySelector(".chapter-edit").addEventListener("click", () => {
-                editTeacherTest(test.id, testCurrentCourseId);
-            });
-
-            card.querySelector(".chapter-delete").addEventListener("click", () => {
-                deleteTeacherTest(testCurrentCourseId, test.id);
-            });
+            card.querySelector(".chapter-edit").addEventListener("click", () => editTeacherTest(test.id, testCurrentCourseId));
+            card.querySelector(".chapter-delete").addEventListener("click", () => deleteTeacherTest(testCurrentCourseId, test.id));
 
             if (testList) testList.appendChild(card);
         });
     } catch (error) {
         console.error(error);
-        if (testList) {
-            testList.innerHTML = `<div class="empty">Không thể tải bài kiểm tra.</div>`;
-        }
+        if (testList) testList.innerHTML = `<div class="empty">Không thể tải bài kiểm tra.</div>`;
     }
 }
 
-// ====================================
-//        QUAY LẠI & BREADCRUMB
-// ====================================
 if (testBackBtn) {
     testBackBtn.addEventListener("click", async () => {
         if (!testCurrentSubject) return;
@@ -1195,56 +984,15 @@ if (testBackBtn) {
     });
 }
 
-if (testBreadcrumbContent) {
-    testBreadcrumbContent.addEventListener("click", async (event) => {
-        const item = event.target.closest(".breadcrumb-item");
-        if (!item) return;
-
-        const level = item.dataset.level;
-        if (level === "subject") {
-            testCurrentCourseId = "";
-            testCurrentChapterId = "";
-            testCurrentLessonId = "";
-
-            hideTestViews();
-            if (testCourseView) testCourseView.style.display = "block";
-
-            const q = query(
-                collection(db, "courses"),
-                where("teacherId", "==", currentTeacherId)
-            );
-
-            const snapshot = await getDocs(q);
-            const courses = [];
-
-            snapshot.forEach((courseDoc) => {
-                const data = courseDoc.data();
-                const subject = data.subjectName || data.subject || "Chưa xác định";
-                if (subject === testCurrentSubject) {
-                    courses.push({
-                        id: courseDoc.id,
-                        ...data
-                    });
-                }
-            });
-
-            await openTestSubject(testCurrentSubject, courses);
-        }
-    });
-}
-
 // ====================================
 //        XÓA & SỬA BÀI KIỂM TRA
 // ====================================
 window.deleteTeacherTest = async function (courseId, testId) {
-    if (!confirm("Bạn có chắc muốn xóa bài kiểm tra này?\nHành động này không thể hoàn tác.")) {
-        return;
-    }
+    if (!confirm("Bạn có chắc muốn xóa bài kiểm tra này?\nHành động này không thể hoàn tác.")) return;
 
     try {
         await deleteDoc(doc(db, "courses", courseId, "tests", testId));
         alert("Đã xóa bài kiểm tra.");
-
         if (testCurrentLessonId && testCurrentChapterId && testCurrentCourseId) {
             await loadTestsForLesson();
         }
@@ -1253,6 +1001,7 @@ window.deleteTeacherTest = async function (courseId, testId) {
         alert("Không thể xóa bài kiểm tra: " + error.message);
     }
 };
+
 async function editTeacherTest(testId, courseId) {
     try {
         const testRef = doc(db, "courses", courseId, "tests", testId);
@@ -1278,30 +1027,19 @@ async function editTeacherTest(testId, courseId) {
         if (part2Score4) part2Score4.value = data.part2?.scores?.four ?? 1;
         if (part3Point) part3Point.value = data.part3?.points ?? 0.5;
 
-        // Clone dữ liệu
         part1QuestionData = JSON.parse(JSON.stringify(data.part1?.questions || []));
         part2QuestionData = JSON.parse(JSON.stringify(data.part2?.questions || []));
         part3QuestionData = JSON.parse(JSON.stringify(data.part3?.questions || []));
 
-        // CHUẨN HÓA ĐÁP ÁN PHẦN 1: Chuyển "A","B","C","D" về index 0, 1, 2, 3
         part1QuestionData.forEach(q => {
             if (typeof q.correctAnswer === 'string') {
                 const upper = q.correctAnswer.trim().toUpperCase();
-                if (['A', 'B', 'C', 'D'].includes(upper)) {
-                    q.correctAnswer = upper.charCodeAt(0) - 65;
-                } else {
-                    q.correctAnswer = parseInt(q.correctAnswer, 10) || 0;
-                }
+                q.correctAnswer = ['A', 'B', 'C', 'D'].includes(upper) ? upper.charCodeAt(0) - 65 : parseInt(q.correctAnswer, 10) || 0;
             }
         });
 
-        // CHUẨN HÓA ĐÁP ÁN PHẦN 2: Đảm bảo dạng boolean [true/false]
         part2QuestionData.forEach(q => {
-            if (Array.isArray(q.answers)) {
-                q.answers = q.answers.map(ans => String(ans) === "true" || ans === true);
-            } else {
-                q.answers = [true, false, false, false];
-            }
+            q.answers = Array.isArray(q.answers) ? q.answers.map(ans => String(ans) === "true" || ans === true) : [true, false, false, false];
         });
 
         await loadTestCourses();
@@ -1328,12 +1066,8 @@ async function editTeacherTest(testId, courseId) {
         updateTestTotal();
 
         const modalTitle = testModal ? testModal.querySelector("h2") : null;
-        if (modalTitle) {
-            modalTitle.innerHTML = `<i class="fa-solid fa-pen"></i> Chỉnh sửa bài kiểm tra`;
-        }
-        if (saveTest) {
-            saveTest.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi`;
-        }
+        if (modalTitle) modalTitle.innerHTML = `<i class="fa-solid fa-pen"></i> Chỉnh sửa bài kiểm tra`;
+        if (saveTest) saveTest.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi`;
 
         if (testModal) testModal.style.display = "flex";
     } catch (error) {
@@ -1341,6 +1075,7 @@ async function editTeacherTest(testId, courseId) {
         alert("Không thể tải bài kiểm tra: " + error.message);
     }
 }
+
 if (createTestBtn) {
     createTestBtn.addEventListener("click", async () => {
         editingTestId = "";
@@ -1350,25 +1085,19 @@ if (createTestBtn) {
         await loadTestCourses();
 
         const modalTitle = testModal ? testModal.querySelector("h2") : null;
-        if (modalTitle) {
-            modalTitle.innerHTML = `<i class="fa-solid fa-file-circle-check"></i> Tạo bài kiểm tra`;
-        }
-        if (saveTest) {
-            saveTest.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu bài kiểm tra`;
-        }
+        if (modalTitle) modalTitle.innerHTML = `<i class="fa-solid fa-file-circle-check"></i> Tạo bài kiểm tra`;
+        if (saveTest) saveTest.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu bài kiểm tra`;
 
         if (testCurrentCourseId && testCurrentChapterId && testCurrentLessonId) {
             if (testCourse) {
                 testCourse.value = testCurrentCourseId;
                 testCourse.dispatchEvent(new Event("change"));
             }
-
             setTimeout(() => {
                 if (testChapter) {
                     testChapter.value = testCurrentChapterId;
                     testChapter.dispatchEvent(new Event("change"));
                 }
-
                 setTimeout(() => {
                     if (testLesson) testLesson.value = testCurrentLessonId;
                 }, 150);
@@ -1385,18 +1114,11 @@ if (cancelTest) {
     });
 }
 
-// ====================================
-//        FORM HELPERS & SELECTORS
-// ====================================
 async function loadTestCourses() {
     if (!testCourse) return;
     testCourse.innerHTML = `<option value="">-- Chọn khóa học --</option>`;
 
-    const q = query(
-        collection(db, "courses"),
-        where("teacherId", "==", currentTeacherId)
-    );
-
+    const q = query(collection(db, "courses"), where("teacherId", "==", currentTeacherId));
     const snapshot = await getDocs(q);
     snapshot.forEach((courseDoc) => {
         const data = courseDoc.data();
@@ -1422,18 +1144,9 @@ if (testCourse) {
 
         if (!courseId) return;
 
-        const snapshot = await getDocs(
-            collection(db, "courses", courseId, "chapters")
-        );
-
+        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
         const chapters = [];
-        snapshot.forEach((chapterDoc) => {
-            chapters.push({
-                id: chapterDoc.id,
-                ...chapterDoc.data()
-            });
-        });
-
+        snapshot.forEach((chapterDoc) => chapters.push({ id: chapterDoc.id, ...chapterDoc.data() }));
         chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
         chapters.forEach((chapter) => {
@@ -1459,18 +1172,9 @@ if (testChapter) {
 
         if (!courseId || !chapterId) return;
 
-        const snapshot = await getDocs(
-            collection(db, "courses", courseId, "chapters", chapterId, "lessons")
-        );
-
+        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters", chapterId, "lessons"));
         const lessons = [];
-        snapshot.forEach((lessonDoc) => {
-            lessons.push({
-                id: lessonDoc.id,
-                ...lessonDoc.data()
-            });
-        });
-
+        snapshot.forEach((lessonDoc) => lessons.push({ id: lessonDoc.id, ...lessonDoc.data() }));
         lessons.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
         lessons.forEach((lesson) => {
@@ -1484,8 +1188,9 @@ if (testChapter) {
         testLesson.disabled = lessons.length === 0;
     });
 }
+
 // ====================================
-//        XỬ LÝ XEM TRƯỚC CÔNG THỨC
+//        XỬ LÝ XEM TRƯỚC CÔNG THỨC & RENDER CÂU HỎI
 // ====================================
 function updateFormulaPreview(inputEl, previewEl) {
     if (!inputEl || !previewEl) return;
@@ -1496,33 +1201,21 @@ function updateFormulaPreview(inputEl, previewEl) {
     }
     
     let formatted = formatChemistryText(val);
-
     if (window.katex) {
         try {
-            formatted = formatted.replace(/\$(.*?)\$/g, (match, formula) => {
-                return katex.renderToString(formula, { throwOnError: false });
-            });
+            formatted = formatted.replace(/\$(.*?)\$/g, (match, formula) => katex.renderToString(formula, { throwOnError: false }));
         } catch (e) {
             console.error("Lỗi render KaTeX:", e);
         }
     }
-
-    // Chuyển ký tự xuống dòng (\n) thành thẻ <br> để hiển thị xuống dòng trong preview
     formatted = formatted.replace(/\r\n|\r|\n/g, "<br>");
-
     previewEl.innerHTML = `<span class="preview-label">Xem trước:</span> <span class="preview-content" style="white-space: pre-wrap; display: inline-block; width: 100%;">${formatted}</span>`;
 }
-// ====================================
-//        RENDER PHẦN I
-// ====================================
+
+// --- Phần I ---
 if (addPart1QuestionBtn) {
     addPart1QuestionBtn.addEventListener("click", () => {
-        part1QuestionData.push({
-            question: "",
-            image: "",
-            options: ["", "", "", ""],
-            correctAnswer: 0
-        });
+        part1QuestionData.push({ question: "", image: "", options: ["", "", "", ""], correctAnswer: 0 });
         renderPart1Questions();
         updateTestTotal();
     });
@@ -1536,135 +1229,96 @@ function renderPart1Questions() {
     }
 
     part1Questions.innerHTML = "";
-
     part1QuestionData.forEach((question, index) => {
         let selectedAnswer = question.correctAnswer;
         if (typeof selectedAnswer === 'string') {
             const upper = selectedAnswer.trim().toUpperCase();
-        if (['A', 'B', 'C', 'D'].includes(upper)) {
-            selectedAnswer = upper.charCodeAt(0) - 65;
-        } else {
-            selectedAnswer = parseInt(selectedAnswer, 10) || 0;
+            selectedAnswer = ['A', 'B', 'C', 'D'].includes(upper) ? upper.charCodeAt(0) - 65 : parseInt(selectedAnswer, 10) || 0;
         }
-    }
+
         const box = document.createElement("div");
-    box.className = "teacher-question";
-    box.innerHTML = `
+        box.className = "teacher-question";
+        box.innerHTML = `
             <div class="question-builder-top">
                 <h4>Câu ${index + 1}</h4>
-                <button type="button" class="remove-question" data-index="${index}">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <button type="button" class="remove-question" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
-                <textarea class="part1-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi (VD: H2SO4, Fe2(SO4)3, $E=mc^2$)...">${escapeHtmlTeacher(question.question)}</textarea>
+                <textarea class="part1-question" data-index="${index}" rows="4">${escapeHtmlTeacher(question.question)}</textarea>
                 <div class="formula-preview part1-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
-                <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
+                <label>Hình ảnh câu hỏi</label>
                 <input type="file" class="part1-image" data-index="${index}" accept="image/*">
-                <div class="image-preview">
-                    ${
-                        question.image
-                            ? `<img src="${question.image}" class="question-image-preview">`
-                            : `<span>Chưa có hình ảnh</span>`
-                    }
-                </div>
+                <div class="image-preview">${question.image ? `<img src="${question.image}" class="question-image-preview">` : `<span>Chưa có hình ảnh</span>`}</div>
             </div>
-<div class="options-builder">
-            ${question.options
-                .map(
-                    (option, optionIndex) => `
+            <div class="options-builder">
+                ${question.options.map((option, optionIndex) => `
                     <div class="option-row-wrapper">
                         <div class="option-row">
-                            <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${
-                            Number(selectedAnswer) === optionIndex ? "checked" : ""
-                        }>
+                            <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${Number(selectedAnswer) === optionIndex ? "checked" : ""}>
                             <input type="text" class="part1-option" data-index="${index}" data-option="${optionIndex}" value="${escapeHtmlTeacher(option)}" placeholder="Đáp án ${String.fromCharCode(65 + optionIndex)}">
                         </div>
                         <div class="formula-preview part1-opt-preview-${index}-${optionIndex} opt-preview"></div>
-                    </div>`
-                )
-                .join("")}
-        </div>
-        <small class="auto-text">Chọn ● để đánh dấu đáp án đúng.</small>
-    `;
+                    </div>`).join("")}
+            </div>
+        `;
         part1Questions.appendChild(box);
 
-        const qInput = box.querySelector(`.part1-question`);
-        const qPreview = box.querySelector(`.part1-q-preview-${index}`);
-        updateFormulaPreview(qInput, qPreview);
-
+        updateFormulaPreview(box.querySelector(`.part1-question`), box.querySelector(`.part1-q-preview-${index}`));
         question.options.forEach((_, optIdx) => {
-            const optInput = box.querySelector(`.part1-option[data-option="${optIdx}"]`);
-            const optPreview = box.querySelector(`.part1-opt-preview-${index}-${optIdx}`);
-            updateFormulaPreview(optInput, optPreview);
+            updateFormulaPreview(box.querySelector(`.part1-option[data-option="${optIdx}"]`), box.querySelector(`.part1-opt-preview-${index}-${optIdx}`));
         });
     });
 
     part1Questions.querySelectorAll(".part1-question").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            part1QuestionData[idx].question = event.target.value;
-            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part1QuestionData[Number(e.target.dataset.index)].question = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".form-group").querySelector(".formula-preview"));
         });
     });
 
     part1Questions.querySelectorAll(".part1-option").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            const optionIdx = Number(event.target.dataset.option);
-            part1QuestionData[idx].options[optionIdx] = event.target.value;
-            const preview = event.target.closest(".option-row-wrapper").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part1QuestionData[Number(e.target.dataset.index)].options[Number(e.target.dataset.option)] = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".option-row-wrapper").querySelector(".formula-preview"));
         });
     });
 
     part1Questions.querySelectorAll('input[type="radio"]').forEach((input) => {
-        input.addEventListener("change", (event) => {
-            const box = event.target.closest(".teacher-question");
+        input.addEventListener("change", (e) => {
+            const box = e.target.closest(".teacher-question");
             const idx = Number(box.querySelector(".part1-question").dataset.index);
-            part1QuestionData[idx].correctAnswer = Number(event.target.value);
+            part1QuestionData[idx].correctAnswer = Number(e.target.value);
         });
     });
 
     part1Questions.querySelectorAll(".remove-question").forEach((button) => {
         button.addEventListener("click", () => {
-            const idx = Number(button.dataset.index);
-            part1QuestionData.splice(idx, 1);
+            part1QuestionData.splice(Number(button.dataset.index), 1);
             renderPart1Questions();
             updateTestTotal();
         });
     });
 
     part1Questions.querySelectorAll(".part1-image").forEach((input) => {
-        input.addEventListener("change", async (event) => {
-            const idx = Number(event.target.dataset.index);
-            const file = event.target.files[0];
+        input.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
-
             const url = await uploadTestImage(file);
             if (url) {
-                part1QuestionData[idx].image = url;
+                part1QuestionData[Number(e.target.dataset.index)].image = url;
                 renderPart1Questions();
             }
         });
     });
 }
 
-// ====================================
-//        RENDER PHẦN II
-// ====================================
+// --- Phần II ---
 if (addPart2QuestionBtn) {
     addPart2QuestionBtn.addEventListener("click", () => {
-        part2QuestionData.push({
-            question: "",
-            image: "",
-            statements: ["", "", "", ""],
-            answers: [true, false, false, false]
-        });
+        part2QuestionData.push({ question: "", image: "", statements: ["", "", "", ""], answers: [true, false, false, false] });
         renderPart2Questions();
         updateTestTotal();
     });
@@ -1678,126 +1332,92 @@ function renderPart2Questions() {
     }
 
     part2Questions.innerHTML = "";
-
     part2QuestionData.forEach((question, index) => {
         const box = document.createElement("div");
         box.className = "teacher-question";
         box.innerHTML = `
             <div class="question-builder-top">
                 <h4>Câu ${index + 1}</h4>
-                <button type="button" class="remove-question" data-index="${index}">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <button type="button" class="remove-question" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
-                <textarea class="part2-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(question.question)}</textarea>
+                <textarea class="part2-question" data-index="${index}" rows="4">${escapeHtmlTeacher(question.question)}</textarea>
                 <div class="formula-preview part2-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
-                <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
+                <label>Hình ảnh câu hỏi</label>
                 <input type="file" class="part2-image" data-index="${index}" accept="image/*">
-                <div class="image-preview">
-                    ${
-                        question.image
-                            ? `<img src="${question.image}" class="question-image-preview">`
-                            : `<span>Chưa có hình ảnh</span>`
-                    }
-                </div>
+                <div class="image-preview">${question.image ? `<img src="${question.image}" class="question-image-preview">` : `<span>Chưa có hình ảnh</span>`}</div>
             </div>
             <div class="true-false-builder">
-                ${question.statements
-                    .map(
-                        (statement, statementIndex) => `
-                        <div class="tf-row-wrapper">
-                            <div class="tf-row">
-                                <div class="tf-label">${String.fromCharCode(97 + statementIndex)}.</div>
-                                <input type="text" class="part2-statement" data-index="${index}" data-statement="${statementIndex}" value="${escapeHtmlTeacher(statement)}" placeholder="Nhập ý ${String.fromCharCode(97 + statementIndex)}...">
-                                <select class="part2-answer" data-index="${index}" data-statement="${statementIndex}">
-                                    <option value="true" ${question.answers[statementIndex] === true ? "selected" : ""}>Đúng</option>
-                                    <option value="false" ${question.answers[statementIndex] === false ? "selected" : ""}>Sai</option>
-                                </select>
-                            </div>
-                            <div class="formula-preview part2-st-preview-${index}-${statementIndex} opt-preview"></div>
-                        </div>`
-                    )
-                    .join("")}
+                ${question.statements.map((statement, statementIndex) => `
+                    <div class="tf-row-wrapper">
+                        <div class="tf-row">
+                            <div class="tf-label">${String.fromCharCode(97 + statementIndex)}.</div>
+                            <input type="text" class="part2-statement" data-index="${index}" data-statement="${statementIndex}" value="${escapeHtmlTeacher(statement)}">
+                            <select class="part2-answer" data-index="${index}" data-statement="${statementIndex}">
+                                <option value="true" ${question.answers[statementIndex] === true ? "selected" : ""}>Đúng</option>
+                                <option value="false" ${question.answers[statementIndex] === false ? "selected" : ""}>Sai</option>
+                            </select>
+                        </div>
+                        <div class="formula-preview part2-st-preview-${index}-${statementIndex} opt-preview"></div>
+                    </div>`).join("")}
             </div>
         `;
         part2Questions.appendChild(box);
 
-        const qInput = box.querySelector(`.part2-question`);
-        const qPreview = box.querySelector(`.part2-q-preview-${index}`);
-        updateFormulaPreview(qInput, qPreview);
-
+        updateFormulaPreview(box.querySelector(`.part2-question`), box.querySelector(`.part2-q-preview-${index}`));
         question.statements.forEach((_, stIdx) => {
-            const stInput = box.querySelector(`.part2-statement[data-statement="${stIdx}"]`);
-            const stPreview = box.querySelector(`.part2-st-preview-${index}-${stIdx}`);
-            updateFormulaPreview(stInput, stPreview);
+            updateFormulaPreview(box.querySelector(`.part2-statement[data-statement="${stIdx}"]`), box.querySelector(`.part2-st-preview-${index}-${stIdx}`));
         });
     });
 
     part2Questions.querySelectorAll(".part2-question").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            part2QuestionData[idx].question = event.target.value;
-            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part2QuestionData[Number(e.target.dataset.index)].question = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".form-group").querySelector(".formula-preview"));
         });
     });
 
     part2Questions.querySelectorAll(".part2-statement").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            const stIdx = Number(event.target.dataset.statement);
-            part2QuestionData[idx].statements[stIdx] = event.target.value;
-            const preview = event.target.closest(".tf-row-wrapper").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part2QuestionData[Number(e.target.dataset.index)].statements[Number(e.target.dataset.statement)] = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".tf-row-wrapper").querySelector(".formula-preview"));
         });
     });
 
     part2Questions.querySelectorAll(".part2-answer").forEach((select) => {
-        select.addEventListener("change", (event) => {
-            const idx = Number(event.target.dataset.index);
-            const stIdx = Number(event.target.dataset.statement);
-            part2QuestionData[idx].answers[stIdx] = event.target.value === "true";
+        select.addEventListener("change", (e) => {
+            part2QuestionData[Number(e.target.dataset.index)].answers[Number(e.target.dataset.statement)] = e.target.value === "true";
         });
     });
 
     part2Questions.querySelectorAll(".remove-question").forEach((button) => {
         button.addEventListener("click", () => {
-            const idx = Number(button.dataset.index);
-            part2QuestionData.splice(idx, 1);
+            part2QuestionData.splice(Number(button.dataset.index), 1);
             renderPart2Questions();
             updateTestTotal();
         });
     });
 
     part2Questions.querySelectorAll(".part2-image").forEach((input) => {
-        input.addEventListener("change", async (event) => {
-            const idx = Number(event.target.dataset.index);
-            const file = event.target.files[0];
+        input.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
-
             const url = await uploadTestImage(file);
             if (url) {
-                part2QuestionData[idx].image = url;
+                part2QuestionData[Number(e.target.dataset.index)].image = url;
                 renderPart2Questions();
             }
         });
     });
 }
 
-// ====================================
-//        RENDER PHẦN III
-// ====================================
+// --- Phần III ---
 if (addPart3QuestionBtn) {
     addPart3QuestionBtn.addEventListener("click", () => {
-        part3QuestionData.push({
-            question: "",
-            image: "",
-            answer: ""
-        });
+        part3QuestionData.push({ question: "", image: "", answer: "" });
         renderPart3Questions();
         updateTestTotal();
     });
@@ -1811,118 +1431,85 @@ function renderPart3Questions() {
     }
 
     part3Questions.innerHTML = "";
-
     part3QuestionData.forEach((question, index) => {
         const box = document.createElement("div");
         box.className = "teacher-question";
         box.innerHTML = `
             <div class="question-builder-top">
                 <h4>Câu ${index + 1}</h4>
-                <button type="button" class="remove-question" data-index="${index}">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <button type="button" class="remove-question" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
             </div>
             <div class="form-group">
                 <label>Nội dung câu hỏi</label>
-                <textarea class="part3-question" data-index="${index}" rows="4" placeholder="Nhập nội dung câu hỏi...">${escapeHtmlTeacher(question.question)}</textarea>
+                <textarea class="part3-question" data-index="${index}" rows="4">${escapeHtmlTeacher(question.question)}</textarea>
                 <div class="formula-preview part3-q-preview-${index}"></div>
             </div>
             <div class="question-image-box">
-                <label>Hình ảnh câu hỏi <small>(không bắt buộc)</small></label>
+                <label>Hình ảnh câu hỏi</label>
                 <input type="file" class="part3-image" data-index="${index}" accept="image/*">
-                <div class="image-preview">
-                    ${
-                        question.image
-                            ? `<img src="${question.image}" class="question-image-preview">`
-                            : `<span>Chưa có hình ảnh</span>`
-                    }
-                </div>
+                <div class="image-preview">${question.image ? `<img src="${question.image}" class="question-image-preview">` : `<span>Chưa có hình ảnh</span>`}</div>
             </div>
             <div class="form-group">
                 <label>Đáp án đúng</label>
-                <input type="text" class="part3-answer" data-index="${index}" value="${escapeHtmlTeacher(question.answer)}" placeholder="Ví dụ 0,25">
+                <input type="text" class="part3-answer" data-index="${index}" value="${escapeHtmlTeacher(question.answer)}">
                 <div class="formula-preview part3-ans-preview-${index} opt-preview"></div>
             </div>
         `;
         part3Questions.appendChild(box);
 
-        const qInput = box.querySelector(`.part3-question`);
-        const qPreview = box.querySelector(`.part3-q-preview-${index}`);
-        updateFormulaPreview(qInput, qPreview);
-
-        const ansInput = box.querySelector(`.part3-answer`);
-        const ansPreview = box.querySelector(`.part3-ans-preview-${index}`);
-        updateFormulaPreview(ansInput, ansPreview);
+        updateFormulaPreview(box.querySelector(`.part3-question`), box.querySelector(`.part3-q-preview-${index}`));
+        updateFormulaPreview(box.querySelector(`.part3-answer`), box.querySelector(`.part3-ans-preview-${index}`));
     });
 
     part3Questions.querySelectorAll(".part3-question").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            part3QuestionData[idx].question = event.target.value;
-            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part3QuestionData[Number(e.target.dataset.index)].question = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".form-group").querySelector(".formula-preview"));
         });
     });
 
     part3Questions.querySelectorAll(".part3-answer").forEach((input) => {
-        input.addEventListener("input", (event) => {
-            const idx = Number(event.target.dataset.index);
-            part3QuestionData[idx].answer = event.target.value;
-            const preview = event.target.closest(".form-group").querySelector(".formula-preview");
-            updateFormulaPreview(event.target, preview);
+        input.addEventListener("input", (e) => {
+            part3QuestionData[Number(e.target.dataset.index)].answer = e.target.value;
+            updateFormulaPreview(e.target, e.target.closest(".form-group").querySelector(".formula-preview"));
         });
     });
 
     part3Questions.querySelectorAll(".remove-question").forEach((button) => {
         button.addEventListener("click", () => {
-            const idx = Number(button.dataset.index);
-            part3QuestionData.splice(idx, 1);
+            part3QuestionData.splice(Number(button.dataset.index), 1);
             renderPart3Questions();
             updateTestTotal();
         });
     });
 
     part3Questions.querySelectorAll(".part3-image").forEach((input) => {
-        input.addEventListener("change", async (event) => {
-            const idx = Number(event.target.dataset.index);
-            const file = event.target.files[0];
+        input.addEventListener("change", async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
-
             const url = await uploadTestImage(file);
             if (url) {
-                part3QuestionData[idx].image = url;
+                part3QuestionData[Number(e.target.dataset.index)].image = url;
                 renderPart3Questions();
             }
         });
     });
 }
 
-// ====================================
-//        TÍNH TỔNG ĐIỂM & ĐỔI TRẠNG THÁI
-// ====================================
 function updateTestTotal() {
-    const count1 = part1QuestionData.length;
-    const count2 = part2QuestionData.length;
-    const count3 = part3QuestionData.length;
-
-    const point1 = Number(part1Point?.value || 0);
-    const score2Max = Number(part2Score4?.value || 0);
-    const point3 = Number(part3Point?.value || 0);
-
-    const totalQuestions = count1 + count2 + count3;
-    const totalPoint = count1 * point1 + count2 * score2Max + count3 * point3;
+    const totalQuestions = part1QuestionData.length + part2QuestionData.length + part3QuestionData.length;
+    const totalPoint = (part1QuestionData.length * Number(part1Point?.value || 0)) +
+                       (part2QuestionData.length * Number(part2Score4?.value || 0)) +
+                       (part3QuestionData.length * Number(part3Point?.value || 0));
 
     if (testQuestionTotal) testQuestionTotal.textContent = totalQuestions;
-    if (testTotalPoint) {
-        testTotalPoint.textContent = totalPoint.toFixed(2).replace(/\.00$/, "");
-    }
+    if (testTotalPoint) testTotalPoint.textContent = totalPoint.toFixed(2).replace(/\.00$/, "");
 }
 
 function resetTestBuilder() {
     part1QuestionData = [];
     part2QuestionData = [];
     part3QuestionData = [];
-
     editingTestId = "";
     editingTestCourseId = "";
 
@@ -1935,18 +1522,10 @@ function resetTestBuilder() {
         testChapter.innerHTML = `<option value="">-- Chọn chương --</option>`;
         testChapter.disabled = true;
     }
-
     if (testLesson) {
         testLesson.innerHTML = `<option value="">-- Chọn bài học --</option>`;
         testLesson.disabled = true;
     }
-
-    if (part1Point) part1Point.value = 0.5;
-    if (part2Score1) part2Score1.value = 0.1;
-    if (part2Score2) part2Score2.value = 0.25;
-    if (part2Score3) part2Score3.value = 0.5;
-    if (part2Score4) part2Score4.value = 1;
-    if (part3Point) part3Point.value = 0.5;
 
     renderPart1Questions();
     renderPart2Questions();
@@ -1954,45 +1533,27 @@ function resetTestBuilder() {
     updateTestTotal();
 }
 
-[
-    part1Point,
-    part2Score1,
-    part2Score2,
-    part2Score3,
-    part2Score4,
-    part3Point
-].forEach((input) => {
+[part1Point, part2Score1, part2Score2, part2Score3, part2Score4, part3Point].forEach((input) => {
     if (input) input.addEventListener("input", updateTestTotal);
 });
 
 // ====================================
-//        UPLOAD HÌNH ẢNH / MEDIA
+//        UPLOAD CLOUDINARY
 // ====================================
 const CLOUD_NAME = "xhljajy6";
 const UPLOAD_PRESET = "htstudy";
 
 async function uploadTestImage(file) {
     if (!file) return "";
-
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
     formData.append("resource_type", "image");
 
     try {
-        const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
         const data = await response.json();
-        if (data.secure_url) {
-            return data.secure_url;
-        }
-
+        if (data.secure_url) return data.secure_url;
         alert("Upload hình ảnh thất bại.");
         return "";
     } catch (error) {
@@ -2002,193 +1563,101 @@ async function uploadTestImage(file) {
     }
 }
 
-// ====================================
-//        LƯU BÀI KIỂM TRA (SAVE TEST)
-// ====================================
 if (saveTest) {
-    saveTest.addEventListener("click", saveNewTest);
-}
+    saveTest.addEventListener("click", async () => {
+        try {
+            const courseId = testCourse.value;
+            const chapterId = testChapter.value;
+            const lessonId = testLesson.value;
+            const title = testTitle.value.trim();
+            const description = testDescription.value.trim();
+            const duration = Number(testType.value.replace("p", ""));
 
-async function saveNewTest() {
-    try {
-        const courseId = testCourse.value;
-        const chapterId = testChapter.value;
-        const lessonId = testLesson.value;
-        const title = testTitle.value.trim();
-        const description = testDescription.value.trim();
-        const duration = Number(testType.value.replace("p", ""));
+            if (!courseId) return alert("Vui lòng chọn khóa học.");
+            if (!chapterId) return alert("Vui lòng chọn chương.");
+            if (!lessonId) return alert("Vui lòng chọn bài học.");
+            if (!title) return alert("Vui lòng nhập tên bài kiểm tra.");
 
-        if (!courseId) return alert("Vui lòng chọn khóa học.");
-        if (!chapterId) return alert("Vui lòng chọn chương.");
-        if (!lessonId) return alert("Vui lòng chọn bài học.");
-        if (!title) return alert("Vui lòng nhập tên bài kiểm tra.");
-
-        if (
-            !part1QuestionData.length &&
-            !part2QuestionData.length &&
-            !part3QuestionData.length
-        ) {
-            return alert("Bài kiểm tra chưa có câu hỏi.");
-        }
-
-        // Validate Phần I
-        for (let i = 0; i < part1QuestionData.length; i++) {
-            const q = part1QuestionData[i];
-            if (!q.question || !q.question.trim()) {
-                return alert(`Phần I - Câu ${i + 1} chưa có nội dung.`);
+            if (!part1QuestionData.length && !part2QuestionData.length && !part3QuestionData.length) {
+                return alert("Bài kiểm tra chưa có câu hỏi.");
             }
-            if (
-                !q.options ||
-                q.options.length !== 4 ||
-                q.options.some((opt) => !opt || !opt.trim())
-            ) {
-                return alert(`Phần I - Câu ${i + 1} chưa nhập đủ 4 đáp án.`);
-            }
-        }
 
-        // Validate Phần II
-        for (let i = 0; i < part2QuestionData.length; i++) {
-            const q = part2QuestionData[i];
-            if (!q.question || !q.question.trim()) {
-                return alert(`Phần II - Câu ${i + 1} chưa có nội dung.`);
-            }
-            if (
-                !q.statements ||
-                q.statements.length !== 4 ||
-                q.statements.some((st) => !st || !st.trim())
-            ) {
-                return alert(`Phần II - Câu ${i + 1} chưa nhập đủ 4 ý.`);
-            }
-        }
-
-        // Validate Phần III
-        for (let i = 0; i < part3QuestionData.length; i++) {
-            const q = part3QuestionData[i];
-            if (!q.question || !q.question.trim()) {
-                return alert(`Phần III - Câu ${i + 1} chưa có nội dung.`);
-            }
-            if (!q.answer || !String(q.answer).trim()) {
-                return alert(`Phần III - Câu ${i + 1} chưa có đáp án.`);
-            }
-        }
-
-        const questionCount =
-            part1QuestionData.length +
-            part2QuestionData.length +
-            part3QuestionData.length;
-
-        const totalPoints =
-            part1QuestionData.length * Number(part1Point.value || 0) +
-            part2QuestionData.length * Number(part2Score4.value || 0) +
-            part3QuestionData.length * Number(part3Point.value || 0);
-
-        const testData = {
-            title,
-            description,
-            type: testType.value,
-            duration,
-            courseId,
-            chapterId,
-            lessonId,
-            teacherId: currentTeacherId,
-            teacherName: currentTeacherName,
-            part1: {
-                points: Number(part1Point.value || 0),
-                questions: part1QuestionData.map(q => ({
-                    ...q,
+            const testData = {
+                title,
+                description,
+                type: testType.value,
+                duration,
+                courseId,
+                chapterId,
+                lessonId,
+                teacherId: currentTeacherId,
+                teacherName: currentTeacherName,
+                part1: {
                     points: Number(part1Point.value || 0),
-                    correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
-                }))
-            },
-            part2: {
-                scores: {
-                    one: Number(part2Score1.value || 0),
-                    two: Number(part2Score2.value || 0),
-                    three: Number(part2Score3.value || 0),
-                    four: Number(part2Score4.value || 0)
+                    questions: part1QuestionData.map(q => ({
+                        ...q,
+                        points: Number(part1Point.value || 0),
+                        correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
+                    }))
                 },
-                questions: part2QuestionData
-            },
-            part3: {
-                points: Number(part3Point.value || 0),
-                questions: part3QuestionData.map(q => ({
-                    ...q,
-                    points: Number(part3Point.value || 0)
-                }))
-            },
-            questionCount,
-            totalPoints,
-            updatedAt: serverTimestamp()
-        };
+                part2: {
+                    scores: {
+                        one: Number(part2Score1.value || 0),
+                        two: Number(part2Score2.value || 0),
+                        three: Number(part2Score3.value || 0),
+                        four: Number(part2Score4.value || 0)
+                    },
+                    questions: part2QuestionData
+                },
+                part3: {
+                    points: Number(part3Point.value || 0),
+                    questions: part3QuestionData.map(q => ({ ...q, points: Number(part3Point.value || 0) }))
+                },
+                questionCount: part1QuestionData.length + part2QuestionData.length + part3QuestionData.length,
+                totalPoints: (part1QuestionData.length * Number(part1Point.value || 0)) +
+                             (part2QuestionData.length * Number(part2Score4.value || 0)) +
+                             (part3QuestionData.length * Number(part3Point.value || 0)),
+                updatedAt: serverTimestamp()
+            };
 
-        if (editingTestId) {
-            const oldCourseId = editingTestCourseId;
-
-            if (oldCourseId === courseId) {
-                await updateDoc(
-                    doc(db, "courses", oldCourseId, "tests", editingTestId),
-                    testData
-                );
-            } else {
-                await addDoc(
-                    collection(db, "courses", courseId, "tests"),
-                    {
-                        ...testData,
-                        createdAt: serverTimestamp()
-                    }
-                );
-
-                await deleteDoc(
-                    doc(db, "courses", oldCourseId, "tests", editingTestId)
-                );
-            }
-            alert("Đã cập nhật bài kiểm tra.");
-        } else {
-            await addDoc(
-                collection(db, "courses", courseId, "tests"),
-                {
-                    ...testData,
-                    createdAt: serverTimestamp()
+            if (editingTestId) {
+                if (editingTestCourseId === courseId) {
+                    await updateDoc(doc(db, "courses", editingTestCourseId, "tests", editingTestId), testData);
+                } else {
+                    await addDoc(collection(db, "courses", courseId, "tests"), { ...testData, createdAt: serverTimestamp() });
+                    await deleteDoc(doc(db, "courses", editingTestCourseId, "tests", editingTestId));
                 }
-            );
-            alert("Đã tạo bài kiểm tra thành công.");
-        }
+                alert("Đã cập nhật bài kiểm tra.");
+            } else {
+                await addDoc(collection(db, "courses", courseId, "tests"), { ...testData, createdAt: serverTimestamp() });
+                alert("Đã tạo bài kiểm tra thành công.");
+            }
 
-        editingTestId = "";
-        editingTestCourseId = "";
-        if (testModal) testModal.style.display = "none";
-        resetTestBuilder();
+            editingTestId = "";
+            editingTestCourseId = "";
+            if (testModal) testModal.style.display = "none";
+            resetTestBuilder();
 
-        if (
-            testCurrentCourseId &&
-            testCurrentChapterId &&
-            testCurrentLessonId
-        ) {
-            await loadTestsForLesson();
+            if (testCurrentCourseId && testCurrentChapterId && testCurrentLessonId) {
+                await loadTestsForLesson();
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Không thể lưu bài kiểm tra: " + error.message);
         }
-    } catch (error) {
-        console.error(error);
-        alert("Không thể lưu bài kiểm tra: " + error.message);
-    }
+    });
 }
 
 // ====================================
-//        TẠO HỌC SINH (STUDENT ACCOUNT)
+//        TẠO HỌC SINH (PENDING STUDENTS)
 // ====================================
 async function createStudentAccount() {
     const name = studentName.value.trim();
     const email = studentEmail.value.trim().toLowerCase();
     const memberId = studentIdInput.value;
 
-    if (name === "" || email === "") {
-        alert("Vui lòng nhập đầy đủ thông tin.");
-        return;
-    }
-
-    if (!email.includes("@")) {
-        alert("Email không hợp lệ.");
-        return;
-    }
+    if (!name || !email) return alert("Vui lòng nhập đầy đủ thông tin.");
+    if (!email.includes("@")) return alert("Email không hợp lệ.");
 
     await addDoc(collection(db, "pendingStudents"), {
         name,
@@ -2201,7 +1670,6 @@ async function createStudentAccount() {
     });
 
     alert("Đã gửi yêu cầu tạo tài khoản.\nVui lòng chờ Admin phê duyệt.");
-
     studentName.value = "";
     studentEmail.value = "";
     studentIdInput.value = await generateMemberId();
@@ -2212,25 +1680,17 @@ if (createStudentBtn) {
 }
 
 // ====================================
-//        QUẢN LÝ THÔNG BÁO (NOTIFICATIONS)
+//        QUẢN LÝ THÔNG BÁO & KHÓA HỌC
 // ====================================
 async function loadNotificationCourses() {
     if (!notificationCourse) return;
     notificationCourse.innerHTML = `<option value="">-- Chọn khóa học --</option>`;
 
-    const q = query(
-        collection(db, "courses"),
-        where("teacherId", "==", currentTeacherId)
-    );
-
+    const q = query(collection(db, "courses"), where("teacherId", "==", currentTeacherId));
     const snapshot = await getDocs(q);
     snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        notificationCourse.innerHTML += `
-            <option value="${docSnap.id}">
-                ${data.subjectName || data.subject} ${data.grade} - Khóa ${data.name}
-            </option>
-        `;
+        notificationCourse.innerHTML += `<option value="${docSnap.id}">${data.subjectName || data.subject} ${data.grade} - Khóa ${data.name}</option>`;
     });
 }
 
@@ -2242,7 +1702,7 @@ async function loadContentList() {
     notificationContentLink.innerHTML = "";
 
     const courseId = notificationCourse.value;
-    if (courseId === "") {
+    if (!courseId) {
         notificationContentLink.innerHTML = `<option value="">Chọn khóa học trước</option>`;
         return;
     }
@@ -2254,73 +1714,57 @@ async function loadContentList() {
     }
 
     notificationContentLink.disabled = false;
-    let collectionName = "lessons";
-    if (notificationType.value === "test") {
-        collectionName = "tests";
-    }
+    const collectionName = notificationType.value === "test" ? "tests" : "lessons";
+    const snapshot = await getDocs(collection(db, "courses", courseId, collectionName));
 
-    const snapshot = await getDocs(
-        collection(db, "courses", courseId, collectionName)
-    );
-
-    notificationContentLink.innerHTML = "";
     snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        notificationContentLink.innerHTML += `
-            <option value="${docSnap.id}">${data.title}</option>
-        `;
+        notificationContentLink.innerHTML += `<option value="${docSnap.id}">${data.title}</option>`;
     });
 }
 
 if (createNotificationBtn) {
-    createNotificationBtn.addEventListener("click", createNotification);
-}
+    createNotificationBtn.addEventListener("click", async () => {
+        try {
+            const type = notificationType.value;
+            const courseId = notificationCourse.value;
+            const courseName = notificationCourse.options[notificationCourse.selectedIndex].text;
+            const title = notificationTitle.value.trim();
+            const content = notificationContent.value.trim();
+            const contentId = notificationContentLink.value;
 
-async function createNotification() {
-    try {
-        const type = notificationType.value;
-        const courseId = notificationCourse.value;
-        const courseName =
-            notificationCourse.options[notificationCourse.selectedIndex].text;
-        const title = notificationTitle.value.trim();
-        const content = notificationContent.value.trim();
-        const contentId = notificationContentLink.value;
+            if (!courseId) return alert("Vui lòng chọn khóa học.");
+            if (!title) return alert("Nhập tiêu đề.");
+            if (!content) return alert("Nhập nội dung.");
 
-        if (courseId === "") return alert("Vui lòng chọn khóa học.");
-        if (title === "") return alert("Nhập tiêu đề.");
-        if (content === "") return alert("Nhập nội dung.");
+            await addDoc(collection(db, "notifications"), {
+                type,
+                courseId,
+                courseName,
+                title,
+                content,
+                contentId,
+                active: true,
+                read: false,
+                createdAt: serverTimestamp()
+            });
 
-        await addDoc(collection(db, "notifications"), {
-            type,
-            courseId,
-            courseName,
-            title,
-            content,
-            contentId,
-            active: true,
-            read: false,
-            createdAt: serverTimestamp()
-        });
-
-        alert("Đã gửi thông báo.");
-        notificationTitle.value = "";
-        notificationContent.value = "";
-        await loadNotifications();
-    } catch (err) {
-        console.error(err);
-        alert(err.message);
-    }
+            alert("Đã gửi thông báo.");
+            notificationTitle.value = "";
+            notificationContent.value = "";
+            await loadNotifications();
+        } catch (err) {
+            console.error(err);
+            alert(err.message);
+        }
+    });
 }
 
 async function loadNotifications() {
     if (!notificationList) return;
     notificationList.innerHTML = "Đang tải...";
 
-    const q = query(
-        collection(db, "notifications"),
-        orderBy("createdAt", "desc")
-    );
-
+    const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
     notificationList.innerHTML = "";
 
@@ -2328,9 +1772,9 @@ async function loadNotifications() {
         const data = docItem.data();
         notificationList.innerHTML += `
             <div class="course-item">
-                <h3>${data.title}</h3>
-                <p><b>${data.courseName}</b></p>
-                <p>${data.content}</p>
+                <h3>${escapeHtmlTeacher(data.title)}</h3>
+                <p><b>${escapeHtmlTeacher(data.courseName)}</b></p>
+                <p>${escapeHtmlTeacher(data.content)}</p>
                 <button onclick="deleteNotification('${docItem.id}')">Xóa</button>
             </div>
         `;
@@ -2343,18 +1787,11 @@ window.deleteNotification = async function (id) {
     await loadNotifications();
 };
 
-// ====================================
-//        KHÓA HỌC CỦA TÔI (COURSES)
-// ====================================
 async function loadMyCourses() {
     if (!teacherCourseList) return;
     teacherCourseList.innerHTML = "Đang tải...";
 
-    const q = query(
-        collection(db, "courses"),
-        where("teacherId", "==", currentTeacherId)
-    );
-
+    const q = query(collection(db, "courses"), where("teacherId", "==", currentTeacherId));
     const snapshot = await getDocs(q);
     teacherCourseList.innerHTML = "";
 
@@ -2367,9 +1804,9 @@ async function loadMyCourses() {
         const course = courseDoc.data();
         teacherCourseList.innerHTML += `
             <div class="course-item">
-                <h3>${course.name}</h3>
-                <p>📚 ${course.subject}</p>
-                <p>🎓 Lớp ${course.grade}</p>
+                <h3>${escapeHtmlTeacher(course.name)}</h3>
+                <p>📚 ${escapeHtmlTeacher(course.subject)}</p>
+                <p>🎓 Lớp ${escapeHtmlTeacher(course.grade)}</p>
                 <button onclick="openCourse('${courseDoc.id}')">Quản lý khóa học</button>
             </div>
         `;
@@ -2379,10 +1816,7 @@ async function loadMyCourses() {
 window.openCourse = async function (courseId) {
     currentCourseId = courseId;
     const snap = await getDoc(doc(db, "courses", courseId));
-    if (!snap.exists()) {
-        alert("Không tìm thấy khóa học.");
-        return;
-    }
+    if (!snap.exists()) return alert("Không tìm thấy khóa học.");
 
     const data = snap.data();
     hideAllPages();
@@ -2426,106 +1860,68 @@ if (cancelLesson) {
 }
 
 if (saveLesson) {
-    saveLesson.addEventListener("click", saveNewLesson);
-}
+    saveLesson.addEventListener("click", async () => {
+        const title = lessonTitle.value.trim();
+        const description = lessonDescription.value.trim();
+        const order = Number(lessonOrder.value);
 
-async function saveNewLesson() {
-    const title = lessonTitle.value.trim();
-    const description = lessonDescription.value.trim();
-    const order = Number(lessonOrder.value);
+        if (!title) return alert("Nhập tên bài học.");
+        if (order <= 0) return alert("Thứ tự không hợp lệ.");
 
-    if (title === "") return alert("Nhập tên bài học.");
-    if (order <= 0) return alert("Thứ tự không hợp lệ.");
+        if (editingLessonId) {
+            const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
+            const snap = await getDoc(lessonRef);
+            const oldData = snap.data();
 
-    if (editingLessonId !== "") {
-        const lessonRef = doc(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters",
-            currentChapterId,
-            "lessons",
-            editingLessonId
-        );
+            if (pdfFile.files.length) await uploadPdf();
+            if (videoFile.files.length) await uploadVideo();
 
-        const snap = await getDoc(lessonRef);
-        const oldData = snap.data();
+            await updateDoc(lessonRef, {
+                title,
+                description,
+                order,
+                video: uploadedVideoLink || oldData.video || "",
+                pdf: uploadedPdfLink || oldData.pdf || ""
+            });
+        } else {
+            const lessonId = "lesson_" + Date.now();
+            if (videoFile.files.length) await uploadVideo();
+            if (!uploadedVideoLink) return alert("Chưa upload video.");
 
-        if (pdfFile.files.length) await uploadPdf();
-        if (videoFile.files.length) await uploadVideo();
+            if (pdfFile.files.length) await uploadPdf();
+            if (!uploadedPdfLink) return alert("Chưa có file PDF.");
 
-        const video = uploadedVideoLink || oldData.video || "";
-        const pdf = uploadedPdfLink || oldData.pdf || "";
-
-        await updateDoc(lessonRef, {
-            title,
-            description,
-            order,
-            video,
-            pdf
-        });
-    } else {
-        const lessonId = "lesson_" + Date.now();
-        if (videoFile.files.length) await uploadVideo();
-        if (uploadedVideoLink === "") return alert("Chưa upload video.");
-
-        if (pdfFile.files.length) await uploadPdf();
-        if (uploadedPdfLink === "") return alert("Chưa có file PDF.");
-
-        await setDoc(
-            doc(
-                db,
-                "courses",
-                currentCourseId,
-                "chapters",
-                currentChapterId,
-                "lessons",
-                lessonId
-            ),
-            {
+            await setDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId), {
                 title,
                 description,
                 order,
                 video: uploadedVideoLink,
                 pdf: uploadedPdfLink,
                 createdAt: serverTimestamp()
-            }
-        );
-    }
+            });
+        }
 
-    editingLessonId = "";
-    lessonTitle.value = "";
-    lessonDescription.value = "";
-    lessonOrder.value = "";
+        editingLessonId = "";
+        lessonTitle.value = "";
+        lessonDescription.value = "";
+        lessonOrder.value = "";
+        videoResult.textContent = "";
+        uploadedVideoLink = "";
+        videoFile.value = "";
+        pdfFile.value = "";
+        pdfResult.textContent = "";
+        uploadedPdfLink = "";
 
-    videoResult.textContent = "";
-    uploadedVideoLink = "";
-    videoFile.value = "";
-
-    pdfFile.value = "";
-    pdfResult.textContent = "";
-    uploadedPdfLink = "";
-
-    lessonModal.style.display = "none";
-    await loadLessons();
+        lessonModal.style.display = "none";
+        await loadLessons();
+    });
 }
 
 async function loadLessons() {
     if (!lessonList) return;
     lessonList.innerHTML = "Đang tải...";
 
-    const q = query(
-        collection(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters",
-            currentChapterId,
-            "lessons"
-        ),
-        orderBy("order")
-    );
-
+    const q = query(collection(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons"), orderBy("order"));
     const snapshot = await getDocs(q);
     lessonList.innerHTML = "";
 
@@ -2538,8 +1934,8 @@ async function loadLessons() {
         const data = lesson.data();
         lessonList.innerHTML += `
             <div class="chapter-card">
-                <h3>${data.order}. ${data.title}</h3>
-                <p>${data.description || ""}</p>
+                <h3>${data.order}. ${escapeHtmlTeacher(data.title)}</h3>
+                <p>${escapeHtmlTeacher(data.description || "")}</p>
                 <div class="chapter-actions">
                     <button class="chapter-edit" onclick="editLesson('${lesson.id}')">Sửa</button>
                     <button class="chapter-delete" onclick="deleteLesson('${lesson.id}')">Xóa</button>
@@ -2551,27 +1947,13 @@ async function loadLessons() {
 
 window.deleteLesson = async function (lessonId) {
     if (!confirm("Bạn có chắc muốn xóa bài học này?")) return;
-
-    await deleteDoc(
-        doc(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters",
-            currentChapterId,
-            "lessons",
-            lessonId
-        )
-    );
+    await deleteDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId));
     await loadLessons();
 };
 
 window.editChapter = async function (chapterId) {
     editingChapterId = chapterId;
-    const snap = await getDoc(
-        doc(db, "courses", currentCourseId, "chapters", chapterId)
-    );
-
+    const snap = await getDoc(doc(db, "courses", currentCourseId, "chapters", chapterId));
     if (!snap.exists()) return alert("Không tìm thấy chương.");
 
     const data = snap.data();
@@ -2584,42 +1966,19 @@ window.editChapter = async function (chapterId) {
 window.deleteChapter = async function (chapterId) {
     if (!confirm("Bạn có chắc muốn xóa chương này?")) return;
 
-    const lessonSnapshot = await getDocs(
-        collection(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters",
-            chapterId,
-            "lessons"
-        )
-    );
-
+    const lessonSnapshot = await getDocs(collection(db, "courses", currentCourseId, "chapters", chapterId, "lessons"));
     if (!lessonSnapshot.empty) {
         alert("Chương vẫn còn bài học.\nHãy xóa hết bài học trước.");
         return;
     }
 
-    await deleteDoc(
-        doc(db, "courses", currentCourseId, "chapters", chapterId)
-    );
+    await deleteDoc(doc(db, "courses", currentCourseId, "chapters", chapterId));
     await loadChapters();
 };
 
 window.editLesson = async function (lessonId) {
     editingLessonId = lessonId;
-    const snap = await getDoc(
-        doc(
-            db,
-            "courses",
-            currentCourseId,
-            "chapters",
-            currentChapterId,
-            "lessons",
-            lessonId
-        )
-    );
-
+    const snap = await getDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId));
     if (!snap.exists()) return alert("Không tìm thấy bài học.");
 
     const data = snap.data();
@@ -2631,13 +1990,8 @@ window.editLesson = async function (lessonId) {
     uploadedVideoLink = data.video || "";
     uploadedPdfLink = data.pdf || "";
 
-    videoResult.innerHTML = data.video
-        ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>`
-        : "";
-
-    pdfResult.innerHTML = data.pdf
-        ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>`
-        : "";
+    videoResult.innerHTML = data.video ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>` : "";
+    pdfResult.innerHTML = data.pdf ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>` : "";
 };
 
 if (backToCoursesBtn) {
@@ -2664,54 +2018,41 @@ if (cancelChapter) {
     });
 }
 
-async function saveNewChapter() {
-    const title = chapterTitle.value.trim();
-    const description = chapterDescription.value.trim();
-    const order = Number(chapterOrder.value);
+if (saveChapter) {
+    saveChapter.addEventListener("click", async () => {
+        const title = chapterTitle.value.trim();
+        const description = chapterDescription.value.trim();
+        const order = Number(chapterOrder.value);
 
-    if (title === "") return alert("Nhập tên chương.");
-    if (order <= 0) return alert("Thứ tự chương không hợp lệ.");
+        if (!title) return alert("Nhập tên chương.");
+        if (order <= 0) return alert("Thứ tự chương không hợp lệ.");
 
-    if (editingChapterId !== "") {
-        await updateDoc(
-            doc(db, "courses", currentCourseId, "chapters", editingChapterId),
-            { title, description, order }
-        );
-    } else {
-        const id = "chapter_" + Date.now();
-        await setDoc(
-            doc(db, "courses", currentCourseId, "chapters", id),
-            {
+        if (editingChapterId) {
+            await updateDoc(doc(db, "courses", currentCourseId, "chapters", editingChapterId), { title, description, order });
+        } else {
+            const id = "chapter_" + Date.now();
+            await setDoc(doc(db, "courses", currentCourseId, "chapters", id), {
                 title,
                 description,
                 order,
                 createdAt: serverTimestamp()
-            }
-        );
-    }
+            });
+        }
 
-    chapterTitle.value = "";
-    chapterDescription.value = "";
-    chapterOrder.value = "";
-    editingChapterId = "";
-    chapterModal.style.display = "none";
-
-    await loadChapters();
-}
-
-if (saveChapter) {
-    saveChapter.addEventListener("click", saveNewChapter);
+        chapterTitle.value = "";
+        chapterDescription.value = "";
+        chapterOrder.value = "";
+        editingChapterId = "";
+        chapterModal.style.display = "none";
+        await loadChapters();
+    });
 }
 
 async function loadChapters() {
     if (!chapterList) return;
     chapterList.innerHTML = "Đang tải...";
 
-    const q = query(
-        collection(db, "courses", currentCourseId, "chapters"),
-        orderBy("order")
-    );
-
+    const q = query(collection(db, "courses", currentCourseId, "chapters"), orderBy("order"));
     const snapshot = await getDocs(q);
     chapterList.innerHTML = "";
 
@@ -2724,10 +2065,10 @@ async function loadChapters() {
         const data = chapter.data();
         chapterList.innerHTML += `
             <div class="chapter-card">
-                <h3>${data.title}</h3>
-                <p>${data.description}</p>
+                <h3>${escapeHtmlTeacher(data.title)}</h3>
+                <p>${escapeHtmlTeacher(data.description)}</p>
                 <div class="chapter-actions">
-                    <button class="chapter-edit" onclick="openChapter('${chapter.id}','${data.title}')">Quản lý bài học</button>
+                    <button class="chapter-edit" onclick="openChapter('${chapter.id}','${escapeHtmlTeacher(data.title)}')">Quản lý bài học</button>
                     <button class="chapter-edit" onclick="editChapter('${chapter.id}')">Sửa</button>
                     <button class="chapter-delete" onclick="deleteChapter('${chapter.id}')">Xóa</button>
                 </div>
@@ -2785,9 +2126,6 @@ if (videoFile) {
     });
 }
 
-let uploadedPdfLink = "";
-let uploadedVideoLink = "";
-
 async function uploadPdf() {
     const file = pdfFile.files[0];
     if (!file) return alert("Vui lòng chọn file PDF.");
@@ -2799,23 +2137,12 @@ async function uploadPdf() {
     formData.append("resource_type", "raw");
 
     try {
-        const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`, { method: "POST", body: formData });
         const data = await response.json();
         if (data.secure_url) {
             uploadedPdfLink = data.secure_url;
-            pdfResult.innerHTML = `
-                ✅ Upload thành công<br><br>
-                <a href="${uploadedPdfLink}" target="_blank">📄 Xem PDF</a>
-            `;
+            pdfResult.innerHTML = `✅ Upload thành công<br><br><a href="${uploadedPdfLink}" target="_blank">📄 Xem PDF</a>`;
         } else {
-            console.error(data);
             alert("Upload thất bại.");
         }
     } catch (err) {
@@ -2835,23 +2162,12 @@ async function uploadVideo() {
     formData.append("resource_type", "video");
 
     try {
-        const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
         const data = await response.json();
         if (data.secure_url) {
             uploadedVideoLink = data.secure_url;
-            videoResult.innerHTML = `
-                ✅ Upload thành công<br><br>
-                <a href="${uploadedVideoLink}" target="_blank">🎥 Xem video</a>
-            `;
+            videoResult.innerHTML = `✅ Upload thành công<br><br><a href="${uploadedVideoLink}" target="_blank">🎥 Xem video</a>`;
         } else {
-            console.error(data);
             alert("Upload video thất bại.");
         }
     } catch (err) {
@@ -2859,6 +2175,7 @@ async function uploadVideo() {
         alert("Có lỗi upload video.");
     }
 }
+
 // ====================================
 //        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
 // ====================================
@@ -2871,361 +2188,16 @@ const studentSingleResultDetailModal = document.getElementById("studentSingleRes
 const singleResultDetailBody = document.getElementById("singleResultDetailBody");
 const closeSingleResultModal = document.getElementById("closeSingleResultModal");
 
-let currentSelectedStudent = null; // Lưu thông tin học sinh đang xem
-let testResultNavStep = 1;         // 1: Chương, 2: Bài học, 3: Bài kiểm tra, 4: Danh sách kết quả
-let selectedChapterForTest = null;
-let selectedLessonForTest = null;
-let selectedTestObj = null;
-
-// Cập nhật lại hàm render danh sách tài khoản học sinh để thêm nút "Kết quả kiểm tra"
-// (Thay thế hoặc tích hợp vào hàm renderStudentAccountList hiện tại của bạn)
-function renderStudentAccountList(accounts) {
-    if (!studentAccountList) return;
-
-    if (!accounts.length) {
-        studentAccountList.innerHTML = `
-            <div class="empty">
-                <i class="fa-solid fa-user-slash"></i>
-                <h3>Chưa có học sinh nào</h3>
-                <p>Khóa học này chưa được cấp tài khoản cho học sinh nào.</p>
-            </div>`;
-        return;
-    }
-
-    studentAccountList.innerHTML = "";
-    accounts.forEach((acc) => {
-        const card = document.createElement("div");
-        card.className = "chapter-card student-account-card";
-        card.style.display = "flex";
-        card.style.justifyContent = "space-between";
-        card.style.alignItems = "center";
-
-        card.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <img src="${acc.avatar && acc.avatar.trim() !== "" ? acc.avatar : "../assets/avatars/default.jpg"}" 
-                     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;" alt="Avatar">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.1rem;">
-                        ${escapeHtmlTeacher(acc.name || "Chưa đặt tên")} 
-                        <span style="font-size: 0.85rem; color: #007bff; font-weight: normal;">(${escapeHtmlTeacher(acc.memberId || "Chưa có Mã")})</span>
-                    </h3>
-                    <p style="margin: 4px 0 0 0; color: #666; font-size: 0.9rem;">
-                        📧 ${escapeHtmlTeacher(acc.email || "Không có email")}
-                    </p>
-                </div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="primary-btn detail-student-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem;">
-                    <i class="fa-solid fa-circle-info"></i> Chi tiết
-                </button>
-                <button class="primary-btn test-result-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem; background-color: #28a745;">
-                    <i class="fa-solid fa-square-poll-vertical"></i> Kết quả kiểm tra
-                </button>
-            </div>
-        `;
-
-        // Sự kiện nút Chi tiết cũ
-        card.querySelector(".detail-student-btn").addEventListener("click", () => {
-            openStudentDetailModal(acc);
-        });
-
-        // Sự kiện nút Kế bên nút chi tiết: Kết quả kiểm tra
-        card.querySelector(".test-result-btn").addEventListener("click", () => {
-            currentSelectedStudent = acc;
-            openStudentTestChapters(currentStudentCourseId);
-        });
-
-        studentAccountList.appendChild(card);
-    });
-}
-
-// BƯỚC 1: Hiển thị danh sách Chương của khóa học
 async function openStudentTestChapters(courseId) {
     testResultNavStep = 1;
     if (backTestResultBtn) backTestResultBtn.style.display = "none";
     if (studentTestResultModal) studentTestResultModal.style.display = "flex";
-    if (studentTestResultBody) {
-        studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách chương...</div>`;
-    }
+    if (studentTestResultBody) studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách chương...</div>`;
 
     try {
         const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
         let chapters = [];
-        snapshot.forEach(docSnap => {
-            chapters.push({ id: docSnap.id, ...docSnap.data() });
-        });
-        chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-
-        if (!chapters.length) {
-            studentTestResultBody.innerHTML = `<div class="empty">Khóa học này chưa có chương nào.</div>`;
-            return;
-        }
-
-        let html = `<h4 style="margin-bottom: 12px;">Học sinh: ${escapeHtmlTeacher(currentSelectedStudent.name)}</h4>`;
-        html += `<p style="margin-bottom: 15px; color: #666;">Chọn chương để tiếp tục:</p>`;
-        chapters.forEach(ch => {
-            html += `
-                <div class="chapter-card select-chapter-item" data-id="${ch.id}" data-title="${escapeHtmlTeacher(ch.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <strong>Chương ${ch.order || ""}: ${escapeHtmlTeacher(ch.title)}</strong>
-                </div>
-            `;
-        });
-        studentTestResultBody.innerHTML = html;
-
-        // Gắn sự kiện chọn chương
-        studentTestResultBody.querySelectorAll(".select-chapter-item").forEach(item => {
-            item.addEventListener("click", () => {
-                selectedChapterForTest = { id: item.dataset.id, title: item.dataset.title };
-                openStudentTestLessons(courseId, selectedChapterForTest.id);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải dữ liệu chương.</div>`;
-    }
-}
-
-// BƯỚC 2: Hiển thị danh sách Bài học thuộc chương
-async function openStudentTestLessons(courseId, chapterId) {
-    testResultNavStep = 2;
-    if (backTestResultBtn) backTestResultBtn.style.display = "block";
-    studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách bài học...</div>`;
-
-    try {
-        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters", chapterId, "lessons"));
-        let lessons = [];
-        snapshot.forEach(docSnap => {
-            lessons.push({ id: docSnap.id, ...docSnap.data() });
-        });
-        lessons.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
-
-        if (!lessons.length) {
-            studentTestResultBody.innerHTML = `<div class="empty">Chương này chưa có bài học nào.</div>`;
-            return;
-        }
-
-        let html = `<h4 style="margin-bottom: 12px;">Chương: ${selectedChapterForTest.title}</h4>`;
-        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài học:</p>`;
-        lessons.forEach(ls => {
-            html += `
-                <div class="chapter-card select-lesson-item" data-id="${ls.id}" data-title="${escapeHtmlTeacher(ls.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <strong>Bài ${ls.order || ""}: ${escapeHtmlTeacher(ls.title)}</strong>
-                </div>
-            `;
-        });
-        studentTestResultBody.innerHTML = html;
-
-        studentTestResultBody.querySelectorAll(".select-lesson-item").forEach(item => {
-            item.addEventListener("click", () => {
-                selectedLessonForTest = { id: item.dataset.id, title: item.dataset.title };
-                openStudentTestsList(courseId, chapterId, selectedLessonForTest.id);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải dữ liệu bài học.</div>`;
-    }
-}
-
-// BƯỚC 3: Hiển thị danh sách Bài kiểm tra thuộc bài học
-async function openStudentTestsList(courseId, chapterId, lessonId) {
-    testResultNavStep = 3;
-    studentTestResultBody.innerHTML = `<div class="empty">Đang tải bài kiểm tra...</div>`;
-
-    try {
-        const snapshot = await getDocs(collection(db, "courses", courseId, "tests"));
-        let tests = [];
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            if (data.chapterId === chapterId && data.lessonId === lessonId) {
-                tests.push({ id: docSnap.id, ...data });
-            }
-        });
-
-        if (!tests.length) {
-            studentTestResultBody.innerHTML = `<div class="empty">Bài học này chưa có bài kiểm tra nào.</div>`;
-            return;
-        }
-
-        let html = `<h4 style="margin-bottom: 12px;">Bài: ${selectedLessonForTest.title}</h4>`;
-        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài kiểm tra để xem kết quả của học sinh:</p>`;
-        tests.forEach(t => {
-            html += `
-                <div class="chapter-card select-test-item" data-id="${t.id}" data-title="${escapeHtmlTeacher(t.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
-                    <strong><i class="fa-solid fa-file-circle-check"></i> ${escapeHtmlTeacher(t.title)}</strong>
-                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #555;">Thời gian: ${t.duration || 15} phút | Tổng điểm: ${t.totalPoints || 0}</p>
-                </div>
-            `;
-        });
-        studentTestResultBody.innerHTML = html;
-
-        studentTestResultBody.querySelectorAll(".select-test-item").forEach(item => {
-            item.addEventListener("click", () => {
-                selectedTestObj = { id: item.dataset.id, title: item.dataset.title };
-                openStudentSubmissionsList(courseId, selectedTestObj.id, currentSelectedStudent.id);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải danh sách bài kiểm tra.</div>`;
-    }
-}
-
-// BƯỚC 4: Hiển thị danh sách kết quả làm bài của học sinh (Có nút xem chi tiết và cho học sinh xem kết quả)
-async function openStudentSubmissionsList(courseId, testId, studentId) {
-    testResultNavStep = 4;
-    studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
-
-    try {
-        // Truy vấn collection chứa kết quả nộp bài (thường lưu tại: tests/{testId}/submissions hoặc tương tự tùy cấu trúc DB của bạn)
-        // Ở đây giả định cấu trúc sub-collection: courses/{courseId}/tests/{testId}/submissions với điều kiện studentId == studentId
-        const q = query(
-            collection(db, "courses", courseId, "tests", testId, "submissions"),
-            where("studentId", "==", studentId)
-        );
-        const snapshot = await getDocs(q);
-        let submissions = [];
-        snapshot.forEach(docSnap => {
-            submissions.push({ id: docSnap.id, ...docSnap.data() });
-        });
-
-        if (!submissions.length) {
-            studentTestResultBody.innerHTML = `
-                <h4 style="margin-bottom: 12px;">Bài kiểm tra: ${selectedTestObj.title}</h4>
-                <div class="empty">Học sinh này chưa làm bài kiểm tra này lần nào.</div>`;
-            return;
-        }
-
-        let html = `<h4 style="margin-bottom: 12px;">Kết quả bài kiểm tra: ${selectedTestObj.title}</h4>`;
-        html += `<p style="margin-bottom: 15px; color: #666;">Danh sách các lần làm bài:</p>`;
-
-        submissions.forEach((sub, idx) => {
-            const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
-            const isAllowedView = sub.allowStudentView === true; // Trạng thái cho học sinh xem kết quả
-            const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
-
-            html += `
-                <div style="padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9;">
-                    <div>
-                        <strong>Lần làm #${idx + 1}</strong> - Điểm: <span style="color: #d9534f; font-weight: bold;">${score} điểm</span>
-                        <br><small style="color: #666;">Nộp lúc: ${timeStr}</small>
-                    </div>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 5px 10px; font-size: 0.85rem;">
-                            Xem chi tiết
-                        </button>
-                        <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 5px 10px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
-                            ${isAllowedView ? 'HS đang được xem' : 'Cho HS xem'}
-                        </button>
-                    </div>
-                </div>
-            `;
-        });
-
-        studentTestResultBody.innerHTML = html;
-
-        // Sự kiện Xem chi tiết bài làm
-        studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const subId = btn.dataset.subId;
-                const subData = submissions.find(s => s.id === subId);
-                showSingleSubmissionDetail(subData);
-            });
-        });
-
-        // Sự kiện Nút cho học sinh xem kết quả (Bật/tắt cờ allowStudentView)
-        studentTestResultBody.querySelectorAll(".toggle-view-btn").forEach(btn => {
-            btn.addEventListener("click", async () => {
-                const subId = btn.dataset.subId;
-                const currentStatus = btn.dataset.allowed === "true";
-                const newStatus = !currentStatus;
-
-                try {
-                    const subRef = doc(db, "courses", courseId, "tests", testId, "submissions", subId);
-                    await updateDoc(subRef, { allowStudentView: newStatus });
-                    
-                    btn.dataset.allowed = String(newStatus);
-                    btn.style.backgroundColor = newStatus ? '#28a745' : '#6c757d';
-                    btn.textContent = newStatus ? 'HS đang được xem' : 'Cho HS xem';
-                    alert(newStatus ? "Đã cho phép học sinh xem kết quả này." : "Đã ẩn kết quả đối với học sinh.");
-                } catch (err) {
-                    console.error(err);
-                    alert("Không thể cập nhật trạng thái: " + err.message);
-                }
-            });
-        });
-
-    } catch (error) {
-        console.error(error);
-        studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
-    }
-}
-
-// Xử lý nút Quay lại trong modal Kết quả kiểm tra
-if (backTestResultBtn) {
-    backTestResultBtn.addEventListener("click", () => {
-        if (testResultNavStep === 4) {
-            testResultNavStep = 3;
-            if (selectedChapterForTest && selectedLessonForTest) {
-                openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
-            }
-        } else if (testResultNavStep === 3) {
-            testResultNavStep = 2;
-            if (selectedChapterForTest) {
-                openStudentTestChapters(currentStudentCourseId);
-                backTestResultBtn.style.display = "none";
-            }
-        } else if (testResultNavStep === 2) {
-            testResultNavStep = 1;
-            openStudentTestChapters(currentStudentCourseId);
-            backTestResultBtn.style.display = "none";
-        }
-    });
-}
-
-// Đóng modal kết quả kiểm tra
-if (closeStudentTestResultBtn) {
-    closeStudentTestResultBtn.addEventListener("click", () => {
-        if (studentTestResultModal) studentTestResultModal.style.display = "none";
-    });
-}
-
-// Hiển thị nội dung chi tiết bài làm cụ thể của học sinh
-function showSingleSubmissionDetail(subData) {
-    if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
-    
-    singleResultDetailBody.innerHTML = `
-        <p><strong>Tổng điểm:</strong> ${subData.score || subData.totalScore || 0}</p>
-        <p><strong>Thời gian nộp:</strong> ${subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A"}</p>
-        <hr style="margin: 10px 0;">
-        <p><i>Chi tiết câu trả lời của học sinh đã được ghi nhận trong hệ thống cơ sở dữ liệu.</i></p>
-    `;
-    studentSingleResultDetailModal.style.display = "flex";
-}
-
-if (closeSingleResultModal) {
-    closeSingleResultModal.addEventListener("click", () => {
-        if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
-    });
-}
-// ====================================
-//        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
-// ====================================
-
-async function openStudentTestChapters(courseId) {
-    testResultNavStep = 1;
-    if (backTestResultBtn) backTestResultBtn.style.display = "none";
-    if (studentTestResultModal) studentTestResultModal.style.display = "flex";
-    if (studentTestResultBody) {
-        studentTestResultBody.innerHTML = `<div class="empty">Đang tải danh sách chương...</div>`;
-    }
-
-    try {
-        const snapshot = await getDocs(collection(db, "courses", courseId, "chapters"));
-        let chapters = [];
-        snapshot.forEach(docSnap => {
-            chapters.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => chapters.push({ id: docSnap.id, ...docSnap.data() }));
         chapters.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
         if (!chapters.length) {
@@ -3264,9 +2236,7 @@ async function openStudentTestLessons(courseId, chapterId) {
     try {
         const snapshot = await getDocs(collection(db, "courses", courseId, "chapters", chapterId, "lessons"));
         let lessons = [];
-        snapshot.forEach(docSnap => {
-            lessons.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => lessons.push({ id: docSnap.id, ...docSnap.data() }));
         lessons.sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
 
         if (!lessons.length) {
@@ -3317,7 +2287,7 @@ async function openStudentTestsList(courseId, chapterId, lessonId) {
         }
 
         let html = `<h4 style="margin-bottom: 12px;">Bài: ${selectedLessonForTest.title}</h4>`;
-        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài kiểm tra để xem kết quả của học sinh:</p>`;
+        html += `<p style="margin-bottom: 15px; color: #666;">Chọn bài kiểm tra để xem kết quả:</p>`;
         tests.forEach(t => {
             html += `
                 <div class="chapter-card select-test-item" data-id="${t.id}" data-title="${escapeHtmlTeacher(t.title)}" style="cursor: pointer; padding: 12px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px;">
@@ -3351,9 +2321,7 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
         );
         const snapshot = await getDocs(q);
         let submissions = [];
-        snapshot.forEach(docSnap => {
-            submissions.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => submissions.push({ id: docSnap.id, ...docSnap.data() }));
 
         if (!submissions.length) {
             studentTestResultBody.innerHTML = `
@@ -3367,7 +2335,7 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
 
         submissions.forEach((sub, idx) => {
             const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
-            const isAllowedView = sub.allowStudentView === true; 
+            const isAllowedView = sub.allowStudentView === true;
             const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
 
             html += `
@@ -3377,9 +2345,7 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
                         <br><small style="color: #666;">Nộp lúc: ${timeStr}</small>
                     </div>
                     <div style="display: flex; gap: 6px; align-items: center;">
-                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 5px 10px; font-size: 0.85rem;">
-                            Xem chi tiết
-                        </button>
+                        <button class="primary-btn view-sub-detail" data-sub-id="${sub.id}" style="padding: 5px 10px; font-size: 0.85rem;">Xem chi tiết</button>
                         <button class="primary-btn toggle-view-btn" data-sub-id="${sub.id}" data-allowed="${isAllowedView}" style="padding: 5px 10px; font-size: 0.85rem; background-color: ${isAllowedView ? '#28a745' : '#6c757d'};">
                             ${isAllowedView ? 'HS đang được xem' : 'Cho HS xem'}
                         </button>
@@ -3392,8 +2358,7 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
 
         studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
             btn.addEventListener("click", () => {
-                const subId = btn.dataset.subId;
-                const subData = submissions.find(s => s.id === subId);
+                const subData = submissions.find(s => s.id === btn.dataset.subId);
                 showSingleSubmissionDetail(subData);
             });
         });
@@ -3401,8 +2366,7 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
         studentTestResultBody.querySelectorAll(".toggle-view-btn").forEach(btn => {
             btn.addEventListener("click", async () => {
                 const subId = btn.dataset.subId;
-                const currentStatus = btn.dataset.allowed === "true";
-                const newStatus = !currentStatus;
+                const newStatus = btn.dataset.allowed !== "true";
 
                 try {
                     const subRef = doc(db, "courses", courseId, "tests", testId, "submissions", subId);
@@ -3418,7 +2382,6 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
                 }
             });
         });
-
     } catch (error) {
         console.error(error);
         studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
@@ -3434,10 +2397,8 @@ if (backTestResultBtn) {
             }
         } else if (testResultNavStep === 3) {
             testResultNavStep = 2;
-            if (selectedChapterForTest) {
-                openStudentTestChapters(currentStudentCourseId);
-                backTestResultBtn.style.display = "none";
-            }
+            openStudentTestChapters(currentStudentCourseId);
+            backTestResultBtn.style.display = "none";
         } else if (testResultNavStep === 2) {
             testResultNavStep = 1;
             openStudentTestChapters(currentStudentCourseId);
@@ -3454,12 +2415,11 @@ if (closeStudentTestResultBtn) {
 
 function showSingleSubmissionDetail(subData) {
     if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
-    
     singleResultDetailBody.innerHTML = `
         <p><strong>Tổng điểm:</strong> ${subData.score || subData.totalScore || 0}</p>
         <p><strong>Thời gian nộp:</strong> ${subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A"}</p>
         <hr style="margin: 10px 0;">
-        <p><i>Chi tiết câu trả lời của học sinh đã được ghi nhận trong hệ thống cơ sở dữ liệu.</i></p>
+        <p><i>Chi tiết câu trả lời của học sinh đã được ghi nhận trong cơ sở dữ liệu.</i></p>
     `;
     studentSingleResultDetailModal.style.display = "flex";
 }
