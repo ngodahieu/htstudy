@@ -860,7 +860,6 @@ window.deleteTeacherTest = async function (courseId, testId) {
         alert("Không thể xóa bài kiểm tra: " + error.message);
     }
 };
-
 async function editTeacherTest(testId, courseId) {
     try {
         const testRef = doc(db, "courses", courseId, "tests", testId);
@@ -886,9 +885,31 @@ async function editTeacherTest(testId, courseId) {
         if (part2Score4) part2Score4.value = data.part2?.scores?.four ?? 1;
         if (part3Point) part3Point.value = data.part3?.points ?? 0.5;
 
+        // Clone dữ liệu
         part1QuestionData = JSON.parse(JSON.stringify(data.part1?.questions || []));
         part2QuestionData = JSON.parse(JSON.stringify(data.part2?.questions || []));
         part3QuestionData = JSON.parse(JSON.stringify(data.part3?.questions || []));
+
+        // CHUẨN HÓA ĐÁP ÁN PHẦN 1: Chuyển "A","B","C","D" về index 0, 1, 2, 3
+        part1QuestionData.forEach(q => {
+            if (typeof q.correctAnswer === 'string') {
+                const upper = q.correctAnswer.trim().toUpperCase();
+                if (['A', 'B', 'C', 'D'].includes(upper)) {
+                    q.correctAnswer = upper.charCodeAt(0) - 65;
+                } else {
+                    q.correctAnswer = parseInt(q.correctAnswer, 10) || 0;
+                }
+            }
+        });
+
+        // CHUẨN HÓA ĐÁP ÁN PHẦN 2: Đảm bảo dạng boolean [true/false]
+        part2QuestionData.forEach(q => {
+            if (Array.isArray(q.answers)) {
+                q.answers = q.answers.map(ans => String(ans) === "true" || ans === true);
+            } else {
+                q.answers = [true, false, false, false];
+            }
+        });
 
         await loadTestCourses();
 
@@ -927,7 +948,6 @@ async function editTeacherTest(testId, courseId) {
         alert("Không thể tải bài kiểm tra: " + error.message);
     }
 }
-
 if (createTestBtn) {
     createTestBtn.addEventListener("click", async () => {
         editingTestId = "";
@@ -1094,9 +1114,11 @@ function updateFormulaPreview(inputEl, previewEl) {
         }
     }
 
-    previewEl.innerHTML = `<span class="preview-label">Xem trước:</span> <span class="preview-content">${formatted}</span>`;
-}
+    // Chuyển ký tự xuống dòng (\n) thành thẻ <br> để hiển thị xuống dòng trong preview
+    formatted = formatted.replace(/\r\n|\r|\n/g, "<br>");
 
+    previewEl.innerHTML = `<span class="preview-label">Xem trước:</span> <span class="preview-content" style="white-space: pre-wrap; display: inline-block; width: 100%;">${formatted}</span>`;
+}
 // ====================================
 //        RENDER PHẦN I
 // ====================================
@@ -1123,9 +1145,18 @@ function renderPart1Questions() {
     part1Questions.innerHTML = "";
 
     part1QuestionData.forEach((question, index) => {
+        let selectedAnswer = question.correctAnswer;
+        if (typeof selectedAnswer === 'string') {
+            const upper = selectedAnswer.trim().toUpperCase();
+        if (['A', 'B', 'C', 'D'].includes(upper)) {
+            selectedAnswer = upper.charCodeAt(0) - 65;
+        } else {
+            selectedAnswer = parseInt(selectedAnswer, 10) || 0;
+        }
+    }
         const box = document.createElement("div");
-        box.className = "teacher-question";
-        box.innerHTML = `
+    box.className = "teacher-question";
+    box.innerHTML = `
             <div class="question-builder-top">
                 <h4>Câu ${index + 1}</h4>
                 <button type="button" class="remove-question" data-index="${index}">
@@ -1148,24 +1179,24 @@ function renderPart1Questions() {
                     }
                 </div>
             </div>
-            <div class="options-builder">
-                ${question.options
-                    .map(
-                        (option, optionIndex) => `
-                        <div class="option-row-wrapper">
-                            <div class="option-row">
-                                <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${
-                                Number(question.correctAnswer) === optionIndex ? "checked" : ""
-                            }>
-                                <input type="text" class="part1-option" data-index="${index}" data-option="${optionIndex}" value="${escapeHtmlTeacher(option)}" placeholder="Đáp án ${String.fromCharCode(65 + optionIndex)}">
-                            </div>
-                            <div class="formula-preview part1-opt-preview-${index}-${optionIndex} opt-preview"></div>
-                        </div>`
-                    )
-                    .join("")}
-            </div>
-            <small class="auto-text">Chọn ● để đánh dấu đáp án đúng.</small>
-        `;
+<div class="options-builder">
+            ${question.options
+                .map(
+                    (option, optionIndex) => `
+                    <div class="option-row-wrapper">
+                        <div class="option-row">
+                            <input type="radio" name="part1Correct${index}" value="${optionIndex}" ${
+                            Number(selectedAnswer) === optionIndex ? "checked" : ""
+                        }>
+                            <input type="text" class="part1-option" data-index="${index}" data-option="${optionIndex}" value="${escapeHtmlTeacher(option)}" placeholder="Đáp án ${String.fromCharCode(65 + optionIndex)}">
+                        </div>
+                        <div class="formula-preview part1-opt-preview-${index}-${optionIndex} opt-preview"></div>
+                    </div>`
+                )
+                .join("")}
+        </div>
+        <small class="auto-text">Chọn ● để đánh dấu đáp án đúng.</small>
+    `;
         part1Questions.appendChild(box);
 
         const qInput = box.querySelector(`.part1-question`);
