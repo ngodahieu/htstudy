@@ -4190,3 +4190,55 @@ background:#cfcfcf;
     font-style: italic;
     font-size: 14px;
 }
+/* Định nghĩa hiệu ứng phóng to/mờ dần cho modal chi tiết */
+@keyframes detailModalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes detailModalOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+}
+
+/* Cập nhật lại lớp .detail-modal để hỗ trợ hiệu ứng chuyển cảnh nền */
+.detail-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0); /* Ban đầu nền trong suốt */
+    backdrop-filter: blur(0px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Khi modal mở (thêm class .active) */
+.detail-modal.active {
+    display: flex;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+}
+
+/* Khung nội dung chi tiết chạy animation khi mở */
+.detail-modal.active .detail-box {
+    animation: detailModalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Khung nội dung chạy animation khi đóng */
+.detail-modal.closing .detail-box {
+    animation: detailModalOut 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
