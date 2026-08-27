@@ -1082,10 +1082,8 @@ function updateFormulaPreview(inputEl, previewEl) {
         return;
     }
     
-    // Tự động chuyển đổi công thức hóa học / văn bản
     let formatted = formatChemistryText(val);
 
-    // Render KaTeX cho công thức Toán / Lí nếu có thư viện KaTeX
     if (window.katex) {
         try {
             formatted = formatted.replace(/\$(.*?)\$/g, (match, formula) => {
@@ -1098,6 +1096,7 @@ function updateFormulaPreview(inputEl, previewEl) {
 
     previewEl.innerHTML = `<span class="preview-label">Xem trước:</span> <span class="preview-content">${formatted}</span>`;
 }
+
 // ====================================
 //        RENDER PHẦN I
 // ====================================
@@ -1169,12 +1168,10 @@ function renderPart1Questions() {
         `;
         part1Questions.appendChild(box);
 
-        // Khởi tạo xem trước câu hỏi
         const qInput = box.querySelector(`.part1-question`);
         const qPreview = box.querySelector(`.part1-q-preview-${index}`);
         updateFormulaPreview(qInput, qPreview);
 
-        // Khởi tạo xem trước cho các đáp án
         question.options.forEach((_, optIdx) => {
             const optInput = box.querySelector(`.part1-option[data-option="${optIdx}"]`);
             const optPreview = box.querySelector(`.part1-opt-preview-${index}-${optIdx}`);
@@ -1232,6 +1229,7 @@ function renderPart1Questions() {
         });
     });
 }
+
 // ====================================
 //        RENDER PHẦN II
 // ====================================
@@ -1304,12 +1302,10 @@ function renderPart2Questions() {
         `;
         part2Questions.appendChild(box);
 
-        // Khởi tạo xem trước câu hỏi
         const qInput = box.querySelector(`.part2-question`);
         const qPreview = box.querySelector(`.part2-q-preview-${index}`);
         updateFormulaPreview(qInput, qPreview);
 
-        // Khởi tạo xem trước mệnh đề
         question.statements.forEach((_, stIdx) => {
             const stInput = box.querySelector(`.part2-statement[data-statement="${stIdx}"]`);
             const stPreview = box.querySelector(`.part2-st-preview-${index}-${stIdx}`);
@@ -1367,6 +1363,7 @@ function renderPart2Questions() {
         });
     });
 }
+
 // ====================================
 //        RENDER PHẦN III
 // ====================================
@@ -1381,6 +1378,7 @@ if (addPart3QuestionBtn) {
         updateTestTotal();
     });
 }
+
 function renderPart3Questions() {
     if (!part3Questions) return;
     if (!part3QuestionData.length) {
@@ -1424,7 +1422,6 @@ function renderPart3Questions() {
         `;
         part3Questions.appendChild(box);
 
-        // Khởi tạo xem trước
         const qInput = box.querySelector(`.part3-question`);
         const qPreview = box.querySelector(`.part3-q-preview-${index}`);
         updateFormulaPreview(qInput, qPreview);
@@ -1475,6 +1472,7 @@ function renderPart3Questions() {
         });
     });
 }
+
 // ====================================
 //        TÍNH TỔNG ĐIỂM & ĐỔI TRẠNG THÁI
 // ====================================
@@ -1671,13 +1669,13 @@ async function saveNewTest() {
             teacherId: currentTeacherId,
             teacherName: currentTeacherName,
             part1: {
-        points: Number(part1Point.value || 0),
-        questions: part1QuestionData.map(q => ({
-            ...q,
-            points: Number(part1Point.value || 0), // Lưu điểm trực tiếp vào từng câu
-            correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer)) // Chuyển 0,1,2,3 thành A,B,C,D
-        }))
-    },
+                points: Number(part1Point.value || 0),
+                questions: part1QuestionData.map(q => ({
+                    ...q,
+                    points: Number(part1Point.value || 0),
+                    correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
+                }))
+            },
             part2: {
                 scores: {
                     one: Number(part2Score1.value || 0),
@@ -1689,7 +1687,10 @@ async function saveNewTest() {
             },
             part3: {
                 points: Number(part3Point.value || 0),
-                questions: part3QuestionData
+                questions: part3QuestionData.map(q => ({
+                    ...q,
+                    points: Number(part3Point.value || 0)
+                }))
             },
             questionCount,
             totalPoints,
