@@ -2309,7 +2309,7 @@ async function openStudentTestsList(courseId, chapterId, lessonId) {
         studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải danh sách bài kiểm tra.</div>`;
     }
 }
-async function openStudentSubmissionsList(courseId, testId, studentId) {
+async function openStudentSubmissionsList(courseId, testId, userId) {
     testResultNavStep = 4;
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
 
@@ -2319,14 +2319,13 @@ async function openStudentSubmissionsList(courseId, testId, studentId) {
         const snapshot = await getDocs(colRef);
         let submissions = [];
 
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            // Kiểm tra khớp ID học sinh ở bất kỳ trường nào (studentId hoặc userId)
-            if (data.studentId === studentId || data.userId === studentId) {
-                submissions.push({ id: docSnap.id, ...data });
-            }
-        });
-
+snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    // Chỉ kiểm tra duy nhất trường userId
+    if (data.userId === studentId) {
+        submissions.push({ id: docSnap.id, ...data });
+    }
+});
         if (!submissions.length) {
             studentTestResultBody.innerHTML = `
                 <h4 style="margin-bottom: 12px;">Bài kiểm tra: ${selectedTestObj.title}</h4>
