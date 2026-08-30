@@ -3,20 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xem Live Trực Tuyến Học Sinh</title>
+    <title>Xem Live Trực Tuyến Học Sinh - H&T Study</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Thêm CSS của bạn ở đây -->
+    <!-- Sử dụng chung file CSS với test.css -->
+    <link rel="stylesheet" href="../css/test.css">
 </head>
 <body>
-    <div style="padding: 20px;">
-        <button id="backBtn" class="primary-btn" style="margin-bottom: 20px;">
-            <i class="fa-solid fa-arrow-left"></i> Quay lại
-        </button>
-        <h2 id="teacherLivePageTitle">Đang kết nối trực tiếp với học sinh...</h2>
-        <div id="teacherLiveContentContainer">
-            <div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải dữ liệu...</div>
-        </div>
+
+    <!-- LOADING / TRẠNG THÁI KHI CHƯA KẾT NỐI (Nếu cần dùng từ test.css) -->
+    <div id="testLoading" style="display: none;">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Đang kết nối hệ thống trực tuyến...</span>
     </div>
+
+    <!-- MAIN HEADER (Đồng bộ với test.css) -->
+    <header class="main-header">
+        <div class="header-container">
+            <a href="#" class="logo" id="backBtn" style="cursor: pointer;">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </div>
+                <div class="logo-text">
+                    <strong>Quay Lại</strong>
+                    <span>H&T STUDY LIVE</span>
+                </div>
+            </a>
+
+            <div class="header-right">
+                <!-- Thông tin học sinh đang được xem live -->
+                <div class="test-user-info">
+                    <div class="test-user-icon">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="test-user-text">
+                        <span>HỌC SINH ĐANG XEM</span>
+                        <strong id="headerStudentName">Đang tải...</strong>
+                    </div>
+                </div>
+
+                <!-- Trạng thái kết nối Realtime -->
+                <div class="header-test-timer timer-stat" id="liveStatusBox" style="min-width: 140px;">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <div>
+                        <span>TRẠNG THÁI</span>
+                        <strong id="liveStatusText">Đang kết nối</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- TEST CONTAINER (Bố cục chuẩn của test.css) -->
+    <main class="test-container">
+        <!-- TOP CARD: Tiêu đề bài kiểm tra & Thông tin live -->
+        <div class="test-top-card">
+            <div class="test-heading">
+                <div class="test-heading-icon">
+                    <i class="fa-solid fa-video"></i>
+                </div>
+                <div class="test-heading-info">
+                    <span class="test-label">GIÁM SÁT TRỰC TUYẾN</span>
+                    <h1 id="teacherLivePageTitle">Đang kết nối trực tiếp với học sinh...</h1>
+                    <p id="teacherLiveSubTitle">Hệ thống đang cập nhật trạng thái làm bài của học sinh theo thời gian thực.</p>
+                </div>
+            </div>
+
+            <div class="test-top-stats">
+                <div class="test-top-stat">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <div>
+                        <span>Thời gian còn lại</span>
+                        <strong id="statRemainingTime">--:--</strong>
+                    </div>
+                </div>
+                <div class="test-top-stat">
+                    <i class="fa-solid fa-list-check"></i>
+                    <div>
+                        <span>Đã hoàn thành</span>
+                        <strong id="statProgress">0 / 0 câu</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST LAYOUT (Chia cột: Trái là nội dung câu hỏi học sinh đang làm, Phải là Sidebar bảng câu hỏi) -->
+        <div class="test-layout">
+            
+            <!-- CỘT TRÁI: HIỂN THỊ CÂU HỎI HỌC SINH ĐANG LÀM -->
+            <section class="test-main-content">
+                <div id="teacherLiveContentContainer">
+                    <div class="question-card" style="padding: 40px; text-align: center;">
+                        <div class="empty" style="color: #64748b; font-size: 15px;">
+                            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #2563eb; margin-bottom: 10px; display: block;"></i> 
+                            Đang tải dữ liệu bài làm của học sinh...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CỘT PHẢI: SIDEBAR BẢNG CÂU HỎI (Đồng bộ test.css) -->
+            <aside class="question-sidebar">
+                <div class="sidebar-card">
+                    <div class="sidebar-card-header">
+                        <div>
+                            <span>DANH SÁCH CÂU HỎI</span>
+                            <h3>Tiến độ làm bài</h3>
+                        </div>
+                        <i class="fa-solid fa-map-pin"></i>
+                    </div>
+
+                    <!-- Chú thích màu sắc (Legend) -->
+                    <div class="question-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot current-dot"></div>
+                            <span>Câu học sinh đang xem</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot answered-dot"></div>
+                            <span>Đã trả lời</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot unanswered-dot"></div>
+                            <span>Chưa trả lời</span>
+                        </div>
+                    </div>
+
+                    <!-- Lưới danh sách câu hỏi -->
+                    <div class="question-grid" id="sidebarQuestionGrid">
+                        <!-- Các ô câu hỏi sẽ được render tự động bằng Javascript -->
+                        <div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Chưa có dữ liệu câu hỏi</div>
+                    </div>
+
+                    <div class="sidebar-note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Giao diện tự động cập nhật ngay khi học sinh chuyển câu hoặc chọn đáp án.</span>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="test-footer">
+        <div class="footer-container">
+            <p>H&T STUDY - Nền tảng học tập và ôn thi trực tuyến</p>
+            <span>Bản quyền © 2026 H&T Study</span>
+        </div>
+    </footer>
 
     <!-- Script xử lý kết nối Firebase Live -->
     <script type="module">
@@ -28,24 +163,85 @@
         const studentId = urlParams.get("studentId");
         const studentName = decodeURIComponent(urlParams.get("studentName") || "Học sinh");
 
-        document.getElementById("teacherLivePageTitle").textContent = `Đang xem Live học sinh: ${studentName}`;
+        // Gán tên học sinh lên giao diện header và title
+        document.getElementById("headerStudentName").textContent = studentName;
+        document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
         
-        document.getElementById("backBtn").addEventListener("click", () => {
-            window.history.back(); // Quay lại trang trước đó (trang quản lý giáo viên)
+        // Nút quay lại trang trước
+        document.getElementById("backBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            window.history.back();
         });
 
         if (studentId) {
             const liveRef = doc(db, "liveStatus", studentId);
+            
             onSnapshot(liveRef, (docSnap) => {
                 const container = document.getElementById("teacherLiveContentContainer");
+                const gridContainer = document.getElementById("sidebarQuestionGrid");
+                const statusText = document.getElementById("liveStatusText");
+                const statusBox = document.getElementById("liveStatusBox");
+                const statRemainingTime = document.getElementById("statRemainingTime");
+                const statProgress = document.getElementById("statProgress");
+
                 if (!docSnap.exists()) {
-                    container.innerHTML = `<div class="empty">Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.</div>`;
+                    statusText.textContent = "Ngoại tuyến";
+                    statusBox.classList.add("danger");
+                    container.innerHTML = `
+                        <div class="question-card" style="padding: 40px; text-align: center;">
+                            <div class="empty" style="color: #64748b; font-size: 15px;">
+                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
+                                Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.
+                            </div>
+                        </div>`;
+                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
                     return;
                 }
+
                 const data = docSnap.data();
-                // Render nội dung live tương tự logic bạn đã viết trước đó...
-                container.innerHTML = `<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;"><strong>Bài kiểm tra:</strong> ${data.testTitle || "Không rõ"}</div>`;
+                statusText.textContent = "Đang trực tuyến";
+                statusBox.classList.remove("danger");
+
+                // Cập nhật thông tin phụ nếu có
+                if (data.testTitle) {
+                    document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
+                }
+                
+                if (data.remainingTime !== undefined) {
+                    const mins = Math.floor(data.remainingTime / 60);
+                    const secs = data.remainingTime % 60;
+                    statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+
+                // Giả lập hoặc lấy danh sách câu hỏi và trạng thái câu hiện tại từ Firestore structure của bạn
+                // Bạn có thể tùy chỉnh lại biến `data` cho khớp với schema thực tế của cơ sở dữ liệu dự án.
+                container.innerHTML = `
+                    <div class="question-card">
+                        <div class="question-card-header">
+                            <span class="question-number">Đang theo dõi học sinh làm bài</span>
+                            <div class="question-status">
+                                <i class="fa-solid fa-circle-check"></i> Trạng thái đồng bộ thời gian thực
+                            </div>
+                        </div>
+                        <div class="question-content">
+                            ${formatChemistryText(data.currentQuestionContent || "Học sinh đang ở trang làm bài tổng quan hoặc chưa đồng bộ nội dung câu hỏi cụ thể.")}
+                        </div>
+                        <div class="answer-container">
+                            <div style="padding: 10px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; color: #334155; font-size: 14px;">
+                                <strong>Hành động gần nhất:</strong> ${data.lastAction || "Đang làm bài..."}
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
+        } else {
+            document.getElementById("teacherLiveContentContainer").innerHTML = `
+                <div class="question-card" style="padding: 40px; text-align: center;">
+                    <div class="empty" style="color: #ef4444; font-size: 15px;">
+                        <i class="fa-solid fa-circle-xmark" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
+                        Thiếu tham số mã học sinh (studentId) trên đường dẫn URL.
+                    </div>
+                </div>`;
         }
     </script>
 </body>
