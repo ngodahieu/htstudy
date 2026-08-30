@@ -2288,8 +2288,12 @@ function startTeacherLiveView(studentId, studentName) {
         });
     }
 
-    document.getElementById("liveModalTitleConnectionString") = `Đang xem Live: ${studentName}`;
-    document.getElementById("liveModalTitle").textContent = `Đang xem Live: ${studentName}`;
+    // Đã sửa lỗi cú pháp gán ở đây:
+    const liveModalTitle = document.getElementById("liveModalTitle");
+    if (liveModalTitle) {
+        liveModalTitle.textContent = `Đang xem Live: ${studentName}`;
+    }
+
     const liveBody = document.getElementById("liveModalBody");
     liveModal.style.display = "flex";
     liveBody.innerHTML = `<div class="empty">Đang đồng bộ dữ liệu với học sinh...</div>`;
@@ -2307,11 +2311,8 @@ function startTeacherLiveView(studentId, studentName) {
 
         const data = docSnap.data();
         const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate().toLocaleTimeString('vi-VN') : "Vừa xong";
-        
-        // Xử lý đếm ngược thời gian còn lại của học sinh
         let remainingSeconds = data.remainingSeconds || 0;
 
-        // Render giao diện thông tin chung & thanh trạng thái cố định ở trên
         let html = `
             <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff; display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -2325,7 +2326,6 @@ function startTeacherLiveView(studentId, studentName) {
             </div>
         `;
 
-        // Lịch sử hoặc danh sách câu hỏi học sinh đã duyệt qua để giáo viên có thể CUỘT (SCROLL) xem lại các câu trước
         html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
         
         const currentQ = data.currentQuestion || {};
@@ -2336,17 +2336,15 @@ function startTeacherLiveView(studentId, studentName) {
         html += `
             <div style="background: #fff; border: 1px solid #dcdcdc; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="background: #007bff; color: #white; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; color: white;">Câu ${qIndex} (Phần ${part})</span>
+                    <span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">Câu ${qIndex} (Phần ${part})</span>
                 </div>
                 <p style="font-weight: 500; font-size: 1.05rem; margin-bottom: 10px;">${formatChemistryText(currentQ.question || "Đang tải nội dung câu hỏi...")}</p>
         `;
 
-        // Hiển thị ảnh câu hỏi nếu có
         if (currentQ.image) {
             html += `<div style="margin: 10px 0;"><img src="${currentQ.image}" style="max-width: 100%; max-height: 220px; border-radius: 6px; border: 1px solid #ddd;"></div>`;
         }
 
-        // Hiển thị chi tiết đáp án dựa theo từng Phần (Part 1, Part 2, Part 3)
         if (part === 1) {
             const options = currentQ.options || [];
             html += `<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">`;
@@ -2392,7 +2390,6 @@ function startTeacherLiveView(studentId, studentName) {
         html += `</div></div>`;
         liveBody.innerHTML = html;
 
-        // Xử lý bộ đếm thời gian thực tế trên giao diện giáo viên
         const timerEl = document.getElementById("liveCountdownTimer");
         if (timerEl && remainingSeconds > 0) {
             let currentSec = remainingSeconds;
@@ -2408,7 +2405,6 @@ function startTeacherLiveView(studentId, studentName) {
                 timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
             }, 1000);
 
-            // Hiển thị ngay lập tức giá trị ban đầu
             const m = Math.floor(currentSec / 60);
             const s = currentSec % 60;
             timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
