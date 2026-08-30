@@ -223,7 +223,7 @@
         </div>
     </footer>
 
-    <!-- Script xử lý kết nối Firebase Live & Render bài làm -->
+<!-- Script xử lý kết nối Firebase Live & Render bài làm -->
 <script type="module">
     import { db } from "../js/firebase.js";
     import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -246,17 +246,38 @@
     
     const modeFreeBtn = document.getElementById("modeFreeBtn");
     const modeLiveBtn = document.getElementById("modeLiveBtn");
+    const mainContentArea = document.querySelector(".test-main-content");
+
+    // Hàm cập nhật trạng thái giao diện khóa/mở cuộn chuột & tương tác của giáo viên
+    function updateTeacherInteractivity() {
+        if (currentViewMode === 'live') {
+            mainContentArea.style.pointerEvents = 'none'; // Chặn mọi hành vi lướt/click thủ công của giáo viên
+            mainContentArea.style.opacity = '0.95';
+            // Khóa click trên danh sách câu hỏi bên sidebar khi ở chế độ trực tiếp
+            document.querySelectorAll("#sidebarQuestionGrid button").forEach(btn => {
+                btn.style.pointerEvents = 'none';
+            });
+        } else {
+            mainContentArea.style.pointerEvents = 'auto'; // Cho phép tự do lướt xem
+            mainContentArea.style.opacity = '1';
+            document.querySelectorAll("#sidebarQuestionGrid button").forEach(btn => {
+                btn.style.pointerEvents = 'auto';
+            });
+        }
+    }
 
     modeFreeBtn.addEventListener("click", () => {
         currentViewMode = 'free';
         modeFreeBtn.classList.add("active");
         modeLiveBtn.classList.remove("active");
+        updateTeacherInteractivity();
     });
 
     modeLiveBtn.addEventListener("click", () => {
         currentViewMode = 'live';
         modeLiveBtn.classList.add("active");
         modeFreeBtn.classList.remove("active");
+        updateTeacherInteractivity();
         scrollToCurrentStudentQuestion(currentStudentQIndex);
     });
 
@@ -458,13 +479,18 @@
             gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
             statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
 
-            if (currentViewMode === 'live' && hasQuestionChanged) {
+            // Áp dụng lại trạng thái khóa/mở tương tác giao viên sau khi render xong nội dung mới
+            updateTeacherInteractivity();
+
+            // Nếu đang bật chế độ Trực tiếp (live), tự động cuộn đến câu hỏi hiện tại của học sinh
+            if (currentViewMode === 'live') {
                 scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
         });
     }
 
     window.jumpToQuestion = function(index) {
+        if (currentViewMode === 'live') return; // Chặn nhảy câu thủ công khi đang ở chế độ trực tiếp
         const targetCard = document.getElementById(`question-card-${index}`);
         if (targetCard) {
             targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
