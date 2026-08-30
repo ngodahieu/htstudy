@@ -1997,6 +1997,64 @@ function showError(msg) {
         testError.textContent = msg;
     }
 }
+// Hàm tự động cập nhật trạng thái làm bài của học sinh lên Firestore
+function autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition) {
+    const liveStatusRef = db.collection('liveStatus').doc(studentId);
+    
+    // Dữ liệu tự động đẩy lên ngầm không cần học sinh xác nhận
+    liveStatusRef.set({
+        examId: examId,
+        currentQuestion: currentQuestion,
+        answers: answers,
+        scrollPosition: scrollPosition,
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+        status: "doing" // Trạng thái đang làm bài
+    }, { merge: true })
+    .then(() => {
+        // Đồng bộ ngầm thành công, không hiển thị thông báo gì cho học sinh
+    })
+    .catch((error) => {
+        console.error("Lỗi đồng bộ live: ", error);
+    });
+}
+
+// Lắng nghe sự kiện học sinh chọn đáp án hoặc cuộn trang để tự động gửi ngầm
+document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('answer-input')) {
+        // Thu thập dữ liệu hiện tại và gọi hàm đồng bộ
+        let studentId = getCurrentStudentId(); // Hàm lấy ID học sinh đang đăng nhập
+        let examId = getCurrentExamId();       // Hàm lấy ID đề thi
+        let currentQuestion = getActiveQuestionIndex();
+        let answers = getAllCurrentAnswers();
+        let scrollPosition = window.scrollY;
+
+        autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition);
+    }
+});
+
+// Hoặc thiết lập cập nhật định kỳ mỗi 5 giây để đảm bảo thời gian làm bài luôn mới nhất
+setInterval(() => {
+    if (isExamining()) { // Kiểm tra xem học sinh có đang trong phòng thi không
+        let studentId = getCurrentStudentId();
+        let examId = getCurrentExamId();
+        let currentQuestion = getActiveQuestionIndex();
+        let answers = getAllCurrentAnswers();
+        let scrollPosition = window.scrollY;
+
+        autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition);
+    }
+}, 5000);
+function submitExam(studentId) {
+    const liveStatusRef = db.collection('liveStatus').doc(studentId);
+    
+    liveStatusRef.update({
+        status: "submitted",
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        // Tiến hành nộp bài thành công và chuyển trang
+        window.location.href = "result.html";
+    });
+}
 // Gọi hàm này mỗi khi học sinh chuyển câu hỏi (lướt trang) hoặc chọn đáp án
 async function syncStudentLiveProgress(studentId, testId, testTitle, currentPart, questionIndex, questionContent, currentAnswer) {
     try {
