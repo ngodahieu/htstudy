@@ -911,6 +911,7 @@ function renderAnswersForIndex(question, index, container) {
                 updateSingleQuestionStatus(index);
                 updateQuestionGrid();
                 syncLiveStatus();
+                renderAnswersForIndex(question, index, container);
             });
             container.appendChild(wrapper);
         });
