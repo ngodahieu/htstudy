@@ -1672,7 +1672,7 @@ if (saveTest) {
         ...q, // Đảm bảo giữ lại q.image cho phần 3
         points: Number(part3Point.value || 0) 
     }))
-}
+},
                 questionCount: part1QuestionData.length + part2QuestionData.length + part3QuestionData.length,
                 totalPoints: (part1QuestionData.length * Number(part1Point.value || 0)) +
                              (part2QuestionData.length * Number(part2Score4.value || 0)) +
