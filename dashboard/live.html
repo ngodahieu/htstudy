@@ -152,8 +152,7 @@
             <span>Bản quyền © 2026 H&T Study</span>
         </div>
     </footer>
-
-    <!-- Script xử lý kết nối Firebase Live -->
+<!-- Script xử lý kết nối Firebase Live -->
     <script type="module">
         import { db } from "../js/firebase.js";
         import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -193,7 +192,7 @@
                         <div class="question-card" style="padding: 40px; text-align: center;">
                             <div class="empty" style="color: #64748b; font-size: 15px;">
                                 <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
-                                Học sinh này chưa bấm vào nút làm bài hoặc chưa mở bài kiểm tra.
+                                Học sinh này chưa mở bài kiểm tra hoặc đã thoát hệ thống.
                                 <br><br>
                                 <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
                                     <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
@@ -202,7 +201,6 @@
                         </div>`;
                     gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
                     
-                    // Tự động chuyển hướng về trang teacher.html sau 3 giây
                     setTimeout(() => {
                         window.location.href = "teacher.html";
                     }, 3000);
@@ -211,8 +209,30 @@
 
                 const data = docSnap.data();
 
-                // Kiểm tra nếu trường isStarted hoặc hasStarted bằng false/chưa bật
-                // (Bạn có thể đổi tên thuộc tính `isStarted` trong điều kiện này cho khớp với biến trạng thái lúc học sinh bấm bắt đầu làm bài)
+                // 1. Kiểm tra nếu học sinh đã bấm nộp bài (Dựa vào thuộc tính isSubmitted hoặc status === 'submitted')
+                if (data.isSubmitted === true || data.status === "submitted") {
+                    statusText.textContent = "Đã nộp bài";
+                    statusBox.classList.add("success"); // Đổi màu trạng thái nếu cần
+                    container.innerHTML = `
+                        <div class="question-card" style="padding: 40px; text-align: center;">
+                            <div class="empty" style="color: #16a34a; font-size: 15px;">
+                                <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #22c55e; margin-bottom: 12px; display: block;"></i>
+                                Học sinh này đã hoàn thành và nộp bài kiểm tra thành công!
+                                <br><br>
+                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
+                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
+                                </button>
+                            </div>
+                        </div>`;
+                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #16a34a; padding: 20px; font-size: 13px;">Đã nộp bài</div>`;
+                    
+                    setTimeout(() => {
+                        window.location.href = "teacher.html";
+                    }, 3000);
+                    return;
+                }
+
+                // 2. Kiểm tra nếu học sinh chưa bắt đầu làm
                 if (data.isStarted === false || data.hasStarted === false) {
                     statusText.textContent = "Chưa làm bài";
                     statusBox.classList.add("danger");
@@ -238,7 +258,6 @@
                 statusText.textContent = "Đang trực tuyến";
                 statusBox.classList.remove("danger");
 
-                // Cập nhật thông tin phụ nếu có
                 if (data.testTitle) {
                     document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
                 }
@@ -249,7 +268,6 @@
                     statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }
 
-                // Render giao diện câu hỏi học sinh đang làm
                 container.innerHTML = `
                     <div class="question-card">
                         <div class="question-card-header">
