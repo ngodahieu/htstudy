@@ -237,10 +237,10 @@
     let cachedQuestions = [];
     let cachedAnswers = {};
     let currentStudentQIndex = 0;
+    let lastRenderedStudentQIndex = -1; // Dùng để theo dõi khi nào học sinh thực sự đổi câu
 
-    // Biến quản lý đồng hồ đếm ngược đồng bộ phía giáo viên
     let liveTimerInterval = null;
-    let currentRemainingSeconds = 0;
+    let targetEndTime = null; // Mốc thời gian kết thúc tuyệt đối (timestamp)
 
     document.getElementById("headerStudentName").textContent = studentName;
     document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
@@ -258,6 +258,7 @@
         currentViewMode = 'live';
         modeLiveBtn.classList.add("active");
         modeFreeBtn.classList.remove("active");
+        // Khi vừa bấm sang chế độ trực tiếp, ép cuộn ngay lập tức về câu hiện tại của học sinh
         scrollToCurrentStudentQuestion(currentStudentQIndex);
     });
 
@@ -267,14 +268,18 @@
     };
     document.getElementById("backBtn").addEventListener("click", handleBack);
 
-    // Khởi tạo vòng lặp đếm ngược mỗi giây phía giáo viên để thời gian chạy mượt mà, không bị chết đứng
-    function startTeacherTimer() {
+    // Đồng hồ chạy dựa trên mốc thời gian thực (Timestamp) để khớp tuyệt đối với học sinh
+    function startAbsoluteTimer() {
         if (liveTimerInterval) clearInterval(liveTimerInterval);
-        
+
         liveTimerInterval = setInterval(() => {
-            if (currentRemainingSeconds > 0) {
-                currentRemainingSeconds--;
-                updateTimerDisplay(currentRemainingSeconds);
+            if (!targetEndTime) return;
+            const now = Date.now();
+            const remainingSec = Math.max(0, Math.ceil((targetEndTime - now) / 1000));
+            updateTimerDisplay(remainingSec);
+
+            if (remainingSec <= 0) {
+                clearInterval(liveTimerInterval);
             }
         }, 1000);
     }
@@ -346,17 +351,19 @@
                 document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
             }
             
-            // Cập nhật lại thời gian chuẩn từ dữ liệu học sinh gửi lên và chạy tiếp đồng hồ
+            // Tính mốc thời gian kết thúc tuyệt đối dựa trên giây còn lại học sinh gửi lên
             if (data.remainingSeconds !== undefined) {
-                currentRemainingSeconds = data.remainingSeconds;
-                updateTimerDisplay(currentRemainingSeconds);
-                startTeacherTimer();
+                targetEndTime = Date.now() + (data.remainingSeconds * 1000);
+                updateTimerDisplay(data.remainingSeconds);
+                startAbsoluteTimer();
             }
 
-            const previousIndex = currentStudentQIndex;
             cachedQuestions = data.questions || [];
             cachedAnswers = data.allAnswers || {};
-            currentStudentQIndex = (data.currentQuestionIndex || 1) - 1;
+            const newStudentQIndex = (data.currentQuestionIndex || 1) - 1;
+            const hasQuestionChanged = newStudentQIndex !== lastRenderedStudentQIndex;
+            currentStudentQIndex = newStudentQIndex;
+            lastRenderedStudentQIndex = currentStudentQIndex;
 
             if (cachedQuestions.length > 0) {
                 let allQuestionsHtml = "";
@@ -442,11 +449,11 @@
                 
                 gridHtml += `<button type="button" class="${classes}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
             }
-            gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: card; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
+            gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
             statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
 
-            // Tự động cuộn ngay lập tức khi học sinh chuyển câu hoặc khi đang bật chế độ Trực tiếp
-            if (currentViewMode === 'live' || currentStudentQIndex !== previousIndex) {
+            // QUAN TRỌNG: Nếu đang ở chế độ "Trực tiếp" HOẶC học sinh vừa đổi câu hỏi mới, tự động cuộn màn hình giáo viên tới đó ngay lập tức
+            if (currentViewMode === 'live' || hasQuestionChanged) {
                 scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
         });
