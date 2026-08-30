@@ -1736,20 +1736,7 @@ async function finishTest() {
     }
 
     try {
-        // Cập nhật ngay trạng thái đã nộp lên Firestore để trang giáo viên live nhận biết được lập tức
-        await setDoc(doc(db, "liveStatus", currentUser.uid), {
-            studentId: currentUser.uid,
-            studentName: currentUser.displayName || currentUser.email || "Học sinh",
-            testId: currentTestId,
-            isStarted: true,
-            hasStarted: true,
-            isSubmitted: true,     // Đánh dấu đã nộp bài thành công
-            status: "submitted",
-            updatedAt: serverTimestamp()
-        }, { merge: true });
-
-        const scoreData =
-            calculateScore();
+        const scoreData = calculateScore();
 
         let wrong = 0;
         let unanswered = 0;
@@ -1815,8 +1802,6 @@ async function finishTest() {
             submittedAt: serverTimestamp()
         };
 
-        console.log("RESULT DATA:", resultData);
-
         await addDoc(
             collection(
                 db,
@@ -1825,9 +1810,27 @@ async function finishTest() {
             resultData
         );
 
+        // 1. Hiển thị thông báo nộp bài thành công
+        alert("Nộp bài thành công! Điểm của bạn: " + scoreData.score + "/" + (questions.length * 0.5) + ". Hệ thống sẽ quay lại trang trước sau 5 giây.");
+
+        // 2. Reset trạng thái live trên Firestore thành "chưa làm bài" sau khi nộp để màn hình giáo viên trả về trạng thái ban đầu
+        await setDoc(doc(db, "liveStatus", currentUser.uid), {
+            studentId: currentUser.uid,
+            studentName: currentUser.displayName || currentUser.email || "Học sinh",
+            testId: currentTestId,
+            isStarted: false,
+            hasStarted: false,
+            isSubmitted: false,
+            status: "not_started",
+            updatedAt: serverTimestamp()
+        });
+
         clearTestStorage();
 
-        window.location.href = "index.html";
+        // 3. Sau 5 giây tự động quay lại trang trước (hoặc trang khóa học)
+        setTimeout(() => {
+            window.location.href = currentCourseId ? `course_detail.html?id=${currentCourseId}` : "index.html";
+        }, 5000);
 
     } catch (error) {
         console.error("Lỗi nộp bài:", error);
@@ -1971,7 +1974,6 @@ function showError(msg) {
         testError.textContent = msg;
     }
 }
-
 /*==================================================
             ĐỒNG BỘ TRẠNG THÁI LIVE (SYNC LIVE STATUS)
 ==================================================*/
@@ -1981,6 +1983,10 @@ async function syncLiveStatus() {
     try {
         const currentQ = questions[currentQuestionIndex] || {};
         
+        // Tính mốc thời gian kết thúc tuyệt đối (timestamp) dựa trên thời gian còn lại
+        const savedEndTime = localStorage.getItem(testTimerKey);
+        const targetEndTime = savedEndTime ? Number(savedEndTime) : (Date.now() + (remainingSeconds * 1000));
+
         const liveData = {
             studentId: currentUser.uid,
             studentName: currentUser.displayName || currentUser.email || "Học sinh",
@@ -1993,9 +1999,10 @@ async function syncLiveStatus() {
             currentPart: currentQ.part || 1,
             currentQuestion: currentQ, 
             currentAnswer: answers[currentQuestionIndex] !== undefined ? answers[currentQuestionIndex] : null,
-            allAnswers: answers, // Gửi toàn bộ đáp án học sinh đã làm để giáo viên xem tổng quan
-            questions: questions, // Gửi toàn bộ mảng câu hỏi để trang giáo viên hiển thị dạng cuộn 1 hàng dọc
+            allAnswers: answers, 
+            questions: questions, 
             remainingSeconds: typeof remainingSeconds !== 'undefined' ? remainingSeconds : 0, 
+            targetEndTime: targetEndTime, // Gửi mốc thời gian kết thúc chính xác xuống Firestore
             updatedAt: serverTimestamp()
         };
 
