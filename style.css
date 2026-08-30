@@ -4823,3 +4823,62 @@ transparent 70%);
         font-size: 2.2rem;
     }
 }
+/*==================================================
+        TỐI ƯU HEADER KHI XOAY NGANG MÀN HÌNH (MOBILE LANDSCAPE)
+==================================================*/
+
+@media (max-width: 900px) and (orientation: landscape) {
+    /* Ép header hiển thị theo hàng ngang gọn gàng khi xoay ngang */
+    .header .container {
+        flex-direction: row !important;
+        height: 70px !important;
+        padding: 0 20px !important;
+    }
+
+    .header-actions {
+        flex-direction: row !important;
+        gap: 15px !important;
+    }
+
+    /* Đưa menu dưới (bottom nav) về lại dạng thanh ngang phía trên header hoặc ẩn bớt định dạng cố định để không che nội dung */
+    .nav-menu {
+        position: static !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        border-top: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: auto !important;
+    }
+
+    .nav-menu a {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* Bỏ khoảng trống padding-bottom của body khi xoay ngang */
+    body {
+        padding-bottom: 0 !important;
+    }
+
+    /* Thu gọn logo một chút khi xoay ngang để tiết kiệm không gian */
+    .logo img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logo-text h2 {
+        font-size: 1.1rem;
+    }
+
+    .logo-text span {
+        display: none; /* Ẩn bớt slogan nhỏ của logo trên màn hình ngang */
+    }
+
+    /* Điều chỉnh vị trí bảng thông báo và menu user khi xoay ngang tránh bị tràn màn hình */
+    .notification-panel,
+    .user-menu {
+        top: 65px;
+        max-height: 80vh;
+    }
+}
