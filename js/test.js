@@ -1678,7 +1678,6 @@ function clearTestStorage() {
 /*==================================================
                 FINISH TEST
 ==================================================*/
-
 async function finishTest() {
 
     if (submitted) {
@@ -1686,14 +1685,10 @@ async function finishTest() {
     }
 
     if (!currentUser) {
-
         alert(
             "Phiên đăng nhập đã hết. Vui lòng đăng nhập lại."
         );
-
-        window.location.href =
-            "index.html";
-
+        window.location.href = "index.html";
         return;
     }
 
@@ -1704,51 +1699,47 @@ async function finishTest() {
     );
 
     if (submitTestBtn) {
-
-        submitTestBtn.disabled =
-            true;
-
-        submitTestBtn.innerHTML =
-            `
+        submitTestBtn.disabled = true;
+        submitTestBtn.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             Đang nộp bài...
-            `;
-
+        `;
     }
 
     if (headerSubmitTestBtn) {
-
-        headerSubmitTestBtn.disabled =
-            true;
-
+        headerSubmitTestBtn.disabled = true;
     }
 
     try {
+        // Cập nhật ngay trạng thái đã nộp lên Firestore để trang giáo viên live nhận biết được lập tức
+        await setDoc(doc(db, "liveStatus", currentUser.uid), {
+            studentId: currentUser.uid,
+            studentName: currentUser.displayName || currentUser.email || "Học sinh",
+            testId: currentTestId,
+            isStarted: true,
+            hasStarted: true,
+            isSubmitted: true,     // Đánh dấu đã nộp bài thành công
+            status: "submitted",
+            updatedAt: serverTimestamp()
+        }, { merge: true });
 
         const scoreData =
             calculateScore();
 
         let wrong = 0;
-
         let unanswered = 0;
-
 
         questions.forEach(
             (question, index) => {
-
-                const userAnswer =
-                    answers[index];
+                const userAnswer = answers[index];
 
                 if (
                     userAnswer === undefined ||
                     userAnswer === null ||
                     String(userAnswer).trim() === ""
                 ) {
-
                     unanswered++;
-
                     return;
-
                 }
 
                 const correctAnswer =
@@ -1764,11 +1755,8 @@ async function finishTest() {
                         userAnswer
                     ) !== correctAnswer
                 ) {
-
                     wrong++;
-
                 }
-
             }
         );
 
@@ -1786,52 +1774,23 @@ async function finishTest() {
         });
 
         const resultData = {
-
-            userId:
-                currentUser.uid,
-
-            courseId:
-                currentCourseId,
+            userId: currentUser.uid,
+            courseId: currentCourseId,
             userEmail: currentUser.email || "",
             userName: currentUser.displayName || "Học sinh",
-            testId:
-                currentTestId,
-
-            testTitle:
-                currentTest.title ||
-                "Bài kiểm tra",
-
-            answers:
-                answers,
-
-            questions:
-                resultQuestions,
-
-            score:
-                scoreData.score,
-
-            correct:
-                scoreData.correct,
-
-            wrong:
-                wrong,
-
-            unanswered:
-                unanswered,
-
-            total:
-                questions.length,
-
-            submittedAt:
-                serverTimestamp()
-
+            testId: currentTestId,
+            testTitle: currentTest?.title || "Bài kiểm tra",
+            answers: answers,
+            questions: resultQuestions,
+            score: scoreData.score,
+            correct: scoreData.correct,
+            wrong: wrong,
+            unanswered: unanswered,
+            total: questions.length,
+            submittedAt: serverTimestamp()
         };
 
-
-        console.log(
-            "RESULT DATA:",
-            resultData
-        );
+        console.log("RESULT DATA:", resultData);
 
         await addDoc(
             collection(
@@ -1843,52 +1802,27 @@ async function finishTest() {
 
         clearTestStorage();
 
-        window.location.href =
-            "index.html";
+        window.location.href = "index.html";
 
-    }
-
-    catch (error) {
-
-        console.error(
-            "Lỗi nộp bài:",
-            error
-        );
-
-
+    } catch (error) {
+        console.error("Lỗi nộp bài:", error);
         submitted = false;
 
-
         if (submitTestBtn) {
-
-            submitTestBtn.disabled =
-                false;
-
-            submitTestBtn.innerHTML =
-                `
+            submitTestBtn.disabled = false;
+            submitTestBtn.innerHTML = `
                 <i class="fa-solid fa-paper-plane"></i>
                 Nộp bài
-                `;
-
+            `;
         }
-
 
         if (headerSubmitTestBtn) {
-
-            headerSubmitTestBtn.disabled =
-                false;
-
+            headerSubmitTestBtn.disabled = false;
         }
 
-
-        alert(
-            "Không thể nộp bài. Vui lòng thử lại."
-        );
-
+        alert("Không thể nộp bài. Vui lòng thử lại.");
     }
-
 }
-
 /*==================================================
                 TÍNH ĐIỂM
 ==================================================*/
@@ -2032,11 +1966,14 @@ async function syncLiveStatus() {
             studentName: currentUser.displayName || currentUser.email || "Học sinh",
             testId: currentTestId,
             testTitle: currentTest?.title || "Bài kiểm tra",
+            isStarted: true,     // Đánh dấu học sinh đã bấm vào làm bài
+            hasStarted: true,    // Tương thích với các điều kiện kiểm tra
+            isSubmitted: false,  // Đang làm bài nên chưa nộp
             currentQuestionIndex: currentQuestionIndex + 1,
             currentPart: currentQ.part || 1,
-            currentQuestion: currentQ, // Đẩy cả object câu hỏi lên để giáo viên thấy nội dung, hình ảnh, đáp án
+            currentQuestion: currentQ, 
             currentAnswer: currentAns,
-            remainingSeconds: typeof remainingSeconds !== 'undefined' ? remainingSeconds : 0, // Đẩy thời gian còn lại
+            remainingSeconds: typeof remainingSeconds !== 'undefined' ? remainingSeconds : 0, 
             updatedAt: serverTimestamp()
         };
 
@@ -2045,7 +1982,6 @@ async function syncLiveStatus() {
         console.error("Lỗi đồng bộ live status:", error);
     }
 }
-
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
