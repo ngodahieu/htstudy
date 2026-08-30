@@ -238,6 +238,10 @@
     let cachedAnswers = {};
     let currentStudentQIndex = 0;
 
+    // Biến quản lý đồng hồ đếm ngược đồng bộ phía giáo viên
+    let liveTimerInterval = null;
+    let currentRemainingSeconds = 0;
+
     document.getElementById("headerStudentName").textContent = studentName;
     document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
     
@@ -263,6 +267,26 @@
     };
     document.getElementById("backBtn").addEventListener("click", handleBack);
 
+    // Khởi tạo vòng lặp đếm ngược mỗi giây phía giáo viên để thời gian chạy mượt mà, không bị chết đứng
+    function startTeacherTimer() {
+        if (liveTimerInterval) clearInterval(liveTimerInterval);
+        
+        liveTimerInterval = setInterval(() => {
+            if (currentRemainingSeconds > 0) {
+                currentRemainingSeconds--;
+                updateTimerDisplay(currentRemainingSeconds);
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay(sec) {
+        const statRemainingTime = document.getElementById("statRemainingTime");
+        if (!statRemainingTime) return;
+        const mins = Math.floor(sec / 60);
+        const secs = sec % 60;
+        statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
     if (studentId) {
         const liveRef = doc(db, "liveStatus", studentId);
         
@@ -271,7 +295,6 @@
             const gridContainer = document.getElementById("sidebarQuestionGrid");
             const statusText = document.getElementById("liveStatusText");
             const statusBox = document.getElementById("liveStatusBox");
-            const statRemainingTime = document.getElementById("statRemainingTime");
             const statProgress = document.getElementById("statProgress");
 
             if (!docSnap.exists()) {
@@ -323,13 +346,14 @@
                 document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
             }
             
+            // Cập nhật lại thời gian chuẩn từ dữ liệu học sinh gửi lên và chạy tiếp đồng hồ
             if (data.remainingSeconds !== undefined) {
-                const remSec = data.remainingSeconds;
-                const mins = Math.floor(remSec / 60);
-                const secs = remSec % 60;
-                statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                currentRemainingSeconds = data.remainingSeconds;
+                updateTimerDisplay(currentRemainingSeconds);
+                startTeacherTimer();
             }
 
+            const previousIndex = currentStudentQIndex;
             cachedQuestions = data.questions || [];
             cachedAnswers = data.allAnswers || {};
             currentStudentQIndex = (data.currentQuestionIndex || 1) - 1;
@@ -342,7 +366,6 @@
                     const isCurrent = currentStudentQIndex === idx;
                     let answerDisplayHtml = "";
 
-                    // Xây dựng giao diện đáp án tương ứng từng phần (Part 1, 2, 3)
                     if (q.part === 1) {
                         const options = q.options || [];
                         answerDisplayHtml = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
@@ -404,7 +427,6 @@
                 container.innerHTML = allQuestionsHtml;
             }
 
-            // Cập nhật Sidebar Bảng Câu Hỏi
             let totalQCount = cachedQuestions.length || 0;
             let gridHtml = "";
             let answeredCount = 0;
@@ -420,11 +442,11 @@
                 
                 gridHtml += `<button type="button" class="${classes}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
             }
-            gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
+            gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: card; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
             statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
 
-            // Tự động cuộn theo học sinh nếu bật chế độ Trực tiếp
-            if (currentViewMode === 'live') {
+            // Tự động cuộn ngay lập tức khi học sinh chuyển câu hoặc khi đang bật chế độ Trực tiếp
+            if (currentViewMode === 'live' || currentStudentQIndex !== previousIndex) {
                 scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
         });
