@@ -226,7 +226,7 @@
     <!-- Script xử lý kết nối Firebase Live & Render bài làm -->
 <script type="module">
     import { db } from "../js/firebase.js";
-    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
     import { formatChemistryText } from "../js/chemistry.js";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -237,10 +237,9 @@
     let cachedQuestions = [];
     let cachedAnswers = {};
     let currentStudentQIndex = 0;
-    let lastRenderedStudentQIndex = -1; // Dùng để theo dõi khi nào học sinh thực sự đổi câu
+    let lastRenderedStudentQIndex = -1; 
 
     let liveTimerInterval = null;
-    let targetEndTime = null; // Mốc thời gian kết thúc tuyệt đối (timestamp)
 
     document.getElementById("headerStudentName").textContent = studentName;
     document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
@@ -258,7 +257,7 @@
         currentViewMode = 'live';
         modeLiveBtn.classList.add("active");
         modeFreeBtn.classList.remove("active");
-        // Khi vừa bấm sang chế độ trực tiếp, ép cuộn ngay lập tức về câu hiện tại của học sinh
+        // Khi chuyển sang chế độ trực tiếp, ép cuộn ngay lập tức về câu hiện tại của học sinh
         scrollToCurrentStudentQuestion(currentStudentQIndex);
     });
 
@@ -268,8 +267,8 @@
     };
     document.getElementById("backBtn").addEventListener("click", handleBack);
 
-    // Đồng hồ chạy dựa trên mốc thời gian thực (Timestamp) để khớp tuyệt đối với học sinh
-    function startAbsoluteTimer() {
+    // Đồng hồ chạy dựa trên mốc thời gian tuyệt đối (targetEndTime) từ Firestore gửi lên
+    function startAbsoluteTimer(targetEndTime) {
         if (liveTimerInterval) clearInterval(liveTimerInterval);
 
         liveTimerInterval = setInterval(() => {
@@ -318,17 +317,16 @@
 
             const data = docSnap.data();
 
+            // Nếu học sinh đã nộp bài, hiển thị thông báo tạm thời nhưng vẫn cho phép giáo viên thấy trạng thái
             if (data.isSubmitted === true || data.status === "submitted") {
-                statusText.textContent = "Đã nộp bài";
+                statusText.textContent = "Đang chờ reset / Đã nộp";
                 statusBox.classList.add("success");
-                container.innerHTML = `
-                    <div class="question-card" style="padding: 40px; text-align: center;">
-                        <div class="empty" style="color: #16a34a; font-size: 15px;">
-                            <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #22c55e; margin-bottom: 12px; display: block;"></i>
-                            Học sinh này đã hoàn thành và nộp bài kiểm tra thành công!
-                        </div>
-                    </div>`;
-                return;
+                
+                // Kiểm tra nếu học sinh vừa nộp xong (có thể hiển thị thông báo nhẹ nhàng)
+                if (data.questions && data.questions.length > 0) {
+                    cachedQuestions = data.questions || [];
+                    cachedAnswers = data.allAnswers || {};
+                }
             }
 
             if (data.isStarted === false || data.hasStarted === false) {
@@ -338,9 +336,10 @@
                     <div class="question-card" style="padding: 40px; text-align: center;">
                         <div class="empty" style="color: #64748b; font-size: 15px;">
                             <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
-                            Học sinh này chưa bấm vào nút làm bài kiểm tra.
+                            Học sinh này chưa bấm vào nút làm bài kiểm tra hoặc đã hoàn thành phiên làm bài.
                         </div>
                     </div>`;
+                gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Chưa có dữ liệu</div>`;
                 return;
             }
 
@@ -351,11 +350,9 @@
                 document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
             }
             
-            // Tính mốc thời gian kết thúc tuyệt đối dựa trên giây còn lại học sinh gửi lên
-            if (data.remainingSeconds !== undefined) {
-                targetEndTime = Date.now() + (data.remainingSeconds * 1000);
-                updateTimerDisplay(data.remainingSeconds);
-                startAbsoluteTimer();
+            // Đồng bộ mốc thời gian tuyệt đối dựa trên targetEndTime từ học sinh gửi lên
+            if (data.targetEndTime) {
+                startAbsoluteTimer(data.targetEndTime);
             }
 
             cachedQuestions = data.questions || [];
@@ -452,18 +449,15 @@
             gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
             statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
 
-            // QUAN TRỌNG: Nếu đang ở chế độ "Trực tiếp" HOẶC học sinh vừa đổi câu hỏi mới, tự động cuộn màn hình giáo viên tới đó ngay lập tức
-            if (currentViewMode === 'live' || hasQuestionChanged) {
+            // QUAN TRỌNG: Chỉ tự động cuộn màn hình giáo viên khi đang ở chế độ "Trực tiếp" (live) và học sinh đổi câu
+            if (currentViewMode === 'live' && hasQuestionChanged) {
                 scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
         });
     }
 
     window.jumpToQuestion = function(index) {
-        if (currentViewMode === 'live') {
-            alert("Bạn đang ở chế độ 'Trực tiếp'. Hãy chuyển sang chế độ 'Tự do' ở góc trên để có thể chủ động chọn câu hỏi!");
-            return;
-        }
+        // Cho phép giáo viên chọn câu tự do mọi lúc ở chế độ 'free'
         const targetCard = document.getElementById(`question-card-${index}`);
         if (targetCard) {
             targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
