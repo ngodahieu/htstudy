@@ -2243,7 +2243,22 @@ async function uploadVideo() {
         alert("Có lỗi upload video.");
     }
 }
-
+// ====================================
+//        XEM LIVE CỦA HỌC SINH
+// ====================================
+function startTeacherLiveView(studentId, studentName) {
+    // Bạn có thể tùy chỉnh logic chuyển hướng hoặc mở modal xem live tại đây
+    // Ví dụ: Chuyển hướng sang trang live kèm theo ID học sinh
+    if (!studentId) {
+        alert("Không tìm thấy thông tin học sinh.");
+        return;
+    }
+    
+    // Nếu bạn có trang live riêng, hãy điều hướng hoặc mở popup:
+    // window.open(`live.html?studentId=${studentId}`, "_blank");
+    
+    alert(`Đang kết nối tới phiên làm việc trực tiếp của học sinh: ${studentName} (ID: ${studentId})`);
+}
 // ====================================
 //        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
 // ====================================
