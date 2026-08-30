@@ -278,6 +278,7 @@ function hideAllPages() {
     if (lessonPage) lessonPage.style.display = "none";
     if (notificationPage) notificationPage.style.display = "none";
     if (testPage) testPage.style.display = "none";
+    if (teacherLivePage) teacherLivePage.style.display = "none";
 }
 
 function escapeHtmlTeacher(value) {
@@ -2244,10 +2245,37 @@ async function uploadVideo() {
     }
 }
 // ====================================
-//        XEM LIVE CỦA HỌC SINH (ĐÃ NÂNG CẤP)
+//        XÊM LIVE CỦA HỌC SINH (NÂNG CẤP TRANG RIÊNG)
 // ====================================
 let liveUnsubscribe = null;
 let liveTimerInterval = null;
+
+// Thêm trang Live vào hàm ẩn tất cả trang (nếu có hideAllPages)
+// Hãy đảm bảo trong hàm hideAllPages() của bạn có thêm dòng:
+// if (teacherLivePage) teacherLivePage.style.display = "none";
+
+const teacherLivePage = document.getElementById("teacherLivePage");
+const backToStudentsFromLiveBtn = document.getElementById("backToStudentsFromLiveBtn");
+const teacherLivePageTitle = document.getElementById("teacherLivePageTitle");
+const teacherLiveContentContainer = document.getElementById("teacherLiveContentContainer");
+
+if (backToStudentsFromLiveBtn) {
+    backToStudentsFromLiveBtn.addEventListener("click", () => {
+        // Dừng lắng nghe dữ liệu firebase khi thoát trang để tiết kiệm tài nguyên
+        if (liveUnsubscribe) {
+            liveUnsubscribe();
+            liveUnsubscribe = null;
+        }
+        if (liveTimerInterval) {
+            clearInterval(liveTimerInterval);
+            liveTimerInterval = null;
+        }
+
+        // Ẩn trang live, quay lại trang học sinh
+        if (teacherLivePage) teacherLivePage.style.display = "none";
+        if (studentPage) studentPage.style.display = "block";
+    });
+}
 
 function startTeacherLiveView(studentId, studentName) {
     if (!studentId) {
@@ -2255,48 +2283,17 @@ function startTeacherLiveView(studentId, studentName) {
         return;
     }
 
-    // Tạo hoặc lấy Modal xem live trên giao diện HTML
-    let liveModal = document.getElementById("teacherLiveModal");
-    if (!liveModal) {
-        liveModal = document.createElement("div");
-        liveModal.id = "teacherLiveModal";
-        liveModal.className = "modal";
-        liveModal.style.cssText = "display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;";
-        liveModal.innerHTML = `
-            <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 700px; max-width: 95%; max-height: 85vh; display: flex; flex-direction: column;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-                    <h3 id="liveModalTitle" style="margin: 0;">Đang xem Live: ...</h3>
-                    <button type="button" id="closeLiveModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div id="liveModalBody" style="overflow-y: auto; flex: 1; padding-right: 5px;">
-                    <div class="empty">Đang kết nối tới phiên làm việc của học sinh...</div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(liveModal);
+    // Ẩn tất cả các trang khác và bật trang Live riêng biệt lên
+    hideAllPages();
+    if (teacherLivePage) teacherLivePage.style.display = "block";
 
-        liveModal.querySelector("#closeLiveModalBtn").addEventListener("click", () => {
-            liveModal.style.display = "none";
-            if (liveUnsubscribe) {
-                liveUnsubscribe(); 
-                liveUnsubscribe = null;
-            }
-            if (liveTimerInterval) {
-                clearInterval(liveTimerInterval);
-                liveTimerInterval = null;
-            }
-        });
+    if (teacherLivePageTitle) {
+        teacherLivePageTitle.textContent = `Đang xem Live học sinh: ${studentName}`;
     }
 
-    // Đã sửa lỗi cú pháp gán ở đây:
-    const liveModalTitle = document.getElementById("liveModalTitle");
-    if (liveModalTitle) {
-        liveModalTitle.textContent = `Đang xem Live: ${studentName}`;
+    if (teacherLiveContentContainer) {
+        teacherLiveContentContainer.innerHTML = `<div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang kết nối trực tiếp với học sinh...</div>`;
     }
-
-    const liveBody = document.getElementById("liveModalBody");
-    liveModal.style.display = "flex";
-    liveBody.innerHTML = `<div class="empty">Đang đồng bộ dữ liệu với học sinh...</div>`;
 
     const liveRef = doc(db, "liveStatus", studentId);
     
@@ -2304,8 +2301,15 @@ function startTeacherLiveView(studentId, studentName) {
     if (liveTimerInterval) clearInterval(liveTimerInterval);
 
     liveUnsubscribe = onSnapshot(liveRef, (docSnap) => {
+        if (!teacherLiveContentContainer) return;
+
         if (!docSnap.exists()) {
-            liveBody.innerHTML = `<div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i> Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.</div>`;
+            teacherLiveContentContainer.innerHTML = `
+                <div class="empty" style="padding: 40px; text-align: center;">
+                    <i class="fa-solid fa-tower-broadcast" style="font-size: 3rem; color: #ccc; margin-bottom: 10px;"></i>
+                    <h3>Học sinh chưa mở bài kiểm tra</h3>
+                    <p>Học sinh hiện chưa bắt đầu hoặc chưa bật chế độ làm bài trực tuyến.</p>
+                </div>`;
             return;
         }
 
@@ -2314,14 +2318,14 @@ function startTeacherLiveView(studentId, studentName) {
         let remainingSeconds = data.remainingSeconds || 0;
 
         let html = `
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <p style="margin: 0 0 4px 0;"><strong>Bài kiểm tra:</strong> ${escapeHtmlTeacher(data.testTitle || "Không rõ")}</p>
-                    <p style="margin: 0; font-size: 0.85rem; color: #666;"><i class="fa-regular fa-clock"></i> Cập nhật: ${updatedAt}</p>
+                    <p style="margin: 0 0 4px 0; font-size: 1.1rem;"><strong>Bài kiểm tra:</strong> ${escapeHtmlTeacher(data.testTitle || "Không rõ")}</p>
+                    <p style="margin: 0; font-size: 0.9rem; color: #666;"><i class="fa-regular fa-clock"></i> Cập nhật gần nhất: ${updatedAt}</p>
                 </div>
                 <div style="text-align: right;">
-                    <span style="font-size: 0.85rem; color: #555;">Thời gian còn lại:</span><br>
-                    <span id="liveCountdownTimer" style="font-size: 1.2rem; font-weight: bold; color: #d9534f;">--:--</span>
+                    <span style="font-size: 0.9rem; color: #555;">Thời gian làm bài còn lại:</span><br>
+                    <span id="liveCountdownTimer" style="font-size: 1.4rem; font-weight: bold; color: #d9534f;">--:--</span>
                 </div>
             </div>
         `;
@@ -2334,61 +2338,61 @@ function startTeacherLiveView(studentId, studentName) {
         const studentAns = data.currentAnswer;
 
         html += `
-            <div style="background: #fff; border: 1px solid #dcdcdc; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">Câu ${qIndex} (Phần ${part})</span>
+            <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="background: #007bff; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">Câu ${qIndex} (Phần ${part})</span>
                 </div>
-                <p style="font-weight: 500; font-size: 1.05rem; margin-bottom: 10px;">${formatChemistryText(currentQ.question || "Đang tải nội dung câu hỏi...")}</p>
+                <p style="font-weight: 500; font-size: 1.1rem; margin-bottom: 15px; line-height: 1.5;">${formatChemistryText(currentQ.question || "Đang tải nội dung câu hỏi...")}</p>
         `;
 
         if (currentQ.image) {
-            html += `<div style="margin: 10px 0;"><img src="${currentQ.image}" style="max-width: 100%; max-height: 220px; border-radius: 6px; border: 1px solid #ddd;"></div>`;
+            html += `<div style="margin: 15px 0;"><img src="${currentQ.image}" style="max-width: 100%; max-height: 300px; border-radius: 6px; border: 1px solid #ddd;"></div>`;
         }
 
         if (part === 1) {
             const options = currentQ.options || [];
-            html += `<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">`;
+            html += `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
             options.forEach((opt, optIdx) => {
                 const optLetter = String.fromCharCode(65 + optIdx);
                 const isSelected = (String(studentAns).toUpperCase() === optLetter) || (Number(studentAns) === optIdx);
                 
-                let optStyle = "padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa;";
+                let optStyle = "padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa;";
                 if (isSelected) {
-                    optStyle = "padding: 8px 12px; border: 1px solid #28a745; border-radius: 6px; background: #e8f5e9; font-weight: bold; color: #2e7d32;";
+                    optStyle = "padding: 10px 14px; border: 1px solid #28a745; border-radius: 6px; background: #e8f5e9; font-weight: bold; color: #2e7d32;";
                 }
 
                 html += `<div style="${optStyle}">
                     <b>${optLetter}.</b> ${formatChemistryText(opt)}
-                    ${isSelected ? '<span style="float: right; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> Học sinh đang chọn</span>' : ''}
+                    ${isSelected ? '<span style="float: right; font-size: 0.9rem;"><i class="fa-solid fa-circle-check"></i> Học sinh đang chọn đáp án này</span>' : ''}
                 </div>`;
             });
             html += `</div>`;
         } else if (part === 2) {
             const statements = currentQ.statements || [];
             const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
-            html += `<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">`;
+            html += `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
             statements.forEach((st, stIdx) => {
                 const stLetter = String.fromCharCode(97 + stIdx);
                 const choice = studentAnsArr[stIdx];
                 let choiceText = choice !== undefined ? (choice ? "Đúng" : "Sai") : "Chưa chọn";
 
-                html += `<div style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa; display: flex; justify-content: space-between; align-items: center;">
+                html += `<div style="padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa; display: flex; justify-content: space-between; align-items: center;">
                     <span><b>${stLetter})</b> ${formatChemistryText(st)}</span>
-                    <span style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">${choiceText}</span>
+                    <span style="background: #e2e8f0; padding: 4px 10px; border-radius: 4px; font-size: 0.95rem; font-weight: bold;">${choiceText}</span>
                 </div>`;
             });
             html += `</div>`;
         } else if (part === 3) {
             html += `
-                <div style="margin-top: 10px; padding: 10px; background: #f1f5f9; border-radius: 6px;">
-                    <span>Học sinh điền đáp án: </span>
-                    <b style="color: #007bff; font-size: 1.1rem;">${escapeHtmlTeacher(String(studentAns || "Chưa nhập"))}</b>
+                <div style="margin-top: 15px; padding: 12px; background: #f1f5f9; border-radius: 6px;">
+                    <span>Học sinh điền đáp án ngắn: </span>
+                    <b style="color: #007bff; font-size: 1.2rem;">${escapeHtmlTeacher(String(studentAns || "Chưa nhập"))}</b>
                 </div>
             `;
         }
 
         html += `</div></div>`;
-        liveBody.innerHTML = html;
+        teacherLiveContentContainer.innerHTML = html;
 
         const timerEl = document.getElementById("liveCountdownTimer");
         if (timerEl && remainingSeconds > 0) {
@@ -2414,7 +2418,9 @@ function startTeacherLiveView(studentId, studentName) {
 
     }, (error) => {
         console.error("Lỗi live view:", error);
-        liveBody.innerHTML = `<div class="empty">Không thể kết nối trực tiếp với học sinh này.</div>`;
+        if (teacherLiveContentContainer) {
+            teacherLiveContentContainer.innerHTML = `<div class="empty">Không thể kết nối trực tiếp với học sinh này.</div>`;
+        }
     });
 }
 // ====================================
