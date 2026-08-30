@@ -17,7 +17,8 @@ import {
     orderBy,
     deleteDoc,
     updateDoc,
-    setDoc
+    setDoc,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 function updateChemistryPreview(input, preview) {
@@ -2617,3 +2618,137 @@ if (closeSingleResultModal) {
         if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
     });
 }
+// Biến lưu trữ unsubscribe listener realtime của Firestore
+let currentLiveUnsubscribe = null;
+
+// Hàm mở chế độ xem học sinh làm bài trực tiếp (Live)
+window.startTeacherLiveView = async function(studentId, studentNameText) {
+    // 1. Ẩn dashboard chính, hiển thị thanh công cụ live và vùng chứa trang test của học sinh
+    const mainContent = document.querySelector(".dashboard-content");
+    
+    // Tạo thanh công cụ phía trên cho giáo viên
+    let liveToolbar = document.getElementById("teacherLiveToolbar");
+    if (!liveToolbar) {
+        liveToolbar = document.createElement("div");
+        liveToolbar.id = "teacherLiveToolbar";
+        liveToolbar.className = "teacher-live-toolbar";
+        document.body.appendChild(liveToolbar);
+    }
+    
+    liveToolbar.innerHTML = `
+        <div class="teacher-live-info">
+            <span class="live-badge">LIVE</span>
+            <span>Đang xem học sinh: <strong id="liveStudentName"></strong></span>
+            <span id="liveTimerDisplay" style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 8px;">Thời gian: --:--</span>
+        </div>
+        <button class="exit-live-btn" onclick="exitTeacherLiveView()">Thoát Live</button>
+    `;
+    document.getElementById("liveStudentName").innerText = studentNameText;
+
+    // Tạo lớp phủ (overlay) khóa điều khiển (không cho giáo viên lướt hay click)
+    let liveOverlay = document.getElementById("teacherLiveOverlay");
+    if (!liveOverlay) {
+        liveOverlay = document.createElement("div");
+        liveOverlay.id = "teacherLiveOverlay";
+        liveOverlay.className = "teacher-live-overlay";
+        document.body.appendChild(liveOverlay);
+    }
+
+    // Tạo container chứa giao diện làm bài của học sinh đượcnhúng/mô phỏng
+    const liveContainer = document.getElementById("teacherLiveViewContainer");
+    liveContainer.style.display = "block";
+    liveContainer.innerHTML = `
+        <div style="padding: 20px; background: white; border-radius: 15px; min-height: 80vh; margin-top: 20px;">
+            <h3>Giao diện làm bài trực tuyến của học sinh</h3>
+            <div id="liveStudentTestContent" style="margin-top: 20px;">Đang đồng bộ dữ liệu bài làm từ học sinh...</div>
+        </div>
+    `;
+
+    // 2. Lắng nghe dữ liệu realtime từ Firestore (Ví dụ collection lưu trạng thái làm bài live của học sinh: "student_live_sessions")
+    // Dữ liệu này phía học sinh sẽ update liên tục gồm: nội dung các câu trả lời, vị trí scrollY, thời gian còn lại, trạng thái nộp bài.
+    const liveDocRef = doc(db, "student_live_sessions", studentId);
+    
+    currentLiveUnsubscribe = onSnapshot(liveDocRef, (docSnap) => {
+        if (!docSnap.exists()) {
+            document.getElementById("liveStudentTestContent").innerHTML = "<p style='color: #64748b;'>Học sinh chưa bắt đầu làm bài hoặc chưa mở đề thi.</p>";
+            return;
+        }
+
+        const data = docSnap.data();
+
+        // Cập nhật thời gian còn lại (vẫn giữ nút thời gian nhưng không ảnh hưởng)
+        if (data.timeLeftFormatted) {
+            document.getElementById("liveTimerDisplay").innerText = `Thời gian: ${data.timeLeftFormatted}`;
+        }
+
+        // Đồng bộ nội dung / đáp án học sinh đang điền
+        if (data.testHtmlContent) {
+            document.getElementById("liveStudentTestContent").innerHTML = data.testHtmlContent;
+        }
+
+        // Đồng bộ vị trí lướt (scroll) của học sinh
+        if (typeof data.scrollTop === "number") {
+            window.scrollTo({
+                top: data.scrollTop,
+                behavior: "smooth"
+            });
+        }
+
+        // Kiểm tra nếu học sinh đã nộp bài
+        if (data.isSubmitted) {
+            // Hiển thị thông báo theo yêu cầu: "Học sinh đã nộp bài, vui lòng giáo viên thoát live."
+            showToast("Học sinh đã nộp bài, vui lòng giáo viên thoát live.", "error");
+            
+            let toolbarInfo = liveToolbar.querySelector(".teacher-live-info");
+            if (toolbarInfo) {
+                toolbarInfo.innerHTML += `<span style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 6px; margin-left: 10px;">Đã nộp bài</span>`;
+            }
+        }
+    });
+};
+
+// Hàm thoát chế độ xem live
+window.exitTeacherLiveView = function() {
+    if (currentLiveUnsubscribe) {
+        currentLiveUnsubscribe(); // Hủy lắng nghe realtime
+        currentLiveUnsubscribe = null;
+    }
+
+    // Xóa bỏ giao diện live toolbar và overlay
+    const liveToolbar = document.getElementById("teacherLiveToolbar");
+    if (liveToolbar) liveToolbar.remove();
+
+    const liveOverlay = document.getElementById("teacherLiveOverlay");
+    if (liveOverlay) liveOverlay.remove();
+
+    const liveContainer = document.getElementById("teacherLiveViewContainer");
+    if (liveContainer) {
+        liveContainer.style.display = "none";
+        liveContainer.innerHTML = "";
+    }
+
+    // Trở về vị trí cuộn và màn hình ban đầu
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    showToast("Đã thoát chế độ xem live.", "success");
+};
+
+// Hàm tiện ích hiển thị thông báo Toast
+function showToast(message, type = "success") {
+    const existingToast = document.querySelector(".toast");
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 4000);
+}
+// Đoạn code mẫu khi tạo nút hành động cho mỗi học sinh trong danh sách:
+// Nút Xem Live:
+const liveBtn = document.createElement("button");
+liveBtn.className = "edit-btn live-btn";
+liveBtn.innerHTML = `<i class="fa-solid fa-tower-broadcast"></i> Xem Live`;
+liveBtn.onclick = () => startTeacherLiveView(student.id, student.name);
