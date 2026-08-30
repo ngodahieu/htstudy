@@ -142,6 +142,25 @@ const submitTestBtn =
     document.getElementById("submitTestBtn");
 
 /*==================================================
+        DOM CHO MỤC LỤC NỔI (FLOATING NAV)
+==================================================*/
+const floatingNavToggle = document.getElementById("floatingNavToggle");
+const floatingSidebarContainer = document.getElementById("floatingSidebarContainer");
+const closeFloatingNav = document.getElementById("closeFloatingNav");
+
+if (floatingNavToggle && floatingSidebarContainer) {
+    floatingNavToggle.addEventListener("click", () => {
+        floatingSidebarContainer.classList.toggle("active");
+    });
+}
+
+if (closeFloatingNav && floatingSidebarContainer) {
+    closeFloatingNav.addEventListener("click", () => {
+        floatingSidebarContainer.classList.remove("active");
+    });
+}
+
+/*==================================================
                 HEADER / USER DOM
 ==================================================*/
 
@@ -764,20 +783,26 @@ function renderQuestionGrid() {
                 index;
 
 
-button.addEventListener("click", () => {
-    currentQuestionIndex = index;
-    saveCurrentQuestion();
-    
-    // Cuộn đến câu hỏi tương ứng trong danh sách dài
-    const targetCard = document.querySelector(`.question-card[data-index="${index}"]`);
-    if (targetCard) {
-        targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
-        targetCard.classList.add("highlighted");
-        setTimeout(() => targetCard.classList.remove("highlighted"), 1500);
-    }
-    
-    syncLiveStatus();
-});
+            button.addEventListener("click", () => {
+                currentQuestionIndex = index;
+                saveCurrentQuestion();
+                
+                // Cuộn đến câu hỏi tương ứng trong danh sách dài
+                const targetCard = document.querySelector(`.question-card[data-index="${index}"]`);
+                if (targetCard) {
+                    targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+                    targetCard.classList.add("highlighted");
+                    setTimeout(() => targetCard.classList.remove("highlighted"), 1500);
+                }
+                
+                syncLiveStatus();
+
+                // Tự động đóng bảng mục lục nổi sau khi chọn câu hỏi
+                if (floatingSidebarContainer) {
+                    floatingSidebarContainer.classList.remove("active");
+                }
+            });
+
             questionGrid.appendChild(
                 button
             );
