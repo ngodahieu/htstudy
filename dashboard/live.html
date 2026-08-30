@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xem Live Trực Tuyến Học Sinh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Thêm CSS của bạn ở đây -->
+</head>
+<body>
+    <div style="padding: 20px;">
+        <button id="backBtn" class="primary-btn" style="margin-bottom: 20px;">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+        <h2 id="teacherLivePageTitle">Đang kết nối trực tiếp với học sinh...</h2>
+        <div id="teacherLiveContentContainer">
+            <div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i> Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+    <!-- Script xử lý kết nối Firebase Live -->
+    <script type="module">
+        import { db } from "./firebase.js";
+        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+        import { formatChemistryText } from "./chemistry.js";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get("studentId");
+        const studentName = decodeURIComponent(urlParams.get("studentName") || "Học sinh");
+
+        document.getElementById("teacherLivePageTitle").textContent = `Đang xem Live học sinh: ${studentName}`;
+        
+        document.getElementById("backBtn").addEventListener("click", () => {
+            window.history.back(); // Quay lại trang trước đó (trang quản lý giáo viên)
+        });
+
+        if (studentId) {
+            const liveRef = doc(db, "liveStatus", studentId);
+            onSnapshot(liveRef, (docSnap) => {
+                const container = document.getElementById("teacherLiveContentContainer");
+                if (!docSnap.exists()) {
+                    container.innerHTML = `<div class="empty">Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.</div>`;
+                    return;
+                }
+                const data = docSnap.data();
+                // Render nội dung live tương tự logic bạn đã viết trước đó...
+                container.innerHTML = `<div style="background: #f8f9fa; padding: 15px; border-radius: 8px;"><strong>Bài kiểm tra:</strong> ${data.testTitle || "Không rõ"}</div>`;
+            });
+        }
+    </script>
+</body>
+</html>
