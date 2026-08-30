@@ -226,7 +226,7 @@
     <!-- Script xử lý kết nối Firebase Live & Render bài làm -->
 <script type="module">
     import { db } from "../js/firebase.js";
-    import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
     import { formatChemistryText } from "../js/chemistry.js";
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -238,8 +238,8 @@
     let cachedAnswers = {};
     let currentStudentQIndex = 0;
     let lastRenderedStudentQIndex = -1; 
-
     let liveTimerInterval = null;
+    let isRedirectingToTeacher = false; // Biến cờ tránh gọi chuyển hướng nhiều lần
 
     document.getElementById("headerStudentName").textContent = studentName;
     document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
@@ -257,7 +257,6 @@
         currentViewMode = 'live';
         modeLiveBtn.classList.add("active");
         modeFreeBtn.classList.remove("active");
-        // Khi chuyển sang chế độ trực tiếp, ép cuộn ngay lập tức về câu hiện tại của học sinh
         scrollToCurrentStudentQuestion(currentStudentQIndex);
     });
 
@@ -267,7 +266,6 @@
     };
     document.getElementById("backBtn").addEventListener("click", handleBack);
 
-    // Đồng hồ chạy dựa trên mốc thời gian tuyệt đối (targetEndTime) từ Firestore gửi lên
     function startAbsoluteTimer(targetEndTime) {
         if (liveTimerInterval) clearInterval(liveTimerInterval);
 
@@ -317,16 +315,28 @@
 
             const data = docSnap.data();
 
-            // Nếu học sinh đã nộp bài, hiển thị thông báo tạm thời nhưng vẫn cho phép giáo viên thấy trạng thái
-            if (data.isSubmitted === true || data.status === "submitted") {
-                statusText.textContent = "Đang chờ reset / Đã nộp";
+            // KIỂM TRA TRẠNG THÁI HỌC SINH VỪA NỘP BÀI HOẶC ĐÃ RESET LIVE VỀ FALSE
+            if ((data.isStarted === false && data.isSubmitted === false) || data.status === "not_started" || data.isSubmitted === true) {
+                statusText.textContent = "Học sinh đã nộp bài";
                 statusBox.classList.add("success");
                 
-                // Kiểm tra nếu học sinh vừa nộp xong (có thể hiển thị thông báo nhẹ nhàng)
-                if (data.questions && data.questions.length > 0) {
-                    cachedQuestions = data.questions || [];
-                    cachedAnswers = data.allAnswers || {};
+                container.innerHTML = `
+                    <div class="question-card" style="padding: 50px; text-align: center; background: #f0fdf4; border: 2px dashed #22c55e;">
+                        <div class="empty" style="color: #166534; font-size: 16px;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 48px; color: #22c55e; margin-bottom: 16px; display: block;"></i>
+                            <strong>Học sinh ${studentName} đã hoàn thành và nộp bài kiểm tra!</strong>
+                            <p style="margin-top: 8px; color: #15803d; font-size: 14px;">Màn hình sẽ tự động quay lại trang danh sách giám sát sau 5 giây...</p>
+                        </div>
+                    </div>`;
+
+                // Kích hoạt đếm ngược 5 giây để tự động về trang teacher.html
+                if (!isRedirectingToTeacher) {
+                    isRedirectingToTeacher = true;
+                    setTimeout(() => {
+                        window.location.href = "teacher.html";
+                    }, 5000);
                 }
+                return;
             }
 
             if (data.isStarted === false || data.hasStarted === false) {
@@ -350,7 +360,6 @@
                 document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
             }
             
-            // Đồng bộ mốc thời gian tuyệt đối dựa trên targetEndTime từ học sinh gửi lên
             if (data.targetEndTime) {
                 startAbsoluteTimer(data.targetEndTime);
             }
@@ -449,7 +458,6 @@
             gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
             statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
 
-            // QUAN TRỌNG: Chỉ tự động cuộn màn hình giáo viên khi đang ở chế độ "Trực tiếp" (live) và học sinh đổi câu
             if (currentViewMode === 'live' && hasQuestionChanged) {
                 scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
@@ -457,7 +465,6 @@
     }
 
     window.jumpToQuestion = function(index) {
-        // Cho phép giáo viên chọn câu tự do mọi lúc ở chế độ 'free'
         const targetCard = document.getElementById(`question-card-${index}`);
         if (targetCard) {
             targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
