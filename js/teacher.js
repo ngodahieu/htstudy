@@ -2244,9 +2244,10 @@ async function uploadVideo() {
     }
 }
 // ====================================
-//        XEM LIVE CỦA HỌC SINH (BỔ SUNG)
+//        XEM LIVE CỦA HỌC SINH (ĐÃ NÂNG CẤP)
 // ====================================
 let liveUnsubscribe = null;
+let liveTimerInterval = null;
 
 function startTeacherLiveView(studentId, studentName) {
     if (!studentId) {
@@ -2262,12 +2263,12 @@ function startTeacherLiveView(studentId, studentName) {
         liveModal.className = "modal";
         liveModal.style.cssText = "display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;";
         liveModal.innerHTML = `
-            <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 700px; max-width: 95%; max-height: 85vh; display: flex; flex-direction: column;">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
                     <h3 id="liveModalTitle" style="margin: 0;">Đang xem Live: ...</h3>
                     <button type="button" id="closeLiveModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <div id="liveModalBody">
+                <div id="liveModalBody" style="overflow-y: auto; flex: 1; padding-right: 5px;">
                     <div class="empty">Đang kết nối tới phiên làm việc của học sinh...</div>
                 </div>
             </div>
@@ -2277,22 +2278,26 @@ function startTeacherLiveView(studentId, studentName) {
         liveModal.querySelector("#closeLiveModalBtn").addEventListener("click", () => {
             liveModal.style.display = "none";
             if (liveUnsubscribe) {
-                liveUnsubscribe(); // Hủy lắng nghe realtime khi đóng modal
+                liveUnsubscribe(); 
                 liveUnsubscribe = null;
+            }
+            if (liveTimerInterval) {
+                clearInterval(liveTimerInterval);
+                liveTimerInterval = null;
             }
         });
     }
 
+    document.getElementById("liveModalTitleConnectionString") = `Đang xem Live: ${studentName}`;
     document.getElementById("liveModalTitle").textContent = `Đang xem Live: ${studentName}`;
     const liveBody = document.getElementById("liveModalBody");
     liveModal.style.display = "flex";
     liveBody.innerHTML = `<div class="empty">Đang đồng bộ dữ liệu với học sinh...</div>`;
 
-    // Lắng nghe collection hoặc document trạng thái làm bài trực tuyến của học sinh (ví dụ: bảng "studentLiveStatus" hoặc subcollection)
-    // Giả sử học sinh cập nhật trạng thái vào doc: liveStatus / {studentId}
     const liveRef = doc(db, "liveStatus", studentId);
     
-    if (liveUnsubscribe) liveUnsubscribe(); // Hủy kết nối cũ nếu có
+    if (liveUnsubscribe) liveUnsubscribe(); 
+    if (liveTimerInterval) clearInterval(liveTimerInterval);
 
     liveUnsubscribe = onSnapshot(liveRef, (docSnap) => {
         if (!docSnap.exists()) {
@@ -2302,21 +2307,115 @@ function startTeacherLiveView(studentId, studentName) {
 
         const data = docSnap.data();
         const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate().toLocaleTimeString('vi-VN') : "Vừa xong";
+        
+        // Xử lý đếm ngược thời gian còn lại của học sinh
+        let remainingSeconds = data.remainingSeconds || 0;
 
+        // Render giao diện thông tin chung & thanh trạng thái cố định ở trên
         let html = `
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff;">
-                <p style="margin: 0 0 5px 0;"><strong>Bài kiểm tra:</strong> ${escapeHtmlTeacher(data.testTitle || "Không rõ")}</p>
-                <p style="margin: 0 0 5px 0;"><strong>Đang ở câu số:</strong> <span style="color: #d9534f; font-weight: bold; font-size: 1.1rem;">Câu ${data.currentQuestionIndex || 1}</span></p>
-                <p style="margin: 0 0 5px 0;"><strong>Phần hiện tại:</strong> Phần ${data.currentPart || 1}</p>
-                <p style="margin: 0; font-size: 0.85rem; color: #666;"><i class="fa-regular fa-clock"></i> Cập nhật lần cuối: ${updatedAt}</p>
-            </div>
-            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 6px; background: #fff;">
-                <h4 style="margin-top: 0; color: #333;">Nội dung học sinh đang nhìn thấy / thao tác:</h4>
-                <p><strong>Câu hỏi:</strong> ${formatChemistryText(data.currentQuestionContent || "Chưa có nội dung")}</p>
-                <p><strong>Đáp án học sinh vừa chọn/nhập:</strong> <span style="color: #28a745; font-weight: bold;">${escapeHtmlTeacher(JSON.stringify(data.currentAnswer) || "Chưa chọn")}</span></p>
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="margin: 0 0 4px 0;"><strong>Bài kiểm tra:</strong> ${escapeHtmlTeacher(data.testTitle || "Không rõ")}</p>
+                    <p style="margin: 0; font-size: 0.85rem; color: #666;"><i class="fa-regular fa-clock"></i> Cập nhật: ${updatedAt}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.85rem; color: #555;">Thời gian còn lại:</span><br>
+                    <span id="liveCountdownTimer" style="font-size: 1.2rem; font-weight: bold; color: #d9534f;">--:--</span>
+                </div>
             </div>
         `;
+
+        // Lịch sử hoặc danh sách câu hỏi học sinh đã duyệt qua để giáo viên có thể CUỘT (SCROLL) xem lại các câu trước
+        html += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
+        
+        const currentQ = data.currentQuestion || {};
+        const qIndex = data.currentQuestionIndex || 1;
+        const part = data.currentPart || 1;
+        const studentAns = data.currentAnswer;
+
+        html += `
+            <div style="background: #fff; border: 1px solid #dcdcdc; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="background: #007bff; color: #white; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: bold; color: white;">Câu ${qIndex} (Phần ${part})</span>
+                </div>
+                <p style="font-weight: 500; font-size: 1.05rem; margin-bottom: 10px;">${formatChemistryText(currentQ.question || "Đang tải nội dung câu hỏi...")}</p>
+        `;
+
+        // Hiển thị ảnh câu hỏi nếu có
+        if (currentQ.image) {
+            html += `<div style="margin: 10px 0;"><img src="${currentQ.image}" style="max-width: 100%; max-height: 220px; border-radius: 6px; border: 1px solid #ddd;"></div>`;
+        }
+
+        // Hiển thị chi tiết đáp án dựa theo từng Phần (Part 1, Part 2, Part 3)
+        if (part === 1) {
+            const options = currentQ.options || [];
+            html += `<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">`;
+            options.forEach((opt, optIdx) => {
+                const optLetter = String.fromCharCode(65 + optIdx);
+                const isSelected = (String(studentAns).toUpperCase() === optLetter) || (Number(studentAns) === optIdx);
+                
+                let optStyle = "padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa;";
+                if (isSelected) {
+                    optStyle = "padding: 8px 12px; border: 1px solid #28a745; border-radius: 6px; background: #e8f5e9; font-weight: bold; color: #2e7d32;";
+                }
+
+                html += `<div style="${optStyle}">
+                    <b>${optLetter}.</b> ${formatChemistryText(opt)}
+                    ${isSelected ? '<span style="float: right; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> Học sinh đang chọn</span>' : ''}
+                </div>`;
+            });
+            html += `</div>`;
+        } else if (part === 2) {
+            const statements = currentQ.statements || [];
+            const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
+            html += `<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">`;
+            statements.forEach((st, stIdx) => {
+                const stLetter = String.fromCharCode(97 + stIdx);
+                const choice = studentAnsArr[stIdx];
+                let choiceText = choice !== undefined ? (choice ? "Đúng" : "Sai") : "Chưa chọn";
+
+                html += `<div style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fafafa; display: flex; justify-content: space-between; align-items: center;">
+                    <span><b>${stLetter})</b> ${formatChemistryText(st)}</span>
+                    <span style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold;">${choiceText}</span>
+                </div>`;
+            });
+            html += `</div>`;
+        } else if (part === 3) {
+            html += `
+                <div style="margin-top: 10px; padding: 10px; background: #f1f5f9; border-radius: 6px;">
+                    <span>Học sinh điền đáp án: </span>
+                    <b style="color: #007bff; font-size: 1.1rem;">${escapeHtmlTeacher(String(studentAns || "Chưa nhập"))}</b>
+                </div>
+            `;
+        }
+
+        html += `</div></div>`;
         liveBody.innerHTML = html;
+
+        // Xử lý bộ đếm thời gian thực tế trên giao diện giáo viên
+        const timerEl = document.getElementById("liveCountdownTimer");
+        if (timerEl && remainingSeconds > 0) {
+            let currentSec = remainingSeconds;
+            liveTimerInterval = setInterval(() => {
+                if (currentSec <= 0) {
+                    clearInterval(liveTimerInterval);
+                    timerEl.textContent = "Hết giờ";
+                    return;
+                }
+                currentSec--;
+                const m = Math.floor(currentSec / 60);
+                const s = currentSec % 60;
+                timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }, 1000);
+
+            // Hiển thị ngay lập tức giá trị ban đầu
+            const m = Math.floor(currentSec / 60);
+            const s = currentSec % 60;
+            timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        } else if (timerEl) {
+            timerEl.textContent = "00:00";
+        }
+
     }, (error) => {
         console.error("Lỗi live view:", error);
         liveBody.innerHTML = `<div class="empty">Không thể kết nối trực tiếp với học sinh này.</div>`;
