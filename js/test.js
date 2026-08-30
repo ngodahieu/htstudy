@@ -1749,6 +1749,7 @@ async function finishTest() {
         const resultQuestions = questions.map((question, index) => {
             return {
                 question: question.question || "",
+                image: question.image || "",
                 options: question.options || [],
                 statements: question.statements || [],
                 correctAnswer: question.correctAnswer ?? question.answer ?? question.answers ?? "",
