@@ -1810,10 +1810,7 @@ async function finishTest() {
             resultData
         );
 
-        // 1. Hiển thị thông báo nộp bài thành công
-        alert("Nộp bài thành công! Điểm của bạn: " + scoreData.score + "/" + (questions.length * 0.5) + ". Hệ thống sẽ quay lại trang trước sau 5 giây.");
-
-        // 2. Reset trạng thái live trên Firestore thành "chưa làm bài" sau khi nộp để màn hình giáo viên trả về trạng thái ban đầu
+        // Reset trạng thái live trên Firestore thành "chưa làm bài" sau khi nộp để màn hình giáo viên trả về trạng thái ban đầu
         await setDoc(doc(db, "liveStatus", currentUser.uid), {
             studentId: currentUser.uid,
             studentName: currentUser.displayName || currentUser.email || "Học sinh",
@@ -1827,10 +1824,8 @@ async function finishTest() {
 
         clearTestStorage();
 
-        // 3. Sau 5 giây tự động quay lại trang trước (hoặc trang khóa học)
-        setTimeout(() => {
-            window.location.href = currentCourseId ? `course_detail.html?id=${currentCourseId}` : "index.html";
-        }, 5000);
+        // Ngay lập tức chuyển về trang index.html không cần chờ đợi hay thông báo dài dòng
+        window.location.href = "index.html";
 
     } catch (error) {
         console.error("Lỗi nộp bài:", error);
