@@ -1954,3 +1954,17 @@ body {
     color: #ffffff;
     box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
 }
+/*==================================================
+    DANH SÁCH CÂU HỎI CUỘN LIÊN TỤC
+==================================================*/
+.all-questions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Khoảng cách giữa các thẻ câu hỏi */
+}
+
+/* Thêm hiệu ứng nhận diện câu hỏi đang được cuộn tới (nếu cần) */
+.question-card.highlighted {
+    border-color: #2563eb;
+    box-shadow: 0 10px 35px rgba(37, 99, 235, 0.12);
+}
