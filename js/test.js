@@ -15,6 +15,7 @@ import {
     doc,
     getDoc,
     addDoc,
+    setDoc,
     collection,
     serverTimestamp
 }
@@ -620,6 +621,8 @@ submitted =
 
         startTimer();
 
+        // Đồng bộ trạng thái live ngay khi load đề xong
+        syncLiveStatus();
 
         hideLoading();
 
@@ -772,6 +775,8 @@ function renderQuestionGrid() {
 
         renderQuestion();
 
+        syncLiveStatus();
+
     }
 );
 
@@ -909,6 +914,7 @@ function renderAnswers(question) {
                 answers[currentQuestionIndex] = letter;
                 saveAnswers();
                 renderQuestion();
+                syncLiveStatus();
             });
             answerContainer.appendChild(wrapper);
         });
@@ -954,6 +960,7 @@ function renderAnswers(question) {
 
                     saveAnswers();
                     renderQuestion();
+                    syncLiveStatus();
                 });
             });
             answerContainer.appendChild(row);
@@ -1030,6 +1037,7 @@ function renderAnswers(question) {
 
                 saveAnswers();
                 renderQuestion();
+                syncLiveStatus();
             });
         });
 
@@ -1040,6 +1048,7 @@ function renderAnswers(question) {
                 delete answers[currentQuestionIndex];
                 saveAnswers();
                 renderQuestion();
+                syncLiveStatus();
             });
         }
 
@@ -1091,6 +1100,8 @@ textarea.addEventListener(
 
 
         updateQuestionGrid();
+
+        syncLiveStatus();
 
     }
 );
@@ -1151,6 +1162,8 @@ renderQuestion();
 
 scrollToQuestion();
 
+syncLiveStatus();
+
             }
 
         }
@@ -1180,6 +1193,8 @@ saveCurrentQuestion();
 renderQuestion();
 
 scrollToQuestion();
+
+syncLiveStatus();
 
             }
 
@@ -1997,80 +2012,39 @@ function showError(msg) {
         testError.textContent = msg;
     }
 }
-// Hàm tự động cập nhật trạng thái làm bài của học sinh lên Firestore
-function autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition) {
-    const liveStatusRef = db.collection('liveStatus').doc(studentId);
-    
-    // Dữ liệu tự động đẩy lên ngầm không cần học sinh xác nhận
-    liveStatusRef.set({
-        examId: examId,
-        currentQuestion: currentQuestion,
-        answers: answers,
-        scrollPosition: scrollPosition,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-        status: "doing" // Trạng thái đang làm bài
-    }, { merge: true })
-    .then(() => {
-        // Đồng bộ ngầm thành công, không hiển thị thông báo gì cho học sinh
-    })
-    .catch((error) => {
-        console.error("Lỗi đồng bộ live: ", error);
-    });
-}
 
-// Lắng nghe sự kiện học sinh chọn đáp án hoặc cuộn trang để tự động gửi ngầm
-document.addEventListener('change', (e) => {
-    if (e.target.classList.contains('answer-input')) {
-        // Thu thập dữ liệu hiện tại và gọi hàm đồng bộ
-        let studentId = getCurrentStudentId(); // Hàm lấy ID học sinh đang đăng nhập
-        let examId = getCurrentExamId();       // Hàm lấy ID đề thi
-        let currentQuestion = getActiveQuestionIndex();
-        let answers = getAllCurrentAnswers();
-        let scrollPosition = window.scrollY;
+/*==================================================
+            ĐỒNG BỘ TRẠNG THÁI LIVE (SYNC LIVE STATUS)
+==================================================*/
+async function syncLiveStatus() {
+    if (!currentUser || !currentTestId || submitted) return;
 
-        autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition);
-    }
-});
-
-// Hoặc thiết lập cập nhật định kỳ mỗi 5 giây để đảm bảo thời gian làm bài luôn mới nhất
-setInterval(() => {
-    if (isExamining()) { // Kiểm tra xem học sinh có đang trong phòng thi không
-        let studentId = getCurrentStudentId();
-        let examId = getCurrentExamId();
-        let currentQuestion = getActiveQuestionIndex();
-        let answers = getAllCurrentAnswers();
-        let scrollPosition = window.scrollY;
-
-        autoSyncLiveStatus(studentId, examId, currentQuestion, answers, scrollPosition);
-    }
-}, 5000);
-function submitExam(studentId) {
-    const liveStatusRef = db.collection('liveStatus').doc(studentId);
-    
-    liveStatusRef.update({
-        status: "submitted",
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        // Tiến hành nộp bài thành công và chuyển trang
-        window.location.href = "result.html";
-    });
-}
-// Gọi hàm này mỗi khi học sinh chuyển câu hỏi (lướt trang) hoặc chọn đáp án
-async function syncStudentLiveProgress(studentId, testId, testTitle, currentPart, questionIndex, questionContent, currentAnswer) {
     try {
-        await setDoc(doc(db, "liveStatus", studentId), {
-            testId: testId,
-            testTitle: testTitle,
-            currentPart: currentPart,
-            currentQuestionIndex: questionIndex,
-            currentQuestionContent: questionContent,
-            currentAnswer: currentAnswer,
+        const currentQ = questions[currentQuestionIndex] || {};
+        
+        let currentAns = null;
+        if (answers[currentQuestionIndex] !== undefined) {
+            currentAns = answers[currentQuestionIndex];
+        }
+
+        const liveData = {
+            studentId: currentUser.uid,
+            studentName: currentUser.displayName || currentUser.email || "Học sinh",
+            testId: currentTestId,
+            testTitle: currentTest?.title || "Bài kiểm tra",
+            currentQuestionIndex: currentQuestionIndex + 1,
+            currentPart: currentQ.part || 1,
+            currentQuestionContent: currentQ.question || currentQ.content || currentQ.text || "",
+            currentAnswer: currentAns,
             updatedAt: serverTimestamp()
-        }, { merge: true });
-    } catch (e) {
-        console.error("Lỗi đồng bộ live:", e);
+        };
+
+        await setDoc(doc(db, "liveStatus", currentUser.uid), liveData);
+    } catch (error) {
+        console.error("Lỗi đồng bộ live status:", error);
     }
 }
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
