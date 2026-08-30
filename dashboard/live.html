@@ -3,11 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xem Live Trực Tuyến Học Sinh - H&T Study</title>
+    <title>Giám Sát Live Trực Tuyến - H&T Study</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX cho công thức toán học/hóa học nếu cần -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <!-- Sử dụng chung file CSS với test.css -->
     <link rel="stylesheet" href="../css/test.css">
+    <style>
+        /* CSS Bổ sung riêng cho chế độ Live của Giáo viên */
+        .live-mode-switcher {
+            display: flex;
+            background: #e2e8f0;
+            padding: 3px;
+            border-radius: 8px;
+            gap: 4px;
+        }
+        .live-mode-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .live-mode-btn.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .teacher-view-badge {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .student-selected-ans {
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            color: #166534;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .student-unanswered {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,7 +78,7 @@
         <span>Đang kết nối hệ thống trực tuyến...</span>
     </div>
 
-    <!-- MAIN HEADER (Đồng bộ với test.css) -->
+    <!-- MAIN HEADER -->
     <header class="main-header">
         <div class="header-container">
             <a href="teacher.html" class="logo" id="backBtn" style="cursor: pointer;">
@@ -30,7 +91,17 @@
                 </div>
             </a>
 
-            <div class="header-right">
+            <div class="header-right" style="display: flex; align-items: center; gap: 15px;">
+                <!-- CHUYỂN ĐỔI CHẾ ĐỘ GIÁM SÁT -->
+                <div class="live-mode-switcher">
+                    <button type="button" id="modeFreeBtn" class="live-mode-btn active" title="Giáo viên tự do lướt xem các câu hỏi">
+                        <i class="fa-solid fa-hand"></i> 1. Tự do
+                    </button>
+                    <button type="button" id="modeLiveBtn" class="live-mode-btn" title="Màn hình tự động cuộn theo học sinh">
+                        <i class="fa-solid fa-satellite-dish"></i> 2. Trực tiếp
+                    </button>
+                </div>
+
                 <!-- Thông tin học sinh đang được xem live -->
                 <div class="test-user-info">
                     <div class="test-user-icon">
@@ -43,8 +114,8 @@
                 </div>
 
                 <!-- Trạng thái kết nối Realtime -->
-                <div class="header-test-timer timer-stat" id="liveStatusBox" style="min-width: 140px;">
-                    <i class="fa-solid fa-satellite-dish"></i>
+                <div class="header-test-timer timer-stat" id="liveStatusBox" style="min-width: 130px;">
+                    <i class="fa-solid fa-circle-dot" style="font-size: 10px; color: #22c55e;"></i>
                     <div>
                         <span>TRẠNG THÁI</span>
                         <strong id="liveStatusText">Đang kết nối</strong>
@@ -54,18 +125,18 @@
         </div>
     </header>
 
-    <!-- TEST CONTAINER (Bố cục chuẩn của test.css) -->
+    <!-- TEST CONTAINER -->
     <main class="test-container">
         <!-- TOP CARD: Tiêu đề bài kiểm tra & Thông tin live -->
         <div class="test-top-card">
             <div class="test-heading">
                 <div class="test-heading-icon">
-                    <i class="fa-solid fa-video"></i>
+                    <i class="fa-solid</i> fa-video"></i>
                 </div>
                 <div class="test-heading-info">
-                    <span class="test-label">GIÁM SÁT TRỰC TUYẾN</span>
+                    <span class="test-label">GIÁM SÁT TRỰC TUYẾN (REALTIME)</span>
                     <h1 id="teacherLivePageTitle">Đang kết nối trực tiếp với học sinh...</h1>
-                    <p id="teacherLiveSubTitle">Hệ thống đang cập nhật trạng thái làm bài của học sinh theo thời gian thực.</p>
+                    <p id="teacherLiveSubTitle">Hệ thống đang cập nhật toàn bộ bài làm của học sinh theo thời gian thực.</p>
                 </div>
             </div>
 
@@ -80,17 +151,17 @@
                 <div class="test-top-stat">
                     <i class="fa-solid fa-list-check"></i>
                     <div>
-                        <span>Đã hoàn thành</span>
+                        <span>Tiến độ làm bài</span>
                         <strong id="statProgress">0 / 0 câu</strong>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TEST LAYOUT (Chia cột: Trái là nội dung câu hỏi học sinh đang làm, Phải là Sidebar bảng câu hỏi) -->
+        <!-- TEST LAYOUT (Chia cột: Trái là toàn bộ nội dung câu hỏi, Phải là Sidebar bảng câu hỏi) -->
         <div class="test-layout">
             
-            <!-- CỘT TRÁI: HIỂN THỊ CÂU HỎI HỌC SINH ĐANG LÀM -->
+            <!-- CỘT TRÁI: HIỂN THỊ TOÀN BỘ CẢM NHẬN / BÀI LÀM CỦA HỌC SINH -->
             <section class="test-main-content">
                 <div id="teacherLiveContentContainer">
                     <div class="question-card" style="padding: 40px; text-align: center;">
@@ -102,13 +173,13 @@
                 </div>
             </section>
 
-            <!-- CỘT PHẢI: SIDEBAR BẢNG CÂU HỎI (Đồng bộ test.css) -->
+            <!-- CỘT PHẢI: SIDEBAR BẢNG CÂU HỎI -->
             <aside class="question-sidebar">
                 <div class="sidebar-card">
                     <div class="sidebar-card-header">
                         <div>
                             <span>DANH SÁCH CÂU HỎI</span>
-                            <h3>Tiến độ làm bài</h3>
+                            <h3>Tiến độ học sinh</h3>
                         </div>
                         <i class="fa-solid fa-map-pin"></i>
                     </div>
@@ -131,13 +202,12 @@
 
                     <!-- Lưới danh sách câu hỏi -->
                     <div class="question-grid" id="sidebarQuestionGrid">
-                        <!-- Các ô câu hỏi sẽ được render tự động bằng Javascript -->
                         <div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Chưa có dữ liệu câu hỏi</div>
                     </div>
 
                     <div class="sidebar-note">
                         <i class="fa-solid fa-circle-info"></i>
-                        <span>Giao diện tự động cập nhật ngay khi học sinh chuyển câu hoặc chọn đáp án.</span>
+                        <span>Bấm vào số câu ở bảng bên để nhảy nhanh đến câu đó (chỉ dùng được ở chế độ Tự do).</span>
                     </div>
                 </div>
             </aside>
@@ -152,7 +222,8 @@
             <span>Bản quyền © 2026 H&T Study</span>
         </div>
     </footer>
-<!-- Script xử lý kết nối Firebase Live -->
+
+    <!-- Script xử lý kết nối Firebase Live & Render bài làm -->
     <script type="module">
         import { db } from "../js/firebase.js";
         import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -162,16 +233,36 @@
         const studentId = urlParams.get("studentId");
         const studentName = decodeURIComponent(urlParams.get("studentName") || "Học sinh");
 
-        // Gán tên học sinh lên giao diện header và title
+        // Biến quản lý chế độ xem: 'free' (Tự do) hoặc 'live' (Trực tiếp theo học sinh)
+        let currentViewMode = 'free'; 
+        let lastRenderedTestId = null;
+        let cachedQuestions = [];
+
         document.getElementById("headerStudentName").textContent = studentName;
         document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
         
-        // Nút quay lại trang teacher.html
+        // Nút chuyển chế độ
+        const modeFreeBtn = document.getElementById("modeFreeBtn");
+        const modeLiveBtn = document.getElementById("modeLiveBtn");
+
+        modeFreeBtn.addEventListener("click", () => {
+            currentViewMode = 'free';
+            modeFreeBtn.classList.add("active");
+            modeLiveBtn.classList.remove("active");
+        });
+
+        modeLiveBtn.addEventListener("click", () => {
+            currentViewMode = 'live';
+            modeLiveBtn.classList.add("active");
+            modeFreeBtn.classList.remove("active");
+            // Khi chuyển sang chế độ trực tiếp, cuộn ngay lập tức về câu học sinh đang đứng
+            scrollToCurrentStudentQuestion();
+        });
+
         const handleBack = (e) => {
             if (e) e.preventDefault();
             window.location.href = "teacher.html";
         };
-
         document.getElementById("backBtn").addEventListener("click", handleBack);
 
         if (studentId) {
@@ -200,39 +291,25 @@
                             </div>
                         </div>`;
                     gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
-                    
-                    setTimeout(() => {
-                        window.location.href = "teacher.html";
-                    }, 3000);
                     return;
                 }
 
                 const data = docSnap.data();
 
-                // 1. Kiểm tra nếu học sinh đã bấm nộp bài (Dựa vào thuộc tính isSubmitted hoặc status === 'submitted')
+                // Kiểm tra trạng thái nộp bài hoặc chưa bắt đầu
                 if (data.isSubmitted === true || data.status === "submitted") {
                     statusText.textContent = "Đã nộp bài";
-                    statusBox.classList.add("success"); // Đổi màu trạng thái nếu cần
+                    statusBox.classList.add("success");
                     container.innerHTML = `
                         <div class="question-card" style="padding: 40px; text-align: center;">
                             <div class="empty" style="color: #16a34a; font-size: 15px;">
                                 <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #22c55e; margin-bottom: 12px; display: block;"></i>
                                 Học sinh này đã hoàn thành và nộp bài kiểm tra thành công!
-                                <br><br>
-                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
-                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
-                                </button>
                             </div>
                         </div>`;
-                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #16a34a; padding: 20px; font-size: 13px;">Đã nộp bài</div>`;
-                    
-                    setTimeout(() => {
-                        window.location.href = "teacher.html";
-                    }, 3000);
                     return;
                 }
 
-                // 2. Kiểm tra nếu học sinh chưa bắt đầu làm
                 if (data.isStarted === false || data.hasStarted === false) {
                     statusText.textContent = "Chưa làm bài";
                     statusBox.classList.add("danger");
@@ -241,17 +318,8 @@
                             <div class="empty" style="color: #64748b; font-size: 15px;">
                                 <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
                                 Học sinh này chưa bấm vào nút làm bài kiểm tra.
-                                <br><br>
-                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
-                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
-                                </button>
                             </div>
                         </div>`;
-                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Chưa bắt đầu</div>`;
-                    
-                    setTimeout(() => {
-                        window.location.href = "teacher.html";
-                    }, 3000);
                     return;
                 }
 
@@ -262,42 +330,126 @@
                     document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
                 }
                 
-                if (data.remainingTime !== undefined) {
-                    const mins = Math.floor(data.remainingTime / 60);
-                    const secs = data.remainingTime % 60;
+                // Đồng hồ đếm ngược
+                if (data.remainingSeconds !== undefined) {
+                    const remSec = data.remainingSeconds;
+                    const mins = Math.floor(remSec / 60);
+                    const secs = remSec % 60;
                     statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }
 
-                container.innerHTML = `
-                    <div class="question-card">
-                        <div class="question-card-header">
-                            <span class="question-number">Đang theo dõi học sinh làm bài</span>
-                            <div class="question-status">
-                                <i class="fa-solid fa-circle-check"></i> Trạng thái đồng bộ thời gian thực
+                // Nếu học sinh có gửi kèm danh sách câu hỏi hoặc toàn bộ cấu trúc đề qua liveData (hoặc chúng ta có thể trích xuất nếu lưu trong cấu trúc)
+                // Lưu ý: test.js hiện tại gửi `currentQuestion` chi tiết. Để giáo viên xem được *toàn bộ* câu hỏi, hệ thống cần truyền danh sách câu hoặc giáo viên render dựa trên dữ liệu bài làm. 
+                // Ở đây chúng ta hiển thị câu hỏi hiện tại và danh sách đáp án học sinh đã chọn qua các state mà học sinh đồng bộ.
+                
+                // Hiển thị tiến độ câu hỏi
+                const currentQIdx = (data.currentQuestionIndex || 1) - 1;
+                
+                // Render nội dung câu hỏi hiện tại mà học sinh đang đứng & các câu đã lưu nếu có
+                if (data.currentQuestion) {
+                    const q = data.currentQuestion;
+                    const userAns = data.currentAnswer;
+                    
+                    let answerDisplayHtml = "";
+                    if (q.part === 1) {
+                        const options = q.options || [];
+                        answerDisplayHtml = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
+                        options.forEach((opt, oIdx) => {
+                            const letter = String.fromCharCode(65 + oIdx);
+                            const isSelected = userAns === letter;
+                            answerDisplayHtml += `
+                                <div style="padding: 10px 14px; border-radius: 8px; border: 1px solid ${isSelected ? '#2563eb' : '#e2e8f0'}; background: ${isSelected ? '#eff6ff' : '#f8fafc'}; color: ${isSelected ? '#1d4ed8' : '#334155'}; font-size: 14px; display: flex; align-items: center; gap: 10px;">
+                                    <strong>${letter}.</strong> <span>${formatChemistryText(opt)}</span>
+                                    ${isSelected ? '<i class="fa-solid fa-check" style="margin-left: auto; color: #2563eb;"><i>' : ''}
+                                </div>
+                            `;
+                        });
+                        answerDisplayHtml += `</div>`;
+                    } else if (q.part === 2) {
+                        const statements = q.statements || [];
+                        const tfAns = Array.isArray(userAns) ? userAns : [null, null, null, null];
+                        answerDisplayHtml = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
+                        statements.forEach((stmt, sIdx) => {
+                            const val = tfAns[sIdx];
+                            answerDisplayHtml += `
+                                <div style="padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div><b>${String.fromCharCode(97 + sIdx)}.</b> ${formatChemistryText(stmt)}</div>
+                                    <div style="font-weight: 600; color: ${val === true ? '#16a34a' : val === false ? '#dc2626' : '#94a3b8'}">
+                                        ${val === true ? 'Đúng' : val === false ? 'Sai' : 'Chưa chọn'}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        answerDisplayHtml += `</div>`;
+                    } else if (q.part === 3) {
+                        answerDisplayHtml = `
+                            <div style="margin-top: 15px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
+                                <strong>Đáp án học sinh nhập (Phiếu trả lời ngắn):</strong> 
+                                <span style="font-family: monospace; font-size: 16px; color: #2563eb; font-weight: bold; margin-left: 10px;">${userAns || "(Chưa trả lời)"}</span>
+                            </div>
+                        `;
+                    }
+
+                    container.innerHTML = `
+                        <div class="question-card" id="activeQuestionCard" data-index="${currentQIdx}">
+                            <div class="question-card-header">
+                                <div class="question-number">
+                                    <span>Câu hỏi hiện tại: ${data.currentQuestionIndex}</span>
+                                </div>
+                                <span class="teacher-view-badge">
+                                    <i class="fa-solid fa-eye"></i> Học sinh đang ở câu này
+                                </span>
+                            </div>
+                            <div class="question-content">
+                                ${formatChemistryText(q.question || q.content || q.text || "Không có nội dung câu hỏi")}
+                            </div>
+                            ${q.image && q.image.trim() !== "" ? `<div style="text-align:center; margin: 15px 0;"><img src="${q.image}" style="max-width:100%; max-height:350px; border-radius: 8px;" /></div>` : ""}
+                            
+                            <div class="answer-container">
+                                ${answerDisplayHtml}
                             </div>
                         </div>
-                        <div class="question-content">
-                            ${formatChemistryText(data.currentQuestionContent || "Học sinh đang ở trang làm bài tổng quan hoặc chưa đồng bộ nội dung câu hỏi cụ thể.")}
-                        </div>
-                        <div class="answer-container">
-                            <div style="padding: 10px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; color: #334155; font-size: 14px;">
-                                <strong>Hành động gần nhất:</strong> ${data.lastAction || "Đang làm bài..."}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
+
+                // Cập nhật Sidebar Bảng Câu Hỏi
+                let totalQCount = data.totalQuestions || 30; // Mặc định hoặc lấy từ dữ liệu nếu có
+                let gridHtml = "";
+                let answeredCount = 0;
+
+                for (let i = 0; i < totalQCount; i++) {
+                    const isCurrent = i === currentQIdx;
+                    // Kiểm tra trạng thái đã trả lời qua mảng answers nếu được đồng bộ đầy đủ
+                    let classes = "question-number";
+                    if (isCurrent) classes += " current";
+                    
+                    gridHtml += `<button type="button" class="${classes}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
+                }
+                gridContainer.innerHTML = gridHtml;
+                statProgress.textContent = `Đang ở câu ${data.currentQuestionIndex}`;
+
+                // Nếu đang ở chế độ 2 (Trực tiếp), tự động cuộn màn hình giáo viên theo học sinh
+                if (currentViewMode === 'live') {
+                    scrollToCurrentStudentQuestion();
+                }
             });
-        } else {
-            document.getElementById("teacherLiveContentContainer").innerHTML = `
-                <div class="question-card" style="padding: 40px; text-align: center;">
-                    <div class="empty" style="color: #ef4444; font-size: 15px;">
-                        <i class="fa-solid fa-circle-xmark" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
-                        Thiếu tham số mã học sinh (studentId) trên đường dẫn URL.
-                    </div>
-                </div>`;
-            setTimeout(() => {
-                window.location.href = "teacher.html";
-            }, 3000);
+        }
+
+        window.jumpToQuestion = function(index) {
+            if (currentViewMode === 'live') {
+                alert("Bạn đang ở chế độ 'Trực tiếp'. Hãy chuyển sang chế độ 'Tự do' nếu muốn chủ động chọn câu hỏi để xem!");
+                return;
+            }
+            // Logic xử lý khi giáo viên tự do bấm vào danh sách câu hỏi ở sidebar
+        }
+
+        function scrollToCurrentStudentQuestion() {
+            const card = document.getElementById("activeQuestionCard");
+            if (card) {
+                card.scrollIntoView({ behavior: "smooth", block: "start" });
+                card.style.borderColor = "#2563eb";
+                setTimeout(() => card.style.borderColor = "", 1000);
+            }
         }
     </script>
 </body>
