@@ -1955,23 +1955,20 @@ async function syncLiveStatus() {
     try {
         const currentQ = questions[currentQuestionIndex] || {};
         
-        let currentAns = null;
-        if (answers[currentQuestionIndex] !== undefined) {
-            currentAns = answers[currentQuestionIndex];
-        }
-
         const liveData = {
             studentId: currentUser.uid,
             studentName: currentUser.displayName || currentUser.email || "Học sinh",
             testId: currentTestId,
             testTitle: currentTest?.title || "Bài kiểm tra",
-            isStarted: true,     // Đánh dấu học sinh đã bấm vào làm bài
-            hasStarted: true,    // Tương thích với các điều kiện kiểm tra
-            isSubmitted: false,  // Đang làm bài nên chưa nộp
+            isStarted: true,
+            hasStarted: true,
+            isSubmitted: false,
             currentQuestionIndex: currentQuestionIndex + 1,
             currentPart: currentQ.part || 1,
             currentQuestion: currentQ, 
-            currentAnswer: currentAns,
+            currentAnswer: answers[currentQuestionIndex] !== undefined ? answers[currentQuestionIndex] : null,
+            allAnswers: answers, // Gửi toàn bộ đáp án học sinh đã làm để giáo viên xem tổng quan
+            questions: questions, // Gửi toàn bộ mảng câu hỏi để trang giáo viên hiển thị dạng cuộn 1 hàng dọc
             remainingSeconds: typeof remainingSeconds !== 'undefined' ? remainingSeconds : 0, 
             updatedAt: serverTimestamp()
         };
