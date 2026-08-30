@@ -2710,26 +2710,21 @@ async function openSingleResultDetailModal(resultId) {
 
                     html += `<div style="${stStyle}">
                         <b>${stLetter})</b> ${formatChemistryText(st)}<br>
-                        <small>Học sinh chọn: <b>${choiceText}</b> | Đáp án chuẩn: <b>${correctText}</b></small>
+                        <small>Học sinh chọn: <b>${choiceText}</b> | Đáp án đúng: <b>${correctText}</b></small>
                     </div>`;
                 });
                 html += `</div>`;
             } else if (q.part === 3) {
-                let correctAns = String(q.answer || "").trim();
-                let studentChoice = String(studentAns || "").trim();
-                let isMatch = normalizeTextAnswer(studentChoice) === normalizeTextAnswer(correctAns);
+                const studentText = normalizeTextAnswer(studentAns);
+                const correctText = normalizeTextAnswer(q.answer);
+                const isMatch = studentText === correctText;
 
-                let p3Style = "padding: 8px; border-radius: 4px;";
-                if (isMatch) {
-                    p3Style += " background-color: #d4edda; color: #155724;";
-                } else {
-                    p3Style += " background-color: #f8d7da; color: #721c24;";
-                }
-
-                html += `<div style="${p3Style}">
-                    Học sinh trả lời: <b>${escapeHtmlTeacher(studentChoice || "Chưa trả lời")}</b><br>
-                    Đáp án đúng: <b>${escapeHtmlTeacher(correctAns)}</b>
-                </div>`;
+                html += `
+                    <div style="margin-left: 10px; padding: 8px; border-radius: 4px; background: ${isMatch ? '#d4edda' : '#f8d7da'}; color: ${isMatch ? '#155724' : '#721c24'};">
+                        <span>Học sinh trả lời: <b>${escapeHtmlTeacher(String(studentAns || "Chưa nhập"))}</b></span><br>
+                        <span>Đáp án đúng: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b></span>
+                    </div>
+                `;
             }
 
             html += `</div>`;
@@ -2744,26 +2739,41 @@ async function openSingleResultDetailModal(resultId) {
     }
 }
 
+// Đóng modal chi tiết kết quả bài làm đơn lẻ
 if (closeSingleResultModal) {
     closeSingleResultModal.addEventListener("click", () => {
         if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
     });
 }
 
+// Đóng modal danh sách kết quả tổng quan của học sinh
 if (closeStudentTestResultBtn) {
     closeStudentTestResultBtn.addEventListener("click", () => {
         if (studentTestResultModal) studentTestResultModal.style.display = "none";
     });
 }
 
+// Nút quay lại trong modal kết quả kiểm tra của học sinh
 if (backTestResultBtn) {
     backTestResultBtn.addEventListener("click", () => {
         if (testResultNavStep === 2) {
             openStudentTestChapters(currentStudentCourseId);
+            backTestResultBtn.style.display = "none";
         } else if (testResultNavStep === 3) {
             openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
+            testResultNavStep = 2;
         } else if (testResultNavStep === 4) {
             openStudentTestsList(currentStudentCourseId, selectedChapterForTest.id, selectedLessonForTest.id);
+            testResultNavStep = 3;
         }
     });
 }
+
+window.addEventListener("click", (event) => {
+    if (event.target === studentTestResultModal) {
+        studentTestResultModal.style.display = "none";
+    }
+    if (event.target === studentSingleResultDetailModal) {
+        studentSingleResultDetailModal.style.display = "none";
+    }
+});
