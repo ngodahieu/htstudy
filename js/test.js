@@ -860,7 +860,18 @@ function renderQuestion() {
 
     }
 
+const imageContainer = document.getElementById("questionImageContainer");
+    const questionImage = document.getElementById("questionImage");
 
+    if (imageContainer && questionImage) {
+        if (question.image && question.image.trim() !== "") {
+            questionImage.src = question.image;
+            imageContainer.style.display = "block";
+        } else {
+            questionImage.src = "";
+            imageContainer.style.display = "none";
+        }
+    }
 renderAnswers(
     question
 );
