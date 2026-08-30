@@ -224,133 +224,125 @@
     </footer>
 
     <!-- Script xử lý kết nối Firebase Live & Render bài làm -->
-    <script type="module">
-        import { db } from "../js/firebase.js";
-        import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-        import { formatChemistryText } from "../js/chemistry.js";
+<script type="module">
+    import { db } from "../js/firebase.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { formatChemistryText } from "../js/chemistry.js";
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const studentId = urlParams.get("studentId");
-        const studentName = decodeURIComponent(urlParams.get("studentName") || "Học sinh");
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get("studentId");
+    const studentName = decodeURIComponent(urlParams.get("studentName") || "Học sinh");
 
-        // Biến quản lý chế độ xem: 'free' (Tự do) hoặc 'live' (Trực tiếp theo học sinh)
-        let currentViewMode = 'free'; 
-        let lastRenderedTestId = null;
-        let cachedQuestions = [];
+    let currentViewMode = 'free'; // 'free' (Tự do) hoặc 'live' (Trực tiếp theo học sinh)
+    let cachedQuestions = [];
+    let cachedAnswers = {};
+    let currentStudentQIndex = 0;
 
-        document.getElementById("headerStudentName").textContent = studentName;
-        document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
+    document.getElementById("headerStudentName").textContent = studentName;
+    document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
+    
+    const modeFreeBtn = document.getElementById("modeFreeBtn");
+    const modeLiveBtn = document.getElementById("modeLiveBtn");
+
+    modeFreeBtn.addEventListener("click", () => {
+        currentViewMode = 'free';
+        modeFreeBtn.classList.add("active");
+        modeLiveBtn.classList.remove("active");
+    });
+
+    modeLiveBtn.addEventListener("click", () => {
+        currentViewMode = 'live';
+        modeLiveBtn.classList.add("active");
+        modeFreeBtn.classList.remove("active");
+        scrollToCurrentStudentQuestion(currentStudentQIndex);
+    });
+
+    const handleBack = (e) => {
+        if (e) e.preventDefault();
+        window.location.href = "teacher.html";
+    };
+    document.getElementById("backBtn").addEventListener("click", handleBack);
+
+    if (studentId) {
+        const liveRef = doc(db, "liveStatus", studentId);
         
-        // Nút chuyển chế độ
-        const modeFreeBtn = document.getElementById("modeFreeBtn");
-        const modeLiveBtn = document.getElementById("modeLiveBtn");
+        onSnapshot(liveRef, (docSnap) => {
+            const container = document.getElementById("teacherLiveContentContainer");
+            const gridContainer = document.getElementById("sidebarQuestionGrid");
+            const statusText = document.getElementById("liveStatusText");
+            const statusBox = document.getElementById("liveStatusBox");
+            const statRemainingTime = document.getElementById("statRemainingTime");
+            const statProgress = document.getElementById("statProgress");
 
-        modeFreeBtn.addEventListener("click", () => {
-            currentViewMode = 'free';
-            modeFreeBtn.classList.add("active");
-            modeLiveBtn.classList.remove("active");
-        });
+            if (!docSnap.exists()) {
+                statusText.textContent = "Ngoại tuyến";
+                statusBox.classList.add("danger");
+                container.innerHTML = `
+                    <div class="question-card" style="padding: 40px; text-align: center;">
+                        <div class="empty" style="color: #64748b; font-size: 15px;">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
+                            Học sinh này chưa mở bài kiểm tra hoặc đã thoát hệ thống.
+                        </div>
+                    </div>`;
+                gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
+                return;
+            }
 
-        modeLiveBtn.addEventListener("click", () => {
-            currentViewMode = 'live';
-            modeLiveBtn.classList.add("active");
-            modeFreeBtn.classList.remove("active");
-            // Khi chuyển sang chế độ trực tiếp, cuộn ngay lập tức về câu học sinh đang đứng
-            scrollToCurrentStudentQuestion();
-        });
+            const data = docSnap.data();
 
-        const handleBack = (e) => {
-            if (e) e.preventDefault();
-            window.location.href = "teacher.html";
-        };
-        document.getElementById("backBtn").addEventListener("click", handleBack);
+            if (data.isSubmitted === true || data.status === "submitted") {
+                statusText.textContent = "Đã nộp bài";
+                statusBox.classList.add("success");
+                container.innerHTML = `
+                    <div class="question-card" style="padding: 40px; text-align: center;">
+                        <div class="empty" style="color: #16a34a; font-size: 15px;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #22c55e; margin-bottom: 12px; display: block;"></i>
+                            Học sinh này đã hoàn thành và nộp bài kiểm tra thành công!
+                        </div>
+                    </div>`;
+                return;
+            }
 
-        if (studentId) {
-            const liveRef = doc(db, "liveStatus", studentId);
+            if (data.isStarted === false || data.hasStarted === false) {
+                statusText.textContent = "Chưa làm bài";
+                statusBox.classList.add("danger");
+                container.innerHTML = `
+                    <div class="question-card" style="padding: 40px; text-align: center;">
+                        <div class="empty" style="color: #64748b; font-size: 15px;">
+                            <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
+                            Học sinh này chưa bấm vào nút làm bài kiểm tra.
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            statusText.textContent = "Đang trực tuyến";
+            statusBox.classList.remove("danger");
+
+            if (data.testTitle) {
+                document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
+            }
             
-            onSnapshot(liveRef, (docSnap) => {
-                const container = document.getElementById("teacherLiveContentContainer");
-                const gridContainer = document.getElementById("sidebarQuestionGrid");
-                const statusText = document.getElementById("liveStatusText");
-                const statusBox = document.getElementById("liveStatusBox");
-                const statRemainingTime = document.getElementById("statRemainingTime");
-                const statProgress = document.getElementById("statProgress");
+            if (data.remainingSeconds !== undefined) {
+                const remSec = data.remainingSeconds;
+                const mins = Math.floor(remSec / 60);
+                const secs = remSec % 60;
+                statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
 
-                if (!docSnap.exists()) {
-                    statusText.textContent = "Ngoại tuyến";
-                    statusBox.classList.add("danger");
-                    container.innerHTML = `
-                        <div class="question-card" style="padding: 40px; text-align: center;">
-                            <div class="empty" style="color: #64748b; font-size: 15px;">
-                                <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
-                                Học sinh này chưa mở bài kiểm tra hoặc đã thoát hệ thống.
-                                <br><br>
-                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
-                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
-                                </button>
-                            </div>
-                        </div>`;
-                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
-                    return;
-                }
+            cachedQuestions = data.questions || [];
+            cachedAnswers = data.allAnswers || {};
+            currentStudentQIndex = (data.currentQuestionIndex || 1) - 1;
 
-                const data = docSnap.data();
-
-                // Kiểm tra trạng thái nộp bài hoặc chưa bắt đầu
-                if (data.isSubmitted === true || data.status === "submitted") {
-                    statusText.textContent = "Đã nộp bài";
-                    statusBox.classList.add("success");
-                    container.innerHTML = `
-                        <div class="question-card" style="padding: 40px; text-align: center;">
-                            <div class="empty" style="color: #16a34a; font-size: 15px;">
-                                <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #22c55e; margin-bottom: 12px; display: block;"></i>
-                                Học sinh này đã hoàn thành và nộp bài kiểm tra thành công!
-                            </div>
-                        </div>`;
-                    return;
-                }
-
-                if (data.isStarted === false || data.hasStarted === false) {
-                    statusText.textContent = "Chưa làm bài";
-                    statusBox.classList.add("danger");
-                    container.innerHTML = `
-                        <div class="question-card" style="padding: 40px; text-align: center;">
-                            <div class="empty" style="color: #64748b; font-size: 15px;">
-                                <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
-                                Học sinh này chưa bấm vào nút làm bài kiểm tra.
-                            </div>
-                        </div>`;
-                    return;
-                }
-
-                statusText.textContent = "Đang trực tuyến";
-                statusBox.classList.remove("danger");
-
-                if (data.testTitle) {
-                    document.getElementById("teacherLiveSubTitle").textContent = `Bài kiểm tra: ${data.testTitle}`;
-                }
+            if (cachedQuestions.length > 0) {
+                let allQuestionsHtml = "";
                 
-                // Đồng hồ đếm ngược
-                if (data.remainingSeconds !== undefined) {
-                    const remSec = data.remainingSeconds;
-                    const mins = Math.floor(remSec / 60);
-                    const secs = remSec % 60;
-                    statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }
-
-                // Nếu học sinh có gửi kèm danh sách câu hỏi hoặc toàn bộ cấu trúc đề qua liveData (hoặc chúng ta có thể trích xuất nếu lưu trong cấu trúc)
-                // Lưu ý: test.js hiện tại gửi `currentQuestion` chi tiết. Để giáo viên xem được *toàn bộ* câu hỏi, hệ thống cần truyền danh sách câu hoặc giáo viên render dựa trên dữ liệu bài làm. 
-                // Ở đây chúng ta hiển thị câu hỏi hiện tại và danh sách đáp án học sinh đã chọn qua các state mà học sinh đồng bộ.
-                
-                // Hiển thị tiến độ câu hỏi
-                const currentQIdx = (data.currentQuestionIndex || 1) - 1;
-                
-                // Render nội dung câu hỏi hiện tại mà học sinh đang đứng & các câu đã lưu nếu có
-                if (data.currentQuestion) {
-                    const q = data.currentQuestion;
-                    const userAns = data.currentAnswer;
-                    
+                cachedQuestions.forEach((q, idx) => {
+                    const userAns = cachedAnswers[idx];
+                    const isCurrent = currentStudentQIndex === idx;
                     let answerDisplayHtml = "";
+
+                    // Xây dựng giao diện đáp án tương ứng từng phần (Part 1, 2, 3)
                     if (q.part === 1) {
                         const options = q.options || [];
                         answerDisplayHtml = `<div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">`;
@@ -360,7 +352,7 @@
                             answerDisplayHtml += `
                                 <div style="padding: 10px 14px; border-radius: 8px; border: 1px solid ${isSelected ? '#2563eb' : '#e2e8f0'}; background: ${isSelected ? '#eff6ff' : '#f8fafc'}; color: ${isSelected ? '#1d4ed8' : '#334155'}; font-size: 14px; display: flex; align-items: center; gap: 10px;">
                                     <strong>${letter}.</strong> <span>${formatChemistryText(opt)}</span>
-                                    ${isSelected ? '<i class="fa-solid fa-check" style="margin-left: auto; color: #2563eb;"><i>' : ''}
+                                    ${isSelected ? '<i class="fa-solid fa-check" style="margin-left: auto; color: #2563eb;"></i>' : ''}
                                 </div>
                             `;
                         });
@@ -384,73 +376,77 @@
                     } else if (q.part === 3) {
                         answerDisplayHtml = `
                             <div style="margin-top: 15px; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
-                                <strong>Đáp án học sinh nhập (Phiếu trả lời ngắn):</strong> 
+                                <strong>Đáp án học sinh nhập:</strong> 
                                 <span style="font-family: monospace; font-size: 16px; color: #2563eb; font-weight: bold; margin-left: 10px;">${userAns || "(Chưa trả lời)"}</span>
                             </div>
                         `;
                     }
 
-                    container.innerHTML = `
-                        <div class="question-card" id="activeQuestionCard" data-index="${currentQIdx}">
+                    allQuestionsHtml += `
+                        <div class="question-card ${isCurrent ? 'teacher-current-target' : ''}" id="question-card-${idx}" data-index="${idx}" style="margin-bottom: 25px; border: ${isCurrent ? '2px solid #2563eb' : '1px solid #e2e8f0'}">
                             <div class="question-card-header">
                                 <div class="question-number">
-                                    <span>Câu hỏi hiện tại: ${data.currentQuestionIndex}</span>
+                                    <span>Câu ${idx + 1} (Phần ${q.part || 1})</span>
                                 </div>
-                                <span class="teacher-view-badge">
-                                    <i class="fa-solid fa-eye"></i> Học sinh đang ở câu này
-                                </span>
+                                ${isCurrent ? '<span class="teacher-view-badge"><i class="fa-solid fa-eye"></i> Học sinh đang ở câu này</span>' : ''}
                             </div>
                             <div class="question-content">
                                 ${formatChemistryText(q.question || q.content || q.text || "Không có nội dung câu hỏi")}
                             </div>
                             ${q.image && q.image.trim() !== "" ? `<div style="text-align:center; margin: 15px 0;"><img src="${q.image}" style="max-width:100%; max-height:350px; border-radius: 8px;" /></div>` : ""}
-                            
                             <div class="answer-container">
                                 ${answerDisplayHtml}
                             </div>
                         </div>
                     `;
-                }
+                });
 
-                // Cập nhật Sidebar Bảng Câu Hỏi
-                let totalQCount = data.totalQuestions || 30; // Mặc định hoặc lấy từ dữ liệu nếu có
-                let gridHtml = "";
-                let answeredCount = 0;
+                container.innerHTML = allQuestionsHtml;
+            }
 
-                for (let i = 0; i < totalQCount; i++) {
-                    const isCurrent = i === currentQIdx;
-                    // Kiểm tra trạng thái đã trả lời qua mảng answers nếu được đồng bộ đầy đủ
-                    let classes = "question-number";
-                    if (isCurrent) classes += " current";
-                    
-                    gridHtml += `<button type="button" class="${classes}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
-                }
-                gridContainer.innerHTML = gridHtml;
-                statProgress.textContent = `Đang ở câu ${data.currentQuestionIndex}`;
+            // Cập nhật Sidebar Bảng Câu Hỏi
+            let totalQCount = cachedQuestions.length || 0;
+            let gridHtml = "";
+            let answeredCount = 0;
 
-                // Nếu đang ở chế độ 2 (Trực tiếp), tự động cuộn màn hình giáo viên theo học sinh
-                if (currentViewMode === 'live') {
-                    scrollToCurrentStudentQuestion();
-                }
-            });
-        }
+            for (let i = 0; i < totalQCount; i++) {
+                const isCurrent = i === currentStudentQIndex;
+                const isAnswered = cachedAnswers[i] !== undefined && cachedAnswers[i] !== null && cachedAnswers[i] !== "";
+                if (isAnswered) answeredCount++;
 
-        window.jumpToQuestion = function(index) {
+                let classes = "question-number";
+                if (isCurrent) classes += " current";
+                if (isAnswered) classes += " answered";
+                
+                gridHtml += `<button type="button" class="${classes}" onclick="jumpToQuestion(${i})">${i + 1}</button>`;
+            }
+            gridContainer.innerHTML = gridHtml || `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu câu hỏi</div>`;
+            statProgress.textContent = `${answeredCount} / ${totalQCount} câu`;
+
+            // Tự động cuộn theo học sinh nếu bật chế độ Trực tiếp
             if (currentViewMode === 'live') {
-                alert("Bạn đang ở chế độ 'Trực tiếp'. Hãy chuyển sang chế độ 'Tự do' nếu muốn chủ động chọn câu hỏi để xem!");
-                return;
+                scrollToCurrentStudentQuestion(currentStudentQIndex);
             }
-            // Logic xử lý khi giáo viên tự do bấm vào danh sách câu hỏi ở sidebar
-        }
+        });
+    }
 
-        function scrollToCurrentStudentQuestion() {
-            const card = document.getElementById("activeQuestionCard");
-            if (card) {
-                card.scrollIntoView({ behavior: "smooth", block: "start" });
-                card.style.borderColor = "#2563eb";
-                setTimeout(() => card.style.borderColor = "", 1000);
-            }
+    window.jumpToQuestion = function(index) {
+        if (currentViewMode === 'live') {
+            alert("Bạn đang ở chế độ 'Trực tiếp'. Hãy chuyển sang chế độ 'Tự do' ở góc trên để có thể chủ động chọn câu hỏi!");
+            return;
         }
-    </script>
+        const targetCard = document.getElementById(`question-card-${index}`);
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
+    function scrollToCurrentStudentQuestion(index) {
+        const card = document.getElementById(`question-card-${index}`);
+        if (card) {
+            card.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+</script>
 </body>
 </html>
