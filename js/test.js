@@ -2034,8 +2034,9 @@ async function syncLiveStatus() {
             testTitle: currentTest?.title || "Bài kiểm tra",
             currentQuestionIndex: currentQuestionIndex + 1,
             currentPart: currentQ.part || 1,
-            currentQuestionContent: currentQ.question || currentQ.content || currentQ.text || "",
+            currentQuestion: currentQ, // Đẩy cả object câu hỏi lên để giáo viên thấy nội dung, hình ảnh, đáp án
             currentAnswer: currentAns,
+            remainingSeconds: typeof remainingSeconds !== 'undefined' ? remainingSeconds : 0, // Đẩy thời gian còn lại
             updatedAt: serverTimestamp()
         };
 
