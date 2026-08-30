@@ -1997,7 +1997,22 @@ function showError(msg) {
         testError.textContent = msg;
     }
 }
-
+// Gọi hàm này mỗi khi học sinh chuyển câu hỏi (lướt trang) hoặc chọn đáp án
+async function syncStudentLiveProgress(studentId, testId, testTitle, currentPart, questionIndex, questionContent, currentAnswer) {
+    try {
+        await setDoc(doc(db, "liveStatus", studentId), {
+            testId: testId,
+            testTitle: testTitle,
+            currentPart: currentPart,
+            currentQuestionIndex: questionIndex,
+            currentQuestionContent: questionContent,
+            currentAnswer: currentAnswer,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+    } catch (e) {
+        console.error("Lỗi đồng bộ live:", e);
+    }
+}
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUser = user;
