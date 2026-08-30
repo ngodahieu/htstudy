@@ -1968,3 +1968,77 @@ body {
     border-color: #2563eb;
     box-shadow: 0 10px 35px rgba(37, 99, 235, 0.12);
 }
+/*==================================================
+    MỤC LỤC NỔI (FLOATING QUESTION NAVIGATOR)
+==================================================*/
+.floating-nav-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1100;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.floating-nav-toggle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+}
+
+/* Khung chứa bảng câu hỏi dạng popup/dropdown ẩn hiện */
+.floating-sidebar-container {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    z-index: 1099;
+    width: 320px;
+    max-height: 80vh;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
+    display: none; /* Mặc định đóng */
+    flex-direction: column;
+    animation: slideUpFade 0.25s ease forwards;
+}
+
+.floating-sidebar-container.active {
+    display: flex;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Nút đóng bảng mục lục */
+.close-floating-nav {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.close-floating-nav:hover {
+    color: #ef4444;
+}
