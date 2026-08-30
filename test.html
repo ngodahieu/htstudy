@@ -299,140 +299,49 @@
     ===================================================-->
 
     <section class="test-layout">
+<!--==================================================
+                QUESTION AREA
+===================================================-->
+
+<div class="test-question-area">
+
+    <!-- Container chứa toàn bộ danh sách câu hỏi để cuộn -->
+    <div id="allQuestionsContainer" class="all-questions-container">
+        <!-- Các câu hỏi sẽ được render tự động vào đây bằng JavaScript -->
+    </div>
+
+    <!--==================================================
+                SUBMIT (Nút nộp bài đặt ở dưới cùng)
+    ===================================================-->
+
+    <div class="submit-area">
+
+        <div class="submit-warning">
+
+            <i class="fa-solid fa-circle-info"></i>
+
+            <span>
+                Hãy kiểm tra lại đáp án trước khi nộp bài.
+            </span>
+
+        </div>
 
 
-        <!--==================================================
-                        QUESTION AREA
-        ===================================================-->
+        <button
+            type="button"
+            id="submitTestBtn"
+            class="submit-test-btn"
+        >
 
-        <div class="test-question-area">
+            <i class="fa-solid fa-paper-plane"></i>
 
+            Nộp bài
 
-            <div class="question-card">
+        </button>
 
+    </div>
 
-                <!-- QUESTION HEADER -->
-
-                <div class="question-card-header">
-
-                    <div class="question-number">
-
-                        <span id="questionNumber">
-                            Câu 1
-                        </span>
-
-                    </div>
-
-                    <span class="question-status">
-
-                        <i class="fa-solid fa-circle-check"></i>
-
-                        Câu hỏi
-
-                    </span>
-
-                </div>
-
-
-
-                <!-- QUESTION -->
-
-                <div
-                    id="questionContent"
-                    class="question-content"
-                >
-
-                </div>
-                <div id="questionImageContainer" class="question-image-container" style="display: none; text-align: center; margin: 15px 0;">
-                    <img id="questionImage" src="" alt="Hình minh họa câu hỏi" style="max-width: 100%; max-height: 400px; border-radius: 10px; border: 1px solid #e2e8f0;" />
-                </div>
-
-
-                <!-- ANSWERS -->
-
-                <div
-                    id="answerContainer"
-                    class="answer-container"
-                >
-
-                </div>
-
-
-            </div>
-
-
-
-            <!--==================================================
-                        NAVIGATION
-            ===================================================-->
-
-            <div class="question-navigation">
-
-
-                <button
-                    type="button"
-                    id="previousQuestionBtn"
-                    class="navigation-btn previous-btn"
-                >
-
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                    <span>
-                        Câu trước
-                    </span>
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="nextQuestionBtn"
-                    class="navigation-btn next-btn"
-                >
-
-                    <span>
-                        Câu sau
-                    </span>
-
-                    <i class="fa-solid fa-arrow-right"></i>
-
-                </button>
-
-            </div>
-
-
-
-            <!--==================================================
-                        SUBMIT
-            ===================================================-->
-
-            <div class="submit-area">
-
-                <div class="submit-warning">
-
-                    <i class="fa-solid fa-circle-info"></i>
-
-                    <span>
-                        Hãy kiểm tra lại đáp án trước khi nộp bài.
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="submitTestBtn"
-                    class="submit-test-btn"
-                >
-
-                    <i class="fa-solid fa-paper-plane"></i>
-
-                    Nộp bài
-
-                </button>
-
-            </div>
-
+</div>
 
         </div>
 
