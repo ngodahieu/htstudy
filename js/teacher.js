@@ -2524,7 +2524,7 @@ async function openSingleResultDetailModal(resultId) {
                     </div>`;
                 });
                 html += `</div>`;
-            } else if (q.part === 2) {
+} else if (q.part === 2) {
                 const statements = q.statements || [];
                 const correctAnsArr = q.answers || [];
                 const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
@@ -2532,32 +2532,42 @@ async function openSingleResultDetailModal(resultId) {
                 html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 6px;">`;
                 statements.forEach((st, stIdx) => {
                     const stLetter = String.fromCharCode(97 + stIdx);
-                    const sAns = studentAnsArr[stIdx];
-                    const cAns = correctAnsArr[stIdx];
-                    const isMatch = sAns === cAns;
+                    const studentChoice = studentAnsArr[stIdx];
+                    const correctChoice = correctAnsArr[stIdx];
 
-                    html += `
-                        <div style="padding: 6px 8px; border-radius: 4px; background: ${isMatch ? '#e2f0d9' : '#fce4d6'}; border: 1px solid ${isMatch ? '#c3e6cb' : '#f5c6cb'};">
-                            <b>${stLetter})</b> ${formatChemistryText(st)} <br>
-                            <span style="font-size: 0.9rem; color: #333;">
-                                Học sinh chọn: <b>${sAns === true ? 'Đúng' : (sAns === false ? 'Sai' : 'Chưa chọn')}</b> | 
-                                Đáp án chuẩn: <b>${cAns === true ? 'Đúng' : 'Sai'}</b>
-                            </span>
-                        </div>
-                    `;
+                    let choiceText = studentChoice !== undefined ? (studentChoice ? "Đúng" : "Sai") : "Chưa chọn";
+                    let correctText = correctChoice ? "Đúng" : "Sai";
+                    let isMatch = studentChoice === correctChoice;
+
+                    let stStyle = "padding: 6px 8px; border-radius: 4px; border: 1px solid #ddd;";
+                    if (isMatch) {
+                        stStyle += " background-color: #d4edda; color: #155724;";
+                    } else {
+                        stStyle += " background-color: #f8d7da; color: #721c24;";
+                    }
+
+                    html += `<div style="${stStyle}">
+                        <b>${stLetter})</b> ${formatChemistryText(st)}<br>
+                        <small>Học sinh chọn: <b>${choiceText}</b> | Đáp án chuẩn: <b>${correctText}</b></small>
+                    </div>`;
                 });
                 html += `</div>`;
             } else if (q.part === 3) {
-                const sAnsText = normalizeTextAnswer(studentAns);
-                const cAnsText = normalizeTextAnswer(q.answer);
-                const isCorrect = sAnsText === cAnsText && sAnsText !== "";
+                let correctAns = String(q.answer || "").trim();
+                let studentChoice = String(studentAns || "").trim();
+                let isMatch = normalizeTextAnswer(studentChoice) === normalizeTextAnswer(correctAns);
 
-                html += `
-                    <div style="margin-left: 10px; padding: 6px 8px; border-radius: 4px; background: ${isCorrect ? '#d4edda' : '#f8d7da'}; border: 1px solid ${isCorrect ? '#c3e6cb' : '#f5c6cb'};">
-                        Học sinh trả lời: <b>${escapeHtmlTeacher(String(studentAns ?? "Chưa trả lời"))}</b> <br>
-                        Đáp án chuẩn: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b>
-                    </div>
-                `;
+                let p3Style = "padding: 8px; border-radius: 4px;";
+                if (isMatch) {
+                    p3Style += " background-color: #d4edda; color: #155724;";
+                } else {
+                    p3Style += " background-color: #f8d7da; color: #721c24;";
+                }
+
+                html += `<div style="${p3Style}">
+                    Học sinh trả lời: <b>${escapeHtmlTeacher(studentChoice || "Chưa trả lời")}</b><br>
+                    Đáp án đúng: <b>${escapeHtmlTeacher(correctAns)}</b>
+                </div>`;
             }
 
             html += `</div>`;
@@ -2565,6 +2575,7 @@ async function openSingleResultDetailModal(resultId) {
 
         html += `</div>`;
         singleResultDetailBody.innerHTML = html;
+
     } catch (error) {
         console.error("Lỗi khi tải chi tiết bài làm:", error);
         singleResultDetailBody.innerHTML = `<div class="empty">Không thể tải chi tiết bài làm.</div>`;
