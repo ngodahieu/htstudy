@@ -608,6 +608,10 @@ function renderStudentAccountList(accounts) {
                 <button class="primary-btn test-result-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem; background-color: #28a745;">
                     <i class="fa-solid fa-square-poll-vertical"></i> Kết quả kiểm tra
                 </button>
+
+                <button class="primary-btn live-btn" data-id="${acc.id}" data-name="${escapeHtmlTeacher(acc.name)}" style="padding: 6px 12px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-tower-broadcast"></i> Xem Live
+                </button>
             </div>
         `;
 
@@ -615,6 +619,9 @@ function renderStudentAccountList(accounts) {
         card.querySelector(".test-result-btn").addEventListener("click", () => {
             currentSelectedStudent = acc;
             openStudentTestChapters(currentStudentCourseId);
+        });
+        card.querySelector(".live-btn").addEventListener("click", () => {
+            startTeacherLiveView(acc.id, acc.name);
         });
 
         studentAccountList.appendChild(card);
@@ -1649,31 +1656,31 @@ if (saveTest) {
                 teacherId: currentTeacherId,
                 teacherName: currentTeacherName,
                 part1: {
-    points: Number(part1Point.value || 0),
-    questions: part1QuestionData.map(q => ({
-        ...q, // Giữ lại toàn bộ thuộc tính bao gồm cả q.image đã được upload
-        points: Number(part1Point.value || 0),
-        correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
-    }))
-},
+                    points: Number(part1Point.value || 0),
+                    questions: part1QuestionData.map(q => ({
+                        ...q, 
+                        points: Number(part1Point.value || 0),
+                        correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
+                    }))
+                },
                 part2: {
-    scores: {
-        one: Number(part2Score1.value || 0),
-        two: Number(part2Score2.value || 0),
-        three: Number(part2Score3.value || 0),
-        four: Number(part2Score4.value || 0)
-    },
-    questions: part2QuestionData.map(q => ({
-        ...q // Đảm bảo giữ lại q.image cho phần 2
-    }))
-},
+                    scores: {
+                        one: Number(part2Score1.value || 0),
+                        two: Number(part2Score2.value || 0),
+                        three: Number(part2Score3.value || 0),
+                        four: Number(part2Score4.value || 0)
+                    },
+                    questions: part2QuestionData.map(q => ({
+                        ...q 
+                    }))
+                },
                 part3: {
-    points: Number(part3Point.value || 0),
-    questions: part3QuestionData.map(q => ({ 
-        ...q, // Đảm bảo giữ lại q.image cho phần 3
-        points: Number(part3Point.value || 0) 
-    }))
-},
+                    points: Number(part3Point.value || 0),
+                    questions: part3QuestionData.map(q => ({ 
+                        ...q, 
+                        points: Number(part3Point.value || 0) 
+                    }))
+                },
                 questionCount: part1QuestionData.length + part2QuestionData.length + part3QuestionData.length,
                 totalPoints: (part1QuestionData.length * Number(part1Point.value || 0)) +
                              (part2QuestionData.length * Number(part2Score4.value || 0)) +
@@ -2373,18 +2380,17 @@ async function openStudentTestsList(courseId, chapterId, lessonId) {
         studentTestResultBody.innerHTML = `<div class="empty">Lỗi tải danh sách bài kiểm tra.</div>`;
     }
 }
+
 async function openStudentSubmissionsList(courseId, testId, userId) {
     testResultNavStep = 4;
     studentTestResultBody.innerHTML = `<div class="empty">Đang tải kết quả làm bài...</div>`;
 
     try {
-        // Lấy thông tin đề thi để chuẩn hóa số câu hỏi
         const testRef = doc(db, "courses", courseId, "tests", testId);
         const testSnap = await getDoc(testRef);
         const testData = testSnap.exists() ? { id: testSnap.id, ...testSnap.data() } : {};
         const questions = extractQuestions(testData);
 
-        // Truy vấn kết quả (hỗ trợ tìm theo collection results hoặc subcollection tùy thiết kế)
         const resultsRef = collection(db, "results");
         const qResults = query(resultsRef, where("courseId", "==", courseId), where("testId", "==", testId), where("userId", "==", userId));
         const resultsSnap = await getDocs(qResults);
@@ -2406,7 +2412,6 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
         
         submissions.forEach((sub, idx) => {
             const score = sub.score !== undefined ? sub.score : (sub.totalScore || 0);
-            const isAllowedView = sub.allowStudentView === true;
             const timeStr = sub.submittedAt?.toDate ? sub.submittedAt.toDate().toLocaleString('vi-VN') : "Vừa xong";
 
             html += `
@@ -2424,18 +2429,18 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
         
         studentTestResultBody.innerHTML = html;
 
-studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
-    btn.addEventListener("click", () => {
-        // Gọi trực tiếp hàm hiển thị chi tiết đầy đủ câu hỏi và đáp án dựa trên ID bài nộp
-        openSingleResultDetailModal(btn.dataset.subId);
-    });
-});
+        studentTestResultBody.querySelectorAll(".view-sub-detail").forEach(btn => {
+            btn.addEventListener("click", () => {
+                openSingleResultDetailModal(btn.dataset.subId);
+            });
+        });
 
     } catch (error) {
         console.error("Lỗi khi tải kết quả:", error);
         studentTestResultBody.innerHTML = `<div class="empty">Không thể tải kết quả.</div>`;
     }
 }
+
 // ==========================================================
 // HÀM QUAN TRỌNG: HIỂN THỊ ĐẦY ĐỦ CÂU HỎI VÀ ĐÁP ÁN KHI ẤN XEM CHI TIẾT
 // ==========================================================
@@ -2445,7 +2450,6 @@ async function openSingleResultDetailModal(resultId) {
     studentSingleResultDetailModal.style.display = "flex";
 
     try {
-        // Thử tìm trong collection "results" trước, nếu không thấy tìm trong "examResults"
         let resDoc = await getDoc(doc(db, "results", resultId));
         if (!resDoc.exists()) {
             resDoc = await getDoc(doc(db, "examResults", resultId));
@@ -2457,15 +2461,14 @@ async function openSingleResultDetailModal(resultId) {
         }
         const resData = resDoc.data();
         
-        // Lấy thông tin chi tiết bài kiểm tra gốc để có danh sách câu hỏi chuẩn
         const testDoc = await getDoc(doc(db, "courses", resData.courseId, "tests", resData.testId));
         if (!testDoc.exists()) {
             singleResultDetailBody.innerHTML = `<div class="empty">Không tìm thấy thông tin bài kiểm tra gốc.</div>`;
             return;
         }
         const testData = testDoc.data();
-        const questions = extractQuestions(testData); // Trích xuất tất cả câu hỏi Phần I, II, III
-        const studentAnswers = resData.answers || {}; // Đáp án học sinh đã chọn
+        const questions = extractQuestions(testData); 
+        const studentAnswers = resData.answers || {}; 
 
         let html = `
             <div style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
@@ -2477,7 +2480,6 @@ async function openSingleResultDetailModal(resultId) {
         `;
 
         questions.forEach((q, idx) => {
-            // Hỗ trợ nhiều định dạng key lưu trữ đáp án khác nhau của học sinh (q_0, index số, hoặc id câu hỏi)
             const studentAns = studentAnswers[`q_${idx}`] !== undefined ? studentAnswers[`q_${idx}`] : 
                                (studentAnswers[idx] !== undefined ? studentAnswers[idx] : studentAnswers[q.id]);
             
@@ -2488,7 +2490,6 @@ async function openSingleResultDetailModal(resultId) {
                 html += `<div style="margin: 8px 0;"><img src="${q.image}" style="max-width: 100%; max-height: 200px; border-radius: 4px;"></div>`;
             }
 
-            // Xử lý hiển thị chi tiết theo từng phần
             if (q.part === 1) {
                 const options = q.options || [];
                 html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 4px;">`;
@@ -2532,10 +2533,14 @@ async function openSingleResultDetailModal(resultId) {
                 });
                 html += `</div>`;
             } else if (q.part === 3) {
+                const sAnsText = normalizeTextAnswer(studentAns);
+                const cAnsText = normalizeTextAnswer(q.answer);
+                const isCorrect = sAnsText === cAnsText && sAnsText !== "";
+
                 html += `
-                    <div style="margin-left: 10px; font-size: 0.95rem; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
-                        <p style="margin: 4px 0;">Học sinh trả lời: <b style="color: #007bff;">${escapeHtmlTeacher(String(studentAns !== undefined && studentAns !== "" ? studentAns : "(Trống)"))}</b></p>
-                        <p style="margin: 4px 0; color: #28a745;">Đáp án chuẩn: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b></p>
+                    <div style="margin-left: 10px; padding: 6px 8px; border-radius: 4px; background: ${isCorrect ? '#d4edda' : '#f8d7da'}; border: 1px solid ${isCorrect ? '#c3e6cb' : '#f5c6cb'};">
+                        Học sinh trả lời: <b>${escapeHtmlTeacher(String(studentAns ?? "Chưa trả lời"))}</b> <br>
+                        Đáp án chuẩn: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b>
                     </div>
                 `;
             }
@@ -2547,25 +2552,13 @@ async function openSingleResultDetailModal(resultId) {
         singleResultDetailBody.innerHTML = html;
     } catch (error) {
         console.error("Lỗi khi tải chi tiết bài làm:", error);
-        singleResultDetailBody.innerHTML = `<div class="empty">Không thể tải nội dung chi tiết bài làm.</div>`;
+        singleResultDetailBody.innerHTML = `<div class="empty">Không thể tải chi tiết bài làm.</div>`;
     }
 }
-if (backTestResultBtn) {
-    backTestResultBtn.addEventListener("click", () => {
-        if (testResultNavStep === 4) {
-            testResultNavStep = 3;
-            if (selectedChapterForTest && selectedLessonForTest) {
-                openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
-            }
-        } else if (testResultNavStep === 3) {
-            testResultNavStep = 2;
-            openStudentTestChapters(currentStudentCourseId);
-            backTestResultBtn.style.display = "none";
-        } else if (testResultNavStep === 2) {
-            testResultNavStep = 1;
-            openStudentTestChapters(currentStudentCourseId);
-            backTestResultBtn.style.display = "none";
-        }
+
+if (closeSingleResultModal) {
+    closeSingleResultModal.addEventListener("click", () => {
+        if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
     });
 }
 
@@ -2574,181 +2567,15 @@ if (closeStudentTestResultBtn) {
         if (studentTestResultModal) studentTestResultModal.style.display = "none";
     });
 }
-function showSingleSubmissionDetail(subData) {
-    if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
-    
-    const timeStr = subData.submittedAt?.toDate ? subData.submittedAt.toDate().toLocaleString('vi-VN') : "N/A";
-    const answersObj = subData.answers || {};
-    
-    // Lấy danh sách câu hỏi từ bài kiểm tra hiện tại nếu có, để hiển thị nội dung trực quan hơn
-    let answersHtml = `<div style="max-height: 400px; overflow-y: auto; padding-right: 5px;">`;
-    
-    // Duyệt qua danh sách câu trả lời của học sinh
-    let index = 1;
-    for (const [qKey, ans] of Object.entries(answersObj)) {
-        let displayAns = ans;
-        
-        // Nếu là Phần II (mảng đúng sai), chuyển đổi thành dạng dễ đọc a, b, c, d
-        if (Array.isArray(ans)) {
-            displayAns = ans.map((val, idx) => `Ý ${String.fromCharCode(97 + idx)}: <b>${val ? "Đúng" : "Sai"}</b>`).join(" | ");
-        }
 
-        answersHtml += `
-            <div style="padding: 10px; margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff;">
-                <p style="margin: 0 0 4px 0; font-weight: bold; color: #333;">Câu ${index++} (ID: ${qKey})</p>
-                <p style="margin: 0; color: #555;">Học sinh chọn: <span style="color: #007bff; font-weight: bold;">${Array.isArray(ans) ? displayAns : escapeHtmlTeacher(String(ans))}</span></p>
-            </div>
-        `;
-    }
-    answersHtml += `</div>`;
-
-    singleResultDetailBody.innerHTML = `
-        <div style="text-align: left;">
-            <p><strong>Tổng điểm:</strong> <span style="color: #d9534f; font-weight: bold; font-size: 1.1rem;">${subData.score || subData.totalScore || 0} điểm</span></p>
-            <p><strong>Thời gian nộp:</strong> ${timeStr}</p>
-            <hr style="margin: 12px 0;">
-            <p style="font-weight: bold; margin-bottom: 8px;">Chi tiết đáp án học sinh đã làm:</p>
-            ${answersHtml}
-        </div>
-    `;
-    studentSingleResultDetailModal.style.display = "flex";
-}
-if (closeSingleResultModal) {
-    closeSingleResultModal.addEventListener("click", () => {
-        if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
-    });
-}
-// Biến lưu trữ unsubscribe listener realtime của Firestore
-let currentLiveUnsubscribe = null;
-
-// Hàm mở chế độ xem học sinh làm bài trực tiếp (Live)
-window.startTeacherLiveView = async function(studentId, studentNameText) {
-    // 1. Ẩn dashboard chính, hiển thị thanh công cụ live và vùng chứa trang test của học sinh
-    const mainContent = document.querySelector(".dashboard-content");
-    
-    // Tạo thanh công cụ phía trên cho giáo viên
-    let liveToolbar = document.getElementById("teacherLiveToolbar");
-    if (!liveToolbar) {
-        liveToolbar = document.createElement("div");
-        liveToolbar.id = "teacherLiveToolbar";
-        liveToolbar.className = "teacher-live-toolbar";
-        document.body.appendChild(liveToolbar);
-    }
-    
-    liveToolbar.innerHTML = `
-        <div class="teacher-live-info">
-            <span class="live-badge">LIVE</span>
-            <span>Đang xem học sinh: <strong id="liveStudentName"></strong></span>
-            <span id="liveTimerDisplay" style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 8px;">Thời gian: --:--</span>
-        </div>
-        <button class="exit-live-btn" onclick="exitTeacherLiveView()">Thoát Live</button>
-    `;
-    document.getElementById("liveStudentName").innerText = studentNameText;
-
-    // Tạo lớp phủ (overlay) khóa điều khiển (không cho giáo viên lướt hay click)
-    let liveOverlay = document.getElementById("teacherLiveOverlay");
-    if (!liveOverlay) {
-        liveOverlay = document.createElement("div");
-        liveOverlay.id = "teacherLiveOverlay";
-        liveOverlay.className = "teacher-live-overlay";
-        document.body.appendChild(liveOverlay);
-    }
-
-    // Tạo container chứa giao diện làm bài của học sinh đượcnhúng/mô phỏng
-    const liveContainer = document.getElementById("teacherLiveViewContainer");
-    liveContainer.style.display = "block";
-    liveContainer.innerHTML = `
-        <div style="padding: 20px; background: white; border-radius: 15px; min-height: 80vh; margin-top: 20px;">
-            <h3>Giao diện làm bài trực tuyến của học sinh</h3>
-            <div id="liveStudentTestContent" style="margin-top: 20px;">Đang đồng bộ dữ liệu bài làm từ học sinh...</div>
-        </div>
-    `;
-
-    // 2. Lắng nghe dữ liệu realtime từ Firestore (Ví dụ collection lưu trạng thái làm bài live của học sinh: "student_live_sessions")
-    // Dữ liệu này phía học sinh sẽ update liên tục gồm: nội dung các câu trả lời, vị trí scrollY, thời gian còn lại, trạng thái nộp bài.
-    const liveDocRef = doc(db, "student_live_sessions", studentId);
-    
-    currentLiveUnsubscribe = onSnapshot(liveDocRef, (docSnap) => {
-        if (!docSnap.exists()) {
-            document.getElementById("liveStudentTestContent").innerHTML = "<p style='color: #64748b;'>Học sinh chưa bắt đầu làm bài hoặc chưa mở đề thi.</p>";
-            return;
-        }
-
-        const data = docSnap.data();
-
-        // Cập nhật thời gian còn lại (vẫn giữ nút thời gian nhưng không ảnh hưởng)
-        if (data.timeLeftFormatted) {
-            document.getElementById("liveTimerDisplay").innerText = `Thời gian: ${data.timeLeftFormatted}`;
-        }
-
-        // Đồng bộ nội dung / đáp án học sinh đang điền
-        if (data.testHtmlContent) {
-            document.getElementById("liveStudentTestContent").innerHTML = data.testHtmlContent;
-        }
-
-        // Đồng bộ vị trí lướt (scroll) của học sinh
-        if (typeof data.scrollTop === "number") {
-            window.scrollTo({
-                top: data.scrollTop,
-                behavior: "smooth"
-            });
-        }
-
-        // Kiểm tra nếu học sinh đã nộp bài
-        if (data.isSubmitted) {
-            // Hiển thị thông báo theo yêu cầu: "Học sinh đã nộp bài, vui lòng giáo viên thoát live."
-            showToast("Học sinh đã nộp bài, vui lòng giáo viên thoát live.", "error");
-            
-            let toolbarInfo = liveToolbar.querySelector(".teacher-live-info");
-            if (toolbarInfo) {
-                toolbarInfo.innerHTML += `<span style="background: #dc2626; color: white; padding: 4px 10px; border-radius: 6px; margin-left: 10px;">Đã nộp bài</span>`;
-            }
+if (backTestResultBtn) {
+    backTestResultBtn.addEventListener("click", () => {
+        if (testResultNavStep === 2) {
+            openStudentTestChapters(currentStudentCourseId);
+        } else if (testResultNavStep === 3) {
+            openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
+        } else if (testResultNavStep === 4) {
+            openStudentTestsList(currentStudentCourseId, selectedChapterForTest.id, selectedLessonForTest.id);
         }
     });
-};
-
-// Hàm thoát chế độ xem live
-window.exitTeacherLiveView = function() {
-    if (currentLiveUnsubscribe) {
-        currentLiveUnsubscribe(); // Hủy lắng nghe realtime
-        currentLiveUnsubscribe = null;
-    }
-
-    // Xóa bỏ giao diện live toolbar và overlay
-    const liveToolbar = document.getElementById("teacherLiveToolbar");
-    if (liveToolbar) liveToolbar.remove();
-
-    const liveOverlay = document.getElementById("teacherLiveOverlay");
-    if (liveOverlay) liveOverlay.remove();
-
-    const liveContainer = document.getElementById("teacherLiveViewContainer");
-    if (liveContainer) {
-        liveContainer.style.display = "none";
-        liveContainer.innerHTML = "";
-    }
-
-    // Trở về vị trí cuộn và màn hình ban đầu
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showToast("Đã thoát chế độ xem live.", "success");
-};
-
-// Hàm tiện ích hiển thị thông báo Toast
-function showToast(message, type = "success") {
-    const existingToast = document.querySelector(".toast");
-    if (existingToast) existingToast.remove();
-
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.remove();
-    }, 4000);
 }
-// Đoạn code mẫu khi tạo nút hành động cho mỗi học sinh trong danh sách:
-// Nút Xem Live:
-const liveBtn = document.createElement("button");
-liveBtn.className = "edit-btn live-btn";
-liveBtn.innerHTML = `<i class="fa-solid fa-tower-broadcast"></i> Xem Live`;
-liveBtn.onclick = () => startTeacherLiveView(student.id, student.name);
