@@ -1648,26 +1648,31 @@ if (saveTest) {
                 teacherId: currentTeacherId,
                 teacherName: currentTeacherName,
                 part1: {
-                    points: Number(part1Point.value || 0),
-                    questions: part1QuestionData.map(q => ({
-                        ...q,
-                        points: Number(part1Point.value || 0),
-                        correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
-                    }))
-                },
+    points: Number(part1Point.value || 0),
+    questions: part1QuestionData.map(q => ({
+        ...q, // Giữ lại toàn bộ thuộc tính bao gồm cả q.image đã được upload
+        points: Number(part1Point.value || 0),
+        correctAnswer: String.fromCharCode(65 + Number(q.correctAnswer))
+    }))
+},
                 part2: {
-                    scores: {
-                        one: Number(part2Score1.value || 0),
-                        two: Number(part2Score2.value || 0),
-                        three: Number(part2Score3.value || 0),
-                        four: Number(part2Score4.value || 0)
-                    },
-                    questions: part2QuestionData
-                },
+    scores: {
+        one: Number(part2Score1.value || 0),
+        two: Number(part2Score2.value || 0),
+        three: Number(part2Score3.value || 0),
+        four: Number(part2Score4.value || 0)
+    },
+    questions: part2QuestionData.map(q => ({
+        ...q // Đảm bảo giữ lại q.image cho phần 2
+    }))
+},
                 part3: {
-                    points: Number(part3Point.value || 0),
-                    questions: part3QuestionData.map(q => ({ ...q, points: Number(part3Point.value || 0) }))
-                },
+    points: Number(part3Point.value || 0),
+    questions: part3QuestionData.map(q => ({ 
+        ...q, // Đảm bảo giữ lại q.image cho phần 3
+        points: Number(part3Point.value || 0) 
+    }))
+}
                 questionCount: part1QuestionData.length + part2QuestionData.length + part3QuestionData.length,
                 totalPoints: (part1QuestionData.length * Number(part1Point.value || 0)) +
                              (part2QuestionData.length * Number(part2Score4.value || 0)) +
