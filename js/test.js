@@ -617,7 +617,7 @@ submitted =
 
         renderQuestionGrid();
 
-        renderQuestion();
+        renderAllQuestions();
 
         startTimer();
 
@@ -764,23 +764,20 @@ function renderQuestionGrid() {
                 index;
 
 
-            button.addEventListener(
-    "click",
-    () => {
-
-        currentQuestionIndex =
-            index;
-
-        saveCurrentQuestion();
-
-        renderQuestion();
-
-        syncLiveStatus();
-
+button.addEventListener("click", () => {
+    currentQuestionIndex = index;
+    saveCurrentQuestion();
+    
+    // Cuộn đến câu hỏi tương ứng trong danh sách dài
+    const targetCard = document.querySelector(`.question-card[data-index="${index}"]`);
+    if (targetCard) {
+        targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        targetCard.classList.add("highlighted");
+        setTimeout(() => targetCard.classList.remove("highlighted"), 1500);
     }
-);
-
-
+    
+    syncLiveStatus();
+});
             questionGrid.appendChild(
                 button
             );
@@ -829,100 +826,99 @@ function updateQuestionGrid() {
     });
 }
 /*==================================================
-                RENDER QUESTION
+        RENDER TOÀN BỘ CÂU HỎI RA MỘT TRANG ĐỂ LƯỚT
 ==================================================*/
+function renderAllQuestions() {
+    const container = document.getElementById("allQuestionsContainer");
+    if (!container) return;
+    
+    container.innerHTML = "";
 
-function renderQuestion() {
+    questions.forEach((question, index) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+        card.dataset.index = index;
 
-    const question =
-        questions[currentQuestionIndex];
+        // Header câu hỏi
+        let headerHtml = `
+            <div class="question-card-header">
+                <div class="question-number">
+                    <span>Câu ${index + 1}</span>
+                </div>
+                <span class="question-status" id="status-${index}">
+                    <i class="fa-solid fa-circle-check" style="color: ${isQuestionAnswered(answers[index]) ? '#22c55e' : '#cbd5e1'}"></i>
+                    ${isQuestionAnswered(answers[index]) ? 'Đã trả lời' : 'Chưa trả lời'}
+                </span>
+            </div>
+        `;
 
+        // Nội dung câu hỏi
+        let contentHtml = `
+            <div class="question-content">
+                ${formatQuestionText(question.question || question.content || question.text || "")}
+            </div>
+        `;
 
-    if (!question) {
+        // Hình ảnh minh họa (nếu có)
+        let imageHtml = `
+            <div class="question-image-container" style="display: ${question.image && question.image.trim() !== "" ? 'block' : 'none'}; text-align: center; margin: 15px 0;">
+                <img src="${question.image || ''}" alt="Hình minh họa câu hỏi" style="max-width: 100%; max-height: 400px; border-radius: 10px; border: 1px solid #e2e8f0;" />
+            </div>
+        `;
 
-        return;
+        card.innerHTML = headerHtml + contentHtml + imageHtml;
 
-    }
+        // Container chứa đáp án riêng cho từng câu
+        const answerDiv = document.createElement("div");
+        answerDiv.className = "answer-container";
+        answerDiv.id = `answer-container-${index}`;
+        card.appendChild(answerDiv);
 
+        container.appendChild(card);
 
-    if (questionNumber) {
+        // Render phần chọn đáp án tương ứng vào câu này
+        renderAnswersForIndex(question, index, answerDiv);
+    });
 
-        questionNumber.textContent =
-            `Câu ${currentQuestionIndex + 1}`;
-
-    }
-
-
-    if (questionContent) {
-
-        questionContent.innerHTML =
-            formatQuestionText(
-                question.question ||
-                question.content ||
-                question.text ||
-                ""
-            );
-
-    }
-
-const imageContainer = document.getElementById("questionImageContainer");
-    const questionImage = document.getElementById("questionImage");
-
-    if (imageContainer && questionImage) {
-        if (question.image && question.image.trim() !== "") {
-            questionImage.src = question.image;
-            imageContainer.style.display = "block";
-        } else {
-            questionImage.src = "";
-            imageContainer.style.display = "none";
-        }
-    }
-renderAnswers(
-    question
-);
-
-updateQuestionGrid();
-
-updateNavigation();
-
-renderMath();
+    updateQuestionGrid();
+    renderMath();
 }
 /*==================================================
-                RENDER ANSWERS
+        RENDER ĐÁP ÁN CHO TỪNG CÂU HỎI RIÊNG BIỆT
 ==================================================*/
-function renderAnswers(question) {
-    if (!answerContainer) return;
-    answerContainer.innerHTML = "";
+function renderAnswersForIndex(question, index, container) {
+    container.innerHTML = "";
 
     // PHẦN I: Trắc nghiệm A, B, C, D
     if (question.part === 1) {
         const options = getQuestionOptions(question);
-        options.forEach((option, index) => {
-            const letter = String.fromCharCode(65 + index);
+        options.forEach((option, oIdx) => {
+            const letter = String.fromCharCode(65 + oIdx);
             const wrapper = document.createElement("label");
             wrapper.className = "answer-option";
-            const checked = answers[currentQuestionIndex] === letter ? "checked" : "";
+            const checked = answers[index] === letter ? "checked" : "";
             if (checked) wrapper.classList.add("selected");
 
             wrapper.innerHTML = `
-                <input type="radio" name="part1-ans" value="${letter}" ${checked}>
+                <input type="radio" name="part1-ans-${index}" value="${letter}" ${checked}>
                 <span class="answer-letter">${letter}</span>
                 <span class="answer-text">${formatQuestionText(option)}</span>
             `;
 
             wrapper.querySelector("input").addEventListener("change", () => {
-                answers[currentQuestionIndex] = letter;
+                answers[index] = letter;
                 saveAnswers();
-                renderQuestion();
+                updateSingleQuestionStatus(index);
+                updateQuestionGrid();
                 syncLiveStatus();
             });
-            answerContainer.appendChild(wrapper);
+            container.appendChild(wrapper);
         });
     }
 
-    // PHẦN II: Đúng / Sai (4 mệnh đề a, b, c, d)
+    // PHẦN II: Đúng / Sai
     else if (question.part === 2) {
-        const currentAns = answers[currentQuestionIndex] || [null, null, null, null];
+        const currentAns = answers[index] || [null, null, null, null];
         const statements = question.statements || [];
 
         statements.forEach((stmt, sIdx) => {
@@ -942,73 +938,63 @@ function renderAnswers(question) {
                 btn.addEventListener("click", (e) => {
                     const val = e.currentTarget.dataset.val === "true";
                     
-                    if (!answers[currentQuestionIndex]) {
-                        answers[currentQuestionIndex] = [null, null, null, null];
+                    if (!answers[index]) {
+                        answers[index] = [null, null, null, null];
                     }
                     
-                    // Chọn lại cùng một giá trị thì hủy chọn
-                    if (answers[currentQuestionIndex][sIdx] === val) {
-                        answers[currentQuestionIndex][sIdx] = null;
+                    if (answers[index][sIdx] === val) {
+                        answers[index][sIdx] = null;
                     } else {
-                        answers[currentQuestionIndex][sIdx] = val;
+                        answers[index][sIdx] = val;
                     }
 
-                    // Nếu cả 4 ô đều null thì xóa luôn key
-                    if (!answers[currentQuestionIndex].some(v => v !== null)) {
-                        delete answers[currentQuestionIndex];
+                    if (!answers[index].some(v => v !== null)) {
+                        delete answers[index];
                     }
 
                     saveAnswers();
-                    renderQuestion();
+                    renderAnswersForIndex(question, index, container);
+                    updateSingleQuestionStatus(index);
+                    updateQuestionGrid();
                     syncLiveStatus();
                 });
             });
-            answerContainer.appendChild(row);
+            container.appendChild(row);
         });
     }
 
-    // PHẦN III: Trả lời ngắn theo dạng Phiếu tô 4 ô chuẩn THPTQG
+    // PHẦN III: Trả lời ngắn (Phiếu tô 4 ô)
     else if (question.part === 3) {
-        const currentAnsStr = answers[currentQuestionIndex] || "";
+        const currentAnsStr = answers[index] || "";
         const currentChars = currentAnsStr.split("").slice(0, 4);
         while (currentChars.length < 4) currentChars.push("");
 
         const sheet = document.createElement("div");
         sheet.className = "short-answer-sheet";
 
-        // Thanh xem trước kết quả đã tô
         let previewHtml = `
             <div class="sheet-preview">
                 <span class="sheet-preview-title">Đáp án đã chọn:</span>
                 <div class="sheet-preview-boxes">
                     ${currentChars.map(ch => `<div class="preview-box">${ch || "&nbsp;"}</div>`).join("")}
                 </div>
-                <button type="button" class="clear-sheet-btn" title="Xóa chọn"><i class="fa-solid fa-rotate-left"></i> Xóa</button>
+                <button type="button" class="clear-sheet-btn"><i class="fa-solid fa-rotate-left"></i> Xóa</button>
             </div>
         `;
 
-        // Danh sách ký tự từng ô theo chuẩn THPT QG
         const colsOptions = [
-            ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 1: có thể là dấu âm
-            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 2
-            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"], // Ô 3
-            ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]        // Ô 4
+            ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+            [",", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+            ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
         ];
 
         let colsHtml = '<div class="sheet-columns">';
         colsOptions.forEach((opts, colIdx) => {
-            colsHtml += `<div class="sheet-column">`;
-            colsHtml += `<span class="col-header">Ô ${colIdx + 1}</span>`;
+            colsHtml += `<div class="sheet-column"><span class="col-header">Ô ${colIdx + 1}</span>`;
             opts.forEach(opt => {
                 const isSelected = currentChars[colIdx] === opt;
-                colsHtml += `
-                    <button type="button" 
-                            class="bubble-btn ${isSelected ? 'selected' : ''}" 
-                            data-col="${colIdx}" 
-                            data-val="${opt}">
-                        ${opt}
-                    </button>
-                `;
+                colsHtml += `<button type="button" class="bubble-btn ${isSelected ? 'selected' : ''}" data-col="${colIdx}" data-val="${opt}">${opt}</button>`;
             });
             colsHtml += `</div>`;
         });
@@ -1016,7 +1002,6 @@ function renderAnswers(question) {
 
         sheet.innerHTML = previewHtml + colsHtml;
 
-        // Xử lý sự kiện tô tròn
         sheet.querySelectorAll(".bubble-btn").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const col = parseInt(e.currentTarget.dataset.col, 10);
@@ -1030,29 +1015,43 @@ function renderAnswers(question) {
 
                 const finalStr = currentChars.join("").trim();
                 if (finalStr !== "") {
-                    answers[currentQuestionIndex] = finalStr;
+                    answers[index] = finalStr;
                 } else {
-                    delete answers[currentQuestionIndex];
+                    delete answers[index];
                 }
 
                 saveAnswers();
-                renderQuestion();
+                renderAnswersForIndex(question, index, container);
+                updateSingleQuestionStatus(index);
+                updateQuestionGrid();
                 syncLiveStatus();
             });
         });
 
-        // Nút Xóa toàn bộ
         const clearBtn = sheet.querySelector(".clear-sheet-btn");
         if (clearBtn) {
             clearBtn.addEventListener("click", () => {
-                delete answers[currentQuestionIndex];
+                delete answers[index];
                 saveAnswers();
-                renderQuestion();
+                renderAnswersForIndex(question, index, container);
+                updateSingleQuestionStatus(index);
+                updateQuestionGrid();
                 syncLiveStatus();
             });
         }
 
-        answerContainer.appendChild(sheet);
+        container.appendChild(sheet);
+    }
+}
+
+function updateSingleQuestionStatus(index) {
+    const statusEl = document.getElementById(`status-${index}`);
+    if (statusEl) {
+        const answered = isQuestionAnswered(answers[index]);
+        statusEl.innerHTML = `
+            <i class="fa-solid fa-circle-check" style="color: ${answered ? '#22c55e' : '#cbd5e1'}"></i>
+            ${answered ? 'Đã trả lời' : 'Chưa trả lời'}
+        `;
     }
 }
 /*==================================================
@@ -1158,7 +1157,7 @@ if (nextQuestionBtn) {
 
 saveCurrentQuestion();
 
-renderQuestion();
+renderAllQuestions();
 
 scrollToQuestion();
 
@@ -1190,7 +1189,7 @@ if (previousQuestionBtn) {
 
 saveCurrentQuestion();
 
-renderQuestion();
+renderAllQuestions();
 
 scrollToQuestion();
 
@@ -1912,7 +1911,7 @@ function formatQuestionText(value) {
 function renderMath() {
     if (window.katex && document.querySelectorAll) {
         try {
-            const elements = document.querySelectorAll("#questionContent, .answer-text, .tf-stmt-text");
+            const elements = document.querySelectorAll(".question-content, .answer-text, .tf-stmt-text, .preview-box, .bubble-btn");
             elements.forEach(el => {
                 if (el.innerHTML.includes("$")) {
                     el.innerHTML = el.innerHTML.replace(/\$(.*?)\$/g, (match, formula) => {
