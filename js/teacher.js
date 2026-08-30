@@ -2244,20 +2244,83 @@ async function uploadVideo() {
     }
 }
 // ====================================
-//        XEM LIVE CỦA HỌC SINH
+//        XEM LIVE CỦA HỌC SINH (BỔ SUNG)
 // ====================================
+let liveUnsubscribe = null;
+
 function startTeacherLiveView(studentId, studentName) {
-    // Bạn có thể tùy chỉnh logic chuyển hướng hoặc mở modal xem live tại đây
-    // Ví dụ: Chuyển hướng sang trang live kèm theo ID học sinh
     if (!studentId) {
         alert("Không tìm thấy thông tin học sinh.");
         return;
     }
+
+    // Tạo hoặc lấy Modal xem live trên giao diện HTML
+    let liveModal = document.getElementById("teacherLiveModal");
+    if (!liveModal) {
+        liveModal = document.createElement("div");
+        liveModal.id = "teacherLiveModal";
+        liveModal.className = "modal";
+        liveModal.style.cssText = "display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;";
+        liveModal.innerHTML = `
+            <div class="modal-content" style="background: #fff; padding: 20px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
+                    <h3 id="liveModalTitle" style="margin: 0;">Đang xem Live: ...</h3>
+                    <button type="button" id="closeLiveModalBtn" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="liveModalBody">
+                    <div class="empty">Đang kết nối tới phiên làm việc của học sinh...</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(liveModal);
+
+        liveModal.querySelector("#closeLiveModalBtn").addEventListener("click", () => {
+            liveModal.style.display = "none";
+            if (liveUnsubscribe) {
+                liveUnsubscribe(); // Hủy lắng nghe realtime khi đóng modal
+                liveUnsubscribe = null;
+            }
+        });
+    }
+
+    document.getElementById("liveModalTitle").textContent = `Đang xem Live: ${studentName}`;
+    const liveBody = document.getElementById("liveModalBody");
+    liveModal.style.display = "flex";
+    liveBody.innerHTML = `<div class="empty">Đang đồng bộ dữ liệu với học sinh...</div>`;
+
+    // Lắng nghe collection hoặc document trạng thái làm bài trực tuyến của học sinh (ví dụ: bảng "studentLiveStatus" hoặc subcollection)
+    // Giả sử học sinh cập nhật trạng thái vào doc: liveStatus / {studentId}
+    const liveRef = doc(db, "liveStatus", studentId);
     
-    // Nếu bạn có trang live riêng, hãy điều hướng hoặc mở popup:
-    // window.open(`live.html?studentId=${studentId}`, "_blank");
-    
-    alert(`Đang kết nối tới phiên làm việc trực tiếp của học sinh: ${studentName} (ID: ${studentId})`);
+    if (liveUnsubscribe) liveUnsubscribe(); // Hủy kết nối cũ nếu có
+
+    liveUnsubscribe = onSnapshot(liveRef, (docSnap) => {
+        if (!docSnap.exists()) {
+            liveBody.innerHTML = `<div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i> Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.</div>`;
+            return;
+        }
+
+        const data = docSnap.data();
+        const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate().toLocaleTimeString('vi-VN') : "Vừa xong";
+
+        let html = `
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #007bff;">
+                <p style="margin: 0 0 5px 0;"><strong>Bài kiểm tra:</strong> ${escapeHtmlTeacher(data.testTitle || "Không rõ")}</p>
+                <p style="margin: 0 0 5px 0;"><strong>Đang ở câu số:</strong> <span style="color: #d9534f; font-weight: bold; font-size: 1.1rem;">Câu ${data.currentQuestionIndex || 1}</span></p>
+                <p style="margin: 0 0 5px 0;"><strong>Phần hiện tại:</strong> Phần ${data.currentPart || 1}</p>
+                <p style="margin: 0; font-size: 0.85rem; color: #666;"><i class="fa-regular fa-clock"></i> Cập nhật lần cuối: ${updatedAt}</p>
+            </div>
+            <div style="border: 1px solid #ddd; padding: 15px; border-radius: 6px; background: #fff;">
+                <h4 style="margin-top: 0; color: #333;">Nội dung học sinh đang nhìn thấy / thao tác:</h4>
+                <p><strong>Câu hỏi:</strong> ${formatChemistryText(data.currentQuestionContent || "Chưa có nội dung")}</p>
+                <p><strong>Đáp án học sinh vừa chọn/nhập:</strong> <span style="color: #28a745; font-weight: bold;">${escapeHtmlTeacher(JSON.stringify(data.currentAnswer) || "Chưa chọn")}</span></p>
+            </div>
+        `;
+        liveBody.innerHTML = html;
+    }, (error) => {
+        console.error("Lỗi live view:", error);
+        liveBody.innerHTML = `<div class="empty">Không thể kết nối trực tiếp với học sinh này.</div>`;
+    });
 }
 // ====================================
 //        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
