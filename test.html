@@ -345,111 +345,6 @@
 
         </div>
 
-
-
-        <!--==================================================
-                        QUESTION SIDEBAR
-        ===================================================-->
-
-        <aside class="question-sidebar">
-
-
-            <div class="sidebar-card">
-
-
-                <!-- HEADER -->
-
-                <div class="sidebar-card-header">
-
-                    <div>
-
-                        <span>
-                            TIẾN ĐỘ
-                        </span>
-
-                        <h3>
-                            Danh sách câu hỏi
-                        </h3>
-
-                    </div>
-
-                    <i class="fa-solid fa-list-check"></i>
-
-                </div>
-
-
-
-                <!-- LEGEND -->
-
-                <div class="question-legend">
-
-
-                    <div class="legend-item">
-
-                        <span class="legend-dot current-dot"></span>
-
-                        <span>
-                            Đang làm
-                        </span>
-
-                    </div>
-
-
-                    <div class="legend-item">
-
-                        <span class="legend-dot answered-dot"></span>
-
-                        <span>
-                            Đã trả lời
-                        </span>
-
-                    </div>
-
-
-                    <div class="legend-item">
-
-                        <span class="legend-dot unanswered-dot"></span>
-
-                        <span>
-                            Chưa trả lời
-                        </span>
-
-                    </div>
-
-
-                </div>
-
-
-
-                <!-- QUESTION GRID -->
-
-                <div
-                    id="questionGrid"
-                    class="question-grid"
-                >
-
-                </div>
-
-
-
-                <!-- SIDEBAR BOTTOM -->
-
-                <div class="sidebar-note">
-
-                    <i class="fa-solid fa-lightbulb"></i>
-
-                    <p>
-                        Bạn có thể nhấn trực tiếp vào số câu để chuyển đến câu hỏi.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-        </aside>
-
-
     </section>
 
 
@@ -516,7 +411,55 @@ window.MathJax = {
     src="js/test.js"
 ></script>
 
+<!-- Thêm nút bấm nổi và khung mục lục ở cuối file HTML (trước thẻ </body>) -->
 
+<!-- Nút mở/đóng mục lục -->
+<button type="button" id="floatingNavToggle" class="floating-nav-toggle" title="Mở danh sách câu hỏi">
+    <i class="fa-solid fa-list-check"></i>
+</button>
+
+<!-- Hộp chứa danh sách câu hỏi dạng ẩn/hiện -->
+<div id="floatingSidebarContainer" class="floating-sidebar-container">
+    <div class="sidebar-card" style="border: none; box-shadow: none; height: 100%;">
+        
+        <!-- HEADER CÓ NÚT ĐÓNG -->
+        <div class="sidebar-card-header">
+            <div>
+                <span>TIẾN ĐỘ</span>
+                <h3>Danh sách câu hỏi</h3>
+            </div>
+            <button type="button" id="closeFloatingNav" class="close-floating-nav">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- LEGEND -->
+        <div class="question-legend">
+            <div class="legend-item">
+                <span class="legend-dot current-dot"></span>
+                <span>Đang làm</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot answered-dot"></span>
+                <span>Đã trả lời</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot unanswered-dot"></span>
+                <span>Chưa trả lời</span>
+            </div>
+        </div>
+
+        <!-- QUESTION GRID -->
+        <div id="questionGrid" class="question-grid" style="max-height: 280px;"></div>
+
+        <!-- SIDEBAR BOTTOM -->
+        <div class="sidebar-note">
+            <i class="fa-solid fa-lightbulb"></i>
+            <p>Nhấn vào số câu để cuộn đến câu hỏi đó.</p>
+        </div>
+
+    </div>
+</div>
 </body>
 
 </html>
