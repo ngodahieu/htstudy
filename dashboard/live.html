@@ -11,7 +11,7 @@
 </head>
 <body>
 
-    <!-- LOADING / TRẠNG THÁI KHI CHƯA KẾT NỐI (Nếu cần dùng từ test.css) -->
+    <!-- LOADING / TRẠNG THÁI KHI CHƯA KẾT NỐI -->
     <div id="testLoading" style="display: none;">
         <i class="fa-solid fa-circle-notch fa-spin"></i>
         <span>Đang kết nối hệ thống trực tuyến...</span>
@@ -20,7 +20,7 @@
     <!-- MAIN HEADER (Đồng bộ với test.css) -->
     <header class="main-header">
         <div class="header-container">
-            <a href="#" class="logo" id="backBtn" style="cursor: pointer;">
+            <a href="teacher.html" class="logo" id="backBtn" style="cursor: pointer;">
                 <div class="logo-icon">
                     <i class="fa-solid fa-arrow-left"></i>
                 </div>
@@ -167,11 +167,13 @@
         document.getElementById("headerStudentName").textContent = studentName;
         document.getElementById("teacherLivePageTitle").textContent = `Giám sát học sinh: ${studentName}`;
         
-        // Nút quay lại trang trước
-        document.getElementById("backBtn").addEventListener("click", (e) => {
-            e.preventDefault();
-            window.history.back();
-        });
+        // Nút quay lại trang teacher.html
+        const handleBack = (e) => {
+            if (e) e.preventDefault();
+            window.location.href = "teacher.html";
+        };
+
+        document.getElementById("backBtn").addEventListener("click", handleBack);
 
         if (studentId) {
             const liveRef = doc(db, "liveStatus", studentId);
@@ -191,14 +193,48 @@
                         <div class="question-card" style="padding: 40px; text-align: center;">
                             <div class="empty" style="color: #64748b; font-size: 15px;">
                                 <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
-                                Học sinh chưa mở bài kiểm tra hoặc chưa bật chế độ làm bài trực tuyến.
+                                Học sinh này chưa bấm vào nút làm bài hoặc chưa mở bài kiểm tra.
+                                <br><br>
+                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
+                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
+                                </button>
                             </div>
                         </div>`;
                     gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Không có dữ liệu</div>`;
+                    
+                    // Tự động chuyển hướng về trang teacher.html sau 3 giây
+                    setTimeout(() => {
+                        window.location.href = "teacher.html";
+                    }, 3000);
                     return;
                 }
 
                 const data = docSnap.data();
+
+                // Kiểm tra nếu trường isStarted hoặc hasStarted bằng false/chưa bật
+                // (Bạn có thể đổi tên thuộc tính `isStarted` trong điều kiện này cho khớp với biến trạng thái lúc học sinh bấm bắt đầu làm bài)
+                if (data.isStarted === false || data.hasStarted === false) {
+                    statusText.textContent = "Chưa làm bài";
+                    statusBox.classList.add("danger");
+                    container.innerHTML = `
+                        <div class="question-card" style="padding: 40px; text-align: center;">
+                            <div class="empty" style="color: #64748b; font-size: 15px;">
+                                <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
+                                Học sinh này chưa bấm vào nút làm bài kiểm tra.
+                                <br><br>
+                                <button onclick="window.location.href='teacher.html'" class="header-submit-btn" style="padding: 10px 20px; font-size: 13px;">
+                                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang quản lý
+                                </button>
+                            </div>
+                        </div>`;
+                    gridContainer.innerHTML = `<div style="grid-column: span 5; text-align: center; color: #94a3b8; padding: 20px; font-size: 13px;">Chưa bắt đầu</div>`;
+                    
+                    setTimeout(() => {
+                        window.location.href = "teacher.html";
+                    }, 3000);
+                    return;
+                }
+
                 statusText.textContent = "Đang trực tuyến";
                 statusBox.classList.remove("danger");
 
@@ -213,8 +249,7 @@
                     statRemainingTime.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }
 
-                // Giả lập hoặc lấy danh sách câu hỏi và trạng thái câu hiện tại từ Firestore structure của bạn
-                // Bạn có thể tùy chỉnh lại biến `data` cho khớp với schema thực tế của cơ sở dữ liệu dự án.
+                // Render giao diện câu hỏi học sinh đang làm
                 container.innerHTML = `
                     <div class="question-card">
                         <div class="question-card-header">
@@ -242,6 +277,9 @@
                         Thiếu tham số mã học sinh (studentId) trên đường dẫn URL.
                     </div>
                 </div>`;
+            setTimeout(() => {
+                window.location.href = "teacher.html";
+            }, 3000);
         }
     </script>
 </body>
