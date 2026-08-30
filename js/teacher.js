@@ -278,7 +278,6 @@ function hideAllPages() {
     if (lessonPage) lessonPage.style.display = "none";
     if (notificationPage) notificationPage.style.display = "none";
     if (testPage) testPage.style.display = "none";
-    if (teacherLivePage) teacherLivePage.style.display = "none";
 }
 
 function escapeHtmlTeacher(value) {
