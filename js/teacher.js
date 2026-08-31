@@ -621,7 +621,6 @@ function renderStudentAccountList(accounts) {
             openStudentTestChapters(currentStudentCourseId);
         });
         card.querySelector(".live-btn").addEventListener("click", () => {
-            // Chuyển hướng sang trang live.html kèm theo ID và Tên học sinh trên URL
             const encodedName = encodeURIComponent(acc.name || "Học sinh");
             window.location.href = `live.html?studentId=${acc.id}&studentName=${encodedName}`;
         });
@@ -2510,7 +2509,7 @@ async function openSingleResultDetailModal(resultId) {
                     </div>`;
                 });
                 html += `</div>`;
-} else if (q.part === 2) {
+            } else if (q.part === 2) {
                 const statements = q.statements || [];
                 const correctAnsArr = q.answers || [];
                 const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
