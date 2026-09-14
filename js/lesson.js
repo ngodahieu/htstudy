@@ -119,14 +119,13 @@ function showLesson(lesson) {
     let contentUrl = "";
     let isPdf = false;
 
-    // Kiểm tra dựa theo tab con đang được chọn, khớp với trường từ teacher_9.js[cite: 38, 39]
-    if (currentTab === "videoTheory" || currentTab === "video") {
+    if (currentTab === "videoTheory") {
         contentUrl = getEmbedUrl(lesson.videoTheory || lesson.video || "");
     } else if (currentTab === "videoExercise") {
         contentUrl = getEmbedUrl(lesson.videoExercise || "");
     } else if (currentTab === "videoHomework") {
         contentUrl = getEmbedUrl(lesson.videoHomework || "");
-    } else if (currentTab === "pdfTheory" || currentTab === "pdf-lythuyet") {
+    } else if (currentTab === "pdfTheory") {
         contentUrl = lesson.pdfTheory || lesson.pdf || "";
         isPdf = true;
     } else if (currentTab === "pdfExercise") {
@@ -139,7 +138,6 @@ function showLesson(lesson) {
 
     if (contentUrl) {
         if (!isPdf) {
-            // Hiển thị khung Video Iframe
             lessonContent.innerHTML = `
             <iframe
                 src="${contentUrl}"
@@ -149,7 +147,6 @@ function showLesson(lesson) {
                 allowfullscreen>
             </iframe>`;
         } else {
-            // Hiển thị khung Tài liệu PDF Iframe
             lessonContent.innerHTML = `
             <iframe
                 src="${contentUrl}"
@@ -165,7 +162,8 @@ function showLesson(lesson) {
         </div>`;
     }
 }
-// Bắt sự kiện click chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
+
+// Xử lý sự kiện click chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
 mainTabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         mainTabButtons.forEach(tab => tab.classList.remove("active"));
@@ -176,19 +174,27 @@ mainTabButtons.forEach(btn => {
         if (parentType === "video-parent") {
             videoSubMenu.style.display = "flex";
             pdfSubMenu.style.display = "none";
-            // Mặc định chọn mục video lý thuyết khi chuyển về tab video chính
+            
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-tab="videoTheory"]');
-            if (defaultSub) defaultSub.classList.add("active");
-            currentTab = "videoTheory";
+            const defaultSub = document.querySelector('[data-sub-tab="videoTheory"], [data-tab="videoTheory"]');
+            if (defaultSub) {
+                defaultSub.classList.add("active");
+                currentTab = defaultSub.dataset.subTab || defaultSub.dataset.tab;
+            } else {
+                currentTab = "videoTheory";
+            }
         } else if (parentType === "pdf-parent") {
             videoSubMenu.style.display = "none";
             pdfSubMenu.style.display = "flex";
-            // Mặc định chọn mục PDF lý thuyết
+            
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-tab="pdfTheory"]');
-            if (defaultSub) defaultSub.classList.add("active");
-            currentTab = "pdfTheory";
+            const defaultSub = document.querySelector('[data-sub-tab="pdfTheory"], [data-tab="pdfTheory"]');
+            if (defaultSub) {
+                defaultSub.classList.add("active");
+                currentTab = defaultSub.dataset.subTab || defaultSub.dataset.tab;
+            } else {
+                currentTab = "pdfTheory";
+            }
         }
 
         if (currentLesson) {
@@ -196,7 +202,7 @@ mainTabButtons.forEach(btn => {
         }
     });
 });
-
+// Xử lý click chọn bài học trong danh sách
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
     if (!item) return;
@@ -209,7 +215,6 @@ document.addEventListener("click", (e) => {
     const lesson = JSON.parse(item.dataset.lesson);
     showLesson(lesson);
 });
-
 tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         tabButtons.forEach(tab => tab.classList.remove("active"));
@@ -234,20 +239,18 @@ tabButtons.forEach(btn => {
         }
     });
 });
-
-// Lắng nghe sự kiện click các nút tab con bên trong (Lý thuyết, Bài tập, BTVN)
+// Xử lý sự kiện click các nút tab con bên trong (Lý thuyết, Bài tập, BTVN)
 subTabButtons.forEach(subBtn => {
     subBtn.addEventListener("click", () => {
         subTabButtons.forEach(sub => sub.classList.remove("active"));
         subBtn.classList.add("active");
-        currentTab = subBtn.dataset.subTab || subBtn.dataset.tab; // Nhận diện loại tab con đang bấm
+        currentTab = subBtn.dataset.subTab || subBtn.dataset.tab;
 
         if (currentLesson) {
             showLesson(currentLesson);
         }
     });
 });
-
 loadCourse();
 
 window.toggleChapter = function(chapterId) {
