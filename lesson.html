@@ -6,11 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bài học | H&T STUDY</title>
 
-<!-- Giữ lại style chung cho background, biến root, header, v.v. -->
 <link rel="stylesheet" href="style.css">
-<!-- Thêm tệp CSS chuyên biệt cho trang bài học -->
 <link rel="stylesheet" href="lesson.css">
-
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
@@ -51,34 +48,36 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
     <div class="lesson-layout">
 
-        <!-- MENU -->
+        <!-- MENU BÊN TRÁI: DẠNG MỤC LỤC THU GỌN -->
         <aside
             id="chapterMenu"
             class="chapter-menu">
         </aside>
 
-        <!-- NỘI DUNG -->
+        <!-- NỘI DUNG BÊN PHẢI -->
         <main class="lesson-view">
-            <h2 id="lessonTitle">
-                Chọn bài học
-            </h2>
-            <p id="lessonDescription">
-            </p>
-
+            
+            <!-- ĐÃ CHUYỂN NÚT VIDEO / PDF LÊN PHÍA TRÊN NỘI DUNG -->
             <div class="lesson-tabs">
                 <button
                     class="tab-btn active"
                     data-tab="video">
                     <i class="fa-solid fa-play"></i>
-                    Video
+                    Video bài giảng
                 </button>
                 <button
                     class="tab-btn"
                     data-tab="pdf">
                     <i class="fa-solid fa-file-pdf"></i>
-                    PDF
+                    Tài liệu PDF
                 </button>
             </div>
+
+            <h2 id="lessonTitle">
+                Chọn bài học
+            </h2>
+            <p id="lessonDescription">
+            </p>
 
             <div
                 id="lessonContent"
