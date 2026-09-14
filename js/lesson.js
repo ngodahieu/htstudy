@@ -119,21 +119,21 @@ function showLesson(lesson) {
     let contentUrl = "";
     let isPdf = false;
 
-    // Kiểm tra dựa theo tab con đang được chọn
-    if (currentTab === "videoTheory") {
-        contentUrl = getEmbedUrl(lesson.videoLyThuyet || lesson.video || "");
+    // Kiểm tra dựa theo tab con đang được chọn, khớp với trường từ teacher_9.js[cite: 38, 39]
+    if (currentTab === "videoTheory" || currentTab === "video") {
+        contentUrl = getEmbedUrl(lesson.videoTheory || lesson.video || "");
     } else if (currentTab === "videoExercise") {
-        contentUrl = getEmbedUrl(lesson.videoBaiTap || "");
+        contentUrl = getEmbedUrl(lesson.videoExercise || "");
     } else if (currentTab === "videoHomework") {
-        contentUrl = getEmbedUrl(lesson.videoBtvn || "");
-    } else if (currentTab === "pdfTheory") {
-        contentUrl = lesson.pdfLyThuyet || lesson.pdf || "";
+        contentUrl = getEmbedUrl(lesson.videoHomework || "");
+    } else if (currentTab === "pdfTheory" || currentTab === "pdf-lythuyet") {
+        contentUrl = lesson.pdfTheory || lesson.pdf || "";
         isPdf = true;
     } else if (currentTab === "pdfExercise") {
-        contentUrl = lesson.pdfBaiTap || "";
+        contentUrl = lesson.pdfExercise || "";
         isPdf = true;
     } else if (currentTab === "pdfHomework") {
-        contentUrl = lesson.pdfBtvn || "";
+        contentUrl = lesson.pdfHomework || "";
         isPdf = true;
     }
 
@@ -165,7 +165,6 @@ function showLesson(lesson) {
         </div>`;
     }
 }
-
 // Bắt sự kiện click chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
 mainTabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
