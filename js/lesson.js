@@ -20,9 +20,12 @@ const lessonContent = document.getElementById("lessonContent");
 const tabButtons = document.querySelectorAll(".tab-btn");
 const subTabButtons = document.querySelectorAll(".sub-tab-btn");
 const pdfSubMenu = document.getElementById("pdfSubMenu");
+const videoSubMenu = document.getElementById("videoSubMenu");
+const mainTabButtons = document.querySelectorAll(".tab-btn");
+const subTabButtons = document.querySelectorAll(".sub-tab-btn");
 
 let currentLesson = null;
-let currentTab = "video";
+let currentTab = "video-lythuyet";
 
 async function loadCourse() {
     const snap = await getDoc(doc(db, "courses", courseId));
@@ -97,55 +100,102 @@ async function loadLessons(chapterId) {
         showLesson(firstLesson);
     }
 }
-
+function getEmbedUrl(rawUrl) {
+    if (!rawUrl) return "";
+    if (rawUrl.includes("youtu.be/")) {
+        const id = rawUrl.split("youtu.be/")[1]?.split("?")[0];
+        return `https://www.youtube.com/embed/${id}`;
+    } else if (rawUrl.includes("watch?v=")) {
+        return rawUrl.replace("watch?v=", "embed/").split("&")[0];
+    }
+    return rawUrl;
+}
 function showLesson(lesson) {
     currentLesson = lesson;
     lessonTitle.textContent = lesson.title;
     lessonDescription.textContent = lesson.description || "";
 
-    if (currentTab === "video") {
-        let videoUrl = "";
-        if (lesson.video) {
-            if (lesson.video.includes("youtu.be/")) {
-                const id = lesson.video.split("youtu.be/")[1];
-                videoUrl = `https://www.youtube.com/embed/${id}`;
-            } else if (lesson.video.includes("watch?v=")) {
-                videoUrl = lesson.video.replace("watch?v=", "embed/");
-            } else {
-                videoUrl = lesson.video;
-            }
-        }
-        lessonContent.innerHTML = `
-        <iframe
-            src="${videoUrl}"
-            width="100%"
-            height="600"
-            frameborder="0"
-            allowfullscreen>
-        </iframe>`;
-    } else {
-        // Xử lý hiển thị tương ứng cho 3 mục PDF con
-        let pdfUrl = "";
-        if (currentTab === "pdf-lythuyet") pdfUrl = lesson.pdfLyThuyet || lesson.pdf || "";
-        if (currentTab === "pdf-baitap") pdfUrl = lesson.pdfBaiTap || "";
-        if (currentTab === "pdf-btvn") pdfUrl = lesson.pdfBtvn || "";
+    let contentUrl = "";
+    let isPdf = false;
 
-        if (pdfUrl) {
+    // Kiểm tra dựa theo tab con đang được chọn
+    if (currentTab === "video-lythuyet") {
+        contentUrl = getEmbedUrl(lesson.videoLyThuyet || lesson.video || "");
+    } else if (currentTab === "video-baitap") {
+        contentUrl = getEmbedUrl(lesson.videoBaiTap || "");
+    } else if (currentTab === "video-btvn") {
+        contentUrl = getEmbedUrl(lesson.videoBtvn || "");
+    } else if (currentTab === "pdf-lythuyet") {
+        contentUrl = lesson.pdfLyThuyet || lesson.pdf || "";
+        isPdf = true;
+    } else if (currentTab === "pdf-baitap") {
+        contentUrl = lesson.pdfBaiTap || "";
+        isPdf = true;
+    } else if (currentTab === "pdf-btvn") {
+        contentUrl = lesson.pdfBtvn || "";
+        isPdf = true;
+    }
+
+    if (contentUrl) {
+        if (!isPdf) {
+            // Hiển thị khung Video Iframe
             lessonContent.innerHTML = `
             <iframe
-                src="${pdfUrl}"
+                src="${contentUrl}"
+                width="100%"
+                height="600"
+                frameborder="0"
+                allowfullscreen>
+            </iframe>`;
+        } else {
+            // Hiển thị khung Tài liệu PDF Iframe
+            lessonContent.innerHTML = `
+            <iframe
+                src="${contentUrl}"
                 width="100%"
                 height="700">
             </iframe>`;
-        } else {
-            lessonContent.innerHTML = `
-            <div style="padding: 40px; text-align: center; color: #9fb6d8; font-size: 1.1rem;">
-                <i class="fa-solid fa-circle-exclamation" style="font-size: 2rem; margin-bottom: 10px; color: #3acfff;"></i>
-                <p>Chưa có tài liệu cho phần này.</p>
-            </div>`;
         }
+    } else {
+        lessonContent.innerHTML = `
+        <div style="padding: 40px; text-align: center; color: #9fb6d8; font-size: 1.1rem;">
+            <i class="fa-solid fa-circle-exclamation" style="font-size: 2rem; margin-bottom: 10px; color: #3acfff;"></i>
+            <p>Chưa có nội dung cho phần này.</p>
+        </div>`;
     }
 }
+
+// Bắt sự kiện click chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
+mainTabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        mainTabButtons.forEach(tab => tab.classList.remove("active"));
+        btn.classList.add("active");
+        
+        const parentType = btn.dataset.tab;
+
+        if (parentType === "video-parent") {
+            videoSubMenu.style.display = "flex";
+            pdfSubMenu.style.display = "none";
+            // Mặc định chọn mục video lý thuyết khi chuyển về tab video chính
+            subTabButtons.forEach(sub => sub.classList.remove("active"));
+            const defaultSub = document.querySelector('[data-tab="video-lythuyet"]');
+            if (defaultSub) defaultSub.classList.add("active");
+            currentTab = "video-lythuyet";
+        } else if (parentType === "pdf-parent") {
+            videoSubMenu.style.display = "none";
+            pdfSubMenu.style.display = "flex";
+            // Mặc định chọn mục PDF lý thuyết
+            subTabButtons.forEach(sub => sub.classList.remove("active"));
+            const defaultSub = document.querySelector('[data-tab="pdf-lythuyet"]');
+            if (defaultSub) defaultSub.classList.add("active");
+            currentTab = "pdf-lythuyet";
+        }
+
+        if (currentLesson) {
+            showLesson(currentLesson);
+        }
+    });
+});
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
     if (!item) return;
@@ -188,7 +238,7 @@ subTabButtons.forEach(subBtn => {
     subBtn.addEventListener("click", () => {
         subTabButtons.forEach(sub => sub.classList.remove("active"));
         subBtn.classList.add("active");
-        currentTab = subBtn.dataset.tab; // Nhận giá trị: pdf-lythuyet, pdf-baitap, hoặc pdf-btvn
+        currentTab = subBtn.dataset.subTab || subBtn.dataset.tab; // Nhận diện loại tab con đang bấm
 
         if (currentLesson) {
             showLesson(currentLesson);
