@@ -28,75 +28,35 @@ const searchInput =
 document.getElementById("searchCourse");
 const courseSidebar =
 document.getElementById("courseSidebar");
-function createCard(course,locked=false){
-
+function createCard(course, locked = false) {
     return `
-
-<div
-class="course-card"
-id="course-${course.id}">
-
-<div class="course-banner">
-
-<img src="${course.image}">
-
-</div>
-
-<div class="course-content">
-
-<div class="course-subject">
-
-${course.subject}
-
-</div>
-
-<h3 class="course-title">
-
-${course.course}
-
-</h3>
-
-<p class="course-desc">
-
-${course.description || "Khóa học tham khảo."}
-
-</p>
-
-<div class="course-footer">
-
-<span class="course-tag ${locked?"lock":""}">
-
-${locked?"Chưa cấp":"Đã cấp"}
-
-</span>
-
-${
-locked?
-
-`<button class="enter-btn" disabled>
-
-Chưa mở
-
-</button>`
-
-:
-
-`<button class="enter-btn">
-
-Vào học
-
-</button>`
-
-}
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
+        <div class="course-card" id="course-${course.id}">
+            <div class="course-banner">
+                <img src="${course.image}">
+            </div>
+            <div class="course-content">
+                <div class="course-subject">
+                    ${course.subject}
+                </div>
+                <h3 class="course-title">
+                    ${course.course}
+                </h3>
+                <p class="course-desc">
+                    ${course.description || "Khóa học tham khảo."}
+                </p>
+                <div class="course-footer">
+                    <span class="course-tag ${locked ? "lock" : ""}">
+                        ${locked ? "Chưa cấp" : "Đã cấp"}
+                    </span>
+                    ${
+                        locked
+                        ? `<button class="enter-btn" disabled>Chưa mở</button>`
+                        : `<button class="enter-btn" onclick="location.href='lesson.html?id=${course.id}'">Vào học</button>`
+                    }
+                </div>
+            </div>
+        </div>
+    `;
 }
 function buildMenu(courses, container){
 
@@ -173,18 +133,12 @@ subjectDiv.appendChild(subjectTitle);
             subjectDiv.className = "menu-subject";
 
 
-            tree[grade][subject].forEach(course=>{
-
-                const a = document.createElement("a");
-
-                a.href = `course.html?id=${course.id}`;
-
-                a.innerHTML =
-`📘 ${course.name}`;
-
-                courseContainer.appendChild(a);
-
-            });
+            tree[grade][subject].forEach(course => {
+    const a = document.createElement("a");
+    a.href = `lesson.html?id=${course.id}`; // <-- Đã đổi thành lesson.html
+    a.innerHTML = `📘 ${course.name}`;
+    courseContainer.appendChild(a);
+});
 subjectDiv.appendChild(courseContainer);
             gradeContent.appendChild(subjectDiv);
 subjectTitle.onclick = (e)=>{
