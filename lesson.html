@@ -69,9 +69,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <div class="lesson-tabs">
     <button
         class="tab-btn active"
-        data-tab="video">
+        data-tab="video-parent">
         <i class="fa-solid fa-play"></i>
         Video bài giảng
+        <i class="fa-solid fa-chevron-down toggle-arrow"></i>
     </button>
     <button
         class="tab-btn"
@@ -81,7 +82,18 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         <i class="fa-solid fa-chevron-down pdf-toggle-arrow"></i>
     </button>
 </div>
-
+<!-- KHU VỰC MENU CON CHO VIDEO (HIỆN RA KHI BẤM VÀO VIDEO BÀI GIẢNG) -->
+<div id="videoSubMenu" class="sub-menu-container" style="display: flex;">
+    <button class="sub-tab-btn active" data-tab="video-lythuyet">
+        <i class="fa-solid fa-book-open"></i> Video Lý thuyết
+    </button>
+    <button class="sub-tab-btn" data-tab="video-baitap">
+        <i class="fa-solid fa-pen-clip"></i> Video Bài tập
+    </button>
+    <button class="sub-tab-btn" data-tab="video-btvn">
+        <i class="fa-solid fa-house-chimney"></i> Video BTVN
+    </button>
+</div>
 <!-- KHU VỰC MENU CON HIỆN RA KHI BẤM VÀO TÀI LIỆU PDF -->
 <div id="pdfSubMenu" class="pdf-sub-menu" style="display: none;">
     <button class="sub-tab-btn active" data-tab="pdf-lythuyet">
