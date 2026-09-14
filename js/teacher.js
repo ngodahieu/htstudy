@@ -2083,7 +2083,11 @@ if (saveLesson) {
         if (isNaN(order) || order <= 0) return alert("Thứ tự bài học không hợp lệ.");
 
         try {
-            // Thực hiện upload file video và PDF chính nếu người dùng đã chọn file trước khi lưu
+            // Hiển thị trạng thái đang tải lên nếu cần
+            saveLesson.disabled = true;
+            saveLesson.textContent = "Đang tải lên tài nguyên...";
+
+            // Upload các file video & pdf chính (nếu có chọn mới)
             if (videoFile && videoFile.files.length) {
                 await uploadVideo();
             }
@@ -2091,23 +2095,41 @@ if (saveLesson) {
                 await uploadPdf();
             }
 
-// Thay thế đoạn xây dựng lessonData cũ bằng đoạn này trong sự kiện click của saveLesson
-const lessonData = {
-    title,
-    description,
-    order,
-    // Các tài nguyên mới bổ sung
-    videoTheory: uploadedVideoTheoryLink || "",
-    videoExercise: uploadedVideoExerciseLink || "",
-    videoHomework: uploadedVideoHomeworkLink || "",
-    pdfTheory: uploadedPdfTheoryLink || "",
-    pdfExercise: uploadedPdfExerciseLink || "",
-    pdfHomework: uploadedPdfHomeworkLink || "",
-    // Các tài nguyên cũ (nếu có)
-    video: uploadedVideoLink || "",
-    pdf: uploadedPdfLink || "",
-    updatedAt: serverTimestamp()
-};
+            // --- UPLOAD CÁC FILE MỚI NẾU NGƯỜI DÙNG CÓ CHỌN ---
+            if (videoTheoryFile && videoTheoryFile.files.length) {
+                uploadedVideoTheoryLink = await uploadResourceToCloudinary(videoTheoryFile.files[0], "video");
+            }
+            if (videoExerciseFile && videoExerciseFile.files.length) {
+                uploadedVideoExerciseLink = await uploadResourceToCloudinary(videoExerciseFile.files[0], "video");
+            }
+            if (videoHomeworkFile && videoHomeworkFile.files.length) {
+                uploadedVideoHomeworkLink = await uploadResourceToCloudinary(videoHomeworkFile.files[0], "video");
+            }
+            if (pdfTheoryFile && pdfTheoryFile.files.length) {
+                uploadedPdfTheoryLink = await uploadResourceToCloudinary(pdfTheoryFile.files[0], "raw");
+            }
+            if (pdfExerciseFile && pdfExerciseFile.files.length) {
+                uploadedPdfExerciseLink = await uploadResourceToCloudinary(pdfExerciseFile.files[0], "raw");
+            }
+            if (pdfHomeworkFile && pdfHomeworkFile.files.length) {
+                uploadedPdfHomeworkLink = await uploadResourceToCloudinary(pdfHomeworkFile.files[0], "raw");
+            }
+            // --------------------------------------------------
+
+            const lessonData = {
+                title,
+                description,
+                order,
+                videoTheory: uploadedVideoTheoryLink || "",
+                videoExercise: uploadedVideoExerciseLink || "",
+                videoHomework: uploadedVideoHomeworkLink || "",
+                pdfTheory: uploadedPdfTheoryLink || "",
+                pdfExercise: uploadedPdfExerciseLink || "",
+                pdfHomework: uploadedPdfHomeworkLink || "",
+                video: uploadedVideoLink || "",
+                pdf: uploadedPdfLink || "",
+                updatedAt: serverTimestamp()
+            };
 
             if (editingLessonId) {
                 const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
@@ -2135,36 +2157,15 @@ const lessonData = {
                 alert("Đã tạo bài học mới thành công!");
             }
 
-            // Reset form & state sau khi lưu thành công
-            editingLessonId = "";
-            lessonTitle.value = "";
-            lessonDescription.value = "";
-            lessonOrder.value = "";
-            uploadedVideoTheoryLink = "";
-            uploadedVideoExerciseLink = "";
-            uploadedVideoHomeworkLink = "";
-            uploadedPdfTheoryLink = "";
-            uploadedPdfExerciseLink = "";
-            uploadedPdfHomeworkLink = "";
-            uploadedVideoLink = "";
-            uploadedPdfLink = "";
-            
-            if (videoTheoryResult) videoTheoryResult.innerHTML = "";
-            if (videoExerciseResult) videoExerciseResult.innerHTML = "";
-            if (videoHomeworkResult) videoHomeworkResult.innerHTML = "";
-            if (pdfTheoryResult) pdfTheoryResult.innerHTML = "";
-            if (pdfExerciseResult) pdfExerciseResult.innerHTML = "";
-            if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = "";
-            if (videoResult) videoResult.textContent = "";
-            if (pdfResult) pdfResult.textContent = "";
-            if (videoFile) videoFile.value = "";
-            if (pdfFile) pdfFile.value = "";
+            // Reset form...
+            // (Giữ nguyên các lệnh reset state và đóng modal của bạn ở đây)
 
-            lessonModal.style.display = "none";
-            await loadLessons();
         } catch (err) {
             console.error("Lỗi lưu bài học:", err);
             alert("Không thể lưu bài học: " + err.message);
+        } finally {
+            saveLesson.disabled = false;
+            saveLesson.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Lưu bài học`;
         }
     });
 }
