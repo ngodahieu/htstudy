@@ -24,7 +24,7 @@ const videoSubMenu = document.getElementById("videoSubMenu");
 const mainTabButtons = document.querySelectorAll(".tab-btn");
 
 let currentLesson = null;
-let currentTab = "video-lythuyet";
+let currentTab = "videoTheory";
 
 async function loadCourse() {
     const snap = await getDoc(doc(db, "courses", courseId));
@@ -120,19 +120,19 @@ function showLesson(lesson) {
     let isPdf = false;
 
     // Kiểm tra dựa theo tab con đang được chọn
-    if (currentTab === "video-lythuyet") {
+    if (currentTab === "videoTheory") {
         contentUrl = getEmbedUrl(lesson.videoLyThuyet || lesson.video || "");
-    } else if (currentTab === "video-baitap") {
+    } else if (currentTab === "videoExercise") {
         contentUrl = getEmbedUrl(lesson.videoBaiTap || "");
-    } else if (currentTab === "video-btvn") {
+    } else if (currentTab === "videoHomework") {
         contentUrl = getEmbedUrl(lesson.videoBtvn || "");
-    } else if (currentTab === "pdf-lythuyet") {
+    } else if (currentTab === "pdfTheory") {
         contentUrl = lesson.pdfLyThuyet || lesson.pdf || "";
         isPdf = true;
-    } else if (currentTab === "pdf-baitap") {
+    } else if (currentTab === "pdfExercise") {
         contentUrl = lesson.pdfBaiTap || "";
         isPdf = true;
-    } else if (currentTab === "pdf-btvn") {
+    } else if (currentTab === "pdfHomework") {
         contentUrl = lesson.pdfBtvn || "";
         isPdf = true;
     }
@@ -179,17 +179,17 @@ mainTabButtons.forEach(btn => {
             pdfSubMenu.style.display = "none";
             // Mặc định chọn mục video lý thuyết khi chuyển về tab video chính
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-tab="video-lythuyet"]');
+            const defaultSub = document.querySelector('[data-tab="videoTheory"]');
             if (defaultSub) defaultSub.classList.add("active");
-            currentTab = "video-lythuyet";
+            currentTab = "videoTheory";
         } else if (parentType === "pdf-parent") {
             videoSubMenu.style.display = "none";
             pdfSubMenu.style.display = "flex";
             // Mặc định chọn mục PDF lý thuyết
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-tab="pdf-lythuyet"]');
+            const defaultSub = document.querySelector('[data-tab="pdfTheory"]');
             if (defaultSub) defaultSub.classList.add("active");
-            currentTab = "pdf-lythuyet";
+            currentTab = "pdfTheory";
         }
 
         if (currentLesson) {
