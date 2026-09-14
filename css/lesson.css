@@ -544,3 +544,53 @@
         height: 380px;
     }
 }
+/* Bổ sung tùy chỉnh cho cụm tab nhiều nút */
+.lesson-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(120, 190, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    color: #d8e9ff;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(120, 190, 255, 0.15);
+    transition: all 0.35s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tab-btn i {
+    font-size: 15px;
+    color: #4ac7ff;
+    transition: color 0.3s;
+}
+
+.tab-btn:hover {
+    background: rgba(0, 170, 255, 0.15);
+    border-color: #4ac7ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 170, 255, 0.25);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #0f67df, #39d2ff);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 25px rgba(0, 170, 255, 0.4);
+}
+
+.tab-btn.active i {
+    color: #fff;
+}
