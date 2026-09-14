@@ -17,14 +17,13 @@ const chapterMenu = document.getElementById("chapterMenu");
 const lessonTitle = document.getElementById("lessonTitle");
 const lessonDescription = document.getElementById("lessonDescription");
 const lessonContent = document.getElementById("lessonContent");
-const tabButtons = document.querySelectorAll(".tab-btn");
 const subTabButtons = document.querySelectorAll(".sub-tab-btn");
 const pdfSubMenu = document.getElementById("pdfSubMenu");
 const videoSubMenu = document.getElementById("videoSubMenu");
 const mainTabButtons = document.querySelectorAll(".tab-btn");
 
 let currentLesson = null;
-let currentTab = "videoTheory";
+let currentTab = "videoTheory"; // Mặc định ban đầu
 
 async function loadCourse() {
     const snap = await getDoc(doc(db, "courses", courseId));
@@ -119,6 +118,7 @@ function showLesson(lesson) {
     let contentUrl = "";
     let isPdf = false;
 
+    // Ánh xạ chính xác giá trị của currentTab với Firestore fields
     if (currentTab === "videoTheory") {
         contentUrl = getEmbedUrl(lesson.videoTheory || lesson.video || "");
     } else if (currentTab === "videoExercise") {
@@ -163,7 +163,7 @@ function showLesson(lesson) {
     }
 }
 
-// Xử lý sự kiện click chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
+// 1. Xử lý chuyển đổi tab chính (Video bài giảng / Tài liệu PDF)
 mainTabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
         mainTabButtons.forEach(tab => tab.classList.remove("active"));
@@ -202,7 +202,8 @@ mainTabButtons.forEach(btn => {
         }
     });
 });
-// Xử lý click chọn bài học trong danh sách
+
+// 2. Xử lý click chọn bài học trong danh sách
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
     if (!item) return;
@@ -215,31 +216,8 @@ document.addEventListener("click", (e) => {
     const lesson = JSON.parse(item.dataset.lesson);
     showLesson(lesson);
 });
-tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-        tabButtons.forEach(tab => tab.classList.remove("active"));
-        btn.classList.add("active");
-        
-        const tabType = btn.dataset.tab;
 
-        if (tabType === "video") {
-            pdfSubMenu.style.display = "none"; // Ẩn menu con PDF đi
-            currentTab = "video";
-        } else if (tabType === "pdf-parent") {
-            pdfSubMenu.style.display = "flex"; // Hiện menu con PDF ra
-            // Mặc định chọn mục "Lý thuyết" khi bấm vào Tài liệu PDF lần đầu
-            subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-tab="pdf-lythuyet"]');
-            if(defaultSub) defaultSub.classList.add("active");
-            currentTab = "pdf-lythuyet";
-        }
-
-        if (currentLesson) {
-            showLesson(currentLesson);
-        }
-    });
-});
-// Xử lý sự kiện click các nút tab con bên trong (Lý thuyết, Bài tập, BTVN)
+// 3. Xử lý sự kiện click các nút tab con bên trong (Lý thuyết, Bài tập, BTVN)
 subTabButtons.forEach(subBtn => {
     subBtn.addEventListener("click", () => {
         subTabButtons.forEach(sub => sub.classList.remove("active"));
@@ -251,6 +229,7 @@ subTabButtons.forEach(subBtn => {
         }
     });
 });
+
 loadCourse();
 
 window.toggleChapter = function(chapterId) {
