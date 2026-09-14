@@ -141,6 +141,31 @@ const lessonTitle = document.getElementById("lessonTitle");
 const lessonDescription = document.getElementById("lessonDescription");
 const lessonOrder = document.getElementById("lessonOrder");
 
+// --- DOM elements cho các file video & pdf mới trong teacher_3.js ---[cite: 31]
+const videoTheoryFile = document.getElementById("videoTheoryFile");
+const videoExerciseFile = document.getElementById("videoExerciseFile");
+const videoHomeworkFile = document.getElementById("videoHomeworkFile");
+
+const uploadVideoTheoryBtn = document.getElementById("uploadVideoTheoryBtn");
+const uploadVideoExerciseBtn = document.getElementById("uploadVideoExerciseBtn");
+const uploadVideoHomeworkBtn = document.getElementById("uploadVideoHomeworkBtn");
+
+const videoTheoryResult = document.getElementById("videoTheoryResult");
+const videoExerciseResult = document.getElementById("videoExerciseResult");
+const videoHomeworkResult = document.getElementById("videoHomeworkResult");
+
+const pdfTheoryFile = document.getElementById("pdfTheoryFile");
+const pdfExerciseFile = document.getElementById("pdfExerciseFile");
+const pdfHomeworkFile = document.getElementById("pdfHomeworkFile");
+
+const uploadPdfTheoryBtn = document.getElementById("uploadPdfTheoryBtn");
+const uploadPdfExerciseBtn = document.getElementById("uploadPdfExerciseBtn");
+const uploadPdfHomeworkBtn = document.getElementById("uploadPdfHomeworkBtn");
+
+const pdfTheoryResult = document.getElementById("pdfTheoryResult");
+const pdfExerciseResult = document.getElementById("pdfExerciseResult");
+const pdfHomeworkResult = document.getElementById("pdfHomeworkResult");
+
 const pdfFile = document.getElementById("pdfFile");
 const imageFile = document.getElementById("imageFile");
 const documentFile = document.getElementById("documentFile");
@@ -203,8 +228,18 @@ let part1QuestionData = [];
 let part2QuestionData = [];
 let part3QuestionData = [];
 
+// Global states cho các tài nguyên mới[cite: 31]
+let uploadedVideoTheoryLink = "";
+let uploadedVideoExerciseLink = "";
+let uploadedVideoHomeworkLink = "";
+
+let uploadedPdfTheoryLink = "";
+let uploadedPdfExerciseLink = "";
+let uploadedPdfHomeworkLink = "";
+
 let uploadedPdfLink = "";
 let uploadedVideoLink = "";
+
 /*==================================================
         HÀM TRÍCH XUẤT VÀ TÍNH ĐIỂM (BỔ SUNG)
 ==================================================*/
@@ -261,6 +296,7 @@ function normalizeTextAnswer(ans) {
     if (ans === undefined || ans === null) return "";
     return String(ans).trim().replace(',', '.').toLowerCase();
 }
+
 // ====================================
 //        HELPER FUNCTIONS
 // ====================================
@@ -608,7 +644,6 @@ function renderStudentAccountList(accounts) {
                 <button class="primary-btn test-result-btn" data-id="${acc.id}" style="padding: 6px 12px; font-size: 0.9rem; background-color: #28a745;">
                     <i class="fa-solid fa-square-poll-vertical"></i> Kết quả kiểm tra
                 </button>
-
                 <button class="primary-btn live-btn" data-id="${acc.id}" data-name="${escapeHtmlTeacher(acc.name)}" style="padding: 6px 12px; font-size: 0.9rem;">
                     <i class="fa-solid fa-tower-broadcast"></i> Xem Live
                 </button>
@@ -1918,6 +1953,22 @@ if (createLessonBtn) {
         if (lessonTitle) lessonTitle.value = "";
         if (lessonDescription) lessonDescription.value = "";
         if (lessonOrder) lessonOrder.value = "";
+        
+        // Reset states tài nguyên mới
+        uploadedVideoTheoryLink = "";
+        uploadedVideoExerciseLink = "";
+        uploadedVideoHomeworkLink = "";
+        uploadedPdfTheoryLink = "";
+        uploadedPdfExerciseLink = "";
+        uploadedPdfHomeworkLink = "";
+        
+        if (videoTheoryResult) videoTheoryResult.innerHTML = "";
+        if (videoExerciseResult) videoExerciseResult.innerHTML = "";
+        if (videoHomeworkResult) videoHomeworkResult.innerHTML = "";
+        if (pdfTheoryResult) pdfTheoryResult.innerHTML = "";
+        if (pdfExerciseResult) pdfExerciseResult.innerHTML = "";
+        if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = "";
+
         if (lessonModal) lessonModal.style.display = "flex";
     });
 }
@@ -1928,58 +1979,189 @@ if (cancelLesson) {
     });
 }
 
+// --- Gán sự kiện click & chọn file cho các nút tài nguyên mới ---[cite: 31]
+if (uploadVideoTheoryBtn && videoTheoryFile) {
+    uploadVideoTheoryBtn.addEventListener("click", () => videoTheoryFile.click());
+    videoTheoryFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            videoTheoryResult.textContent = "Đang tải lên video lý thuyết...";
+            uploadedVideoTheoryLink = await uploadResourceToCloudinary(file, "video");
+            videoTheoryResult.innerHTML = uploadedVideoTheoryLink ? `<a href="${uploadedVideoTheoryLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+if (uploadVideoExerciseBtn && videoExerciseFile) {
+    uploadVideoExerciseBtn.addEventListener("click", () => videoExerciseFile.click());
+    videoExerciseFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            videoExerciseResult.textContent = "Đang tải lên video bài tập...";
+            uploadedVideoExerciseLink = await uploadResourceToCloudinary(file, "video");
+            videoExerciseResult.innerHTML = uploadedVideoExerciseLink ? `<a href="${uploadedVideoExerciseLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+if (uploadVideoHomeworkBtn && videoHomeworkFile) {
+    uploadVideoHomeworkBtn.addEventListener("click", () => videoHomeworkFile.click());
+    videoHomeworkFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            videoHomeworkResult.textContent = "Đang tải lên video BTVN...";
+            uploadedVideoHomeworkLink = await uploadResourceToCloudinary(file, "video");
+            videoHomeworkResult.innerHTML = uploadedVideoHomeworkLink ? `<a href="${uploadedVideoHomeworkLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+if (uploadPdfTheoryBtn && pdfTheoryFile) {
+    uploadPdfTheoryBtn.addEventListener("click", () => pdfTheoryFile.click());
+    pdfTheoryFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            pdfTheoryResult.textContent = "Đang tải lên PDF lý thuyết...";
+            uploadedPdfTheoryLink = await uploadResourceToCloudinary(file, "raw");
+            pdfTheoryResult.innerHTML = uploadedPdfTheoryLink ? `<a href="${uploadedPdfTheoryLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+if (uploadPdfExerciseBtn && pdfExerciseFile) {
+    uploadPdfExerciseBtn.addEventListener("click", () => pdfExerciseFile.click());
+    pdfExerciseFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            pdfExerciseResult.textContent = "Đang tải lên PDF bài tập...";
+            uploadedPdfExerciseLink = await uploadResourceToCloudinary(file, "raw");
+            pdfExerciseResult.innerHTML = uploadedPdfExerciseLink ? `<a href="${uploadedPdfExerciseLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+if (uploadPdfHomeworkBtn && pdfHomeworkFile) {
+    uploadPdfHomeworkBtn.addEventListener("click", () => pdfHomeworkFile.click());
+    pdfHomeworkFile.addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            pdfHomeworkResult.textContent = "Đang tải lên PDF BTVN...";
+            uploadedPdfHomeworkLink = await uploadResourceToCloudinary(file, "raw");
+            pdfHomeworkResult.innerHTML = uploadedPdfHomeworkLink ? `<a href="${uploadedPdfHomeworkLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+        }
+    });
+}
+
+// Hàm hỗ trợ upload chung lên Cloudinary[cite: 31]
+async function uploadResourceToCloudinary(file, resourceType = "auto") {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "htstudy");
+    formData.append("resource_type", resourceType);
+
+    try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/xhljajy6/${resourceType}/upload`, {
+            method: "POST",
+            body: formData
+        });
+        const data = await res.json();
+        return data.secure_url || "";
+    } catch (err) {
+        console.error("Lỗi upload:", err);
+        return "";
+    }
+}
+
+// Cập nhật sự kiện Lưu bài học (`saveLesson`)[cite: 31]
 if (saveLesson) {
     saveLesson.addEventListener("click", async () => {
         const title = lessonTitle.value.trim();
         const description = lessonDescription.value.trim();
         const order = Number(lessonOrder.value);
 
-        if (!title) return alert("Nhập tên bài học.");
-        if (order <= 0) return alert("Thứ tự không hợp lệ.");
+        if (!title) return alert("Vui lòng nhập tên bài học.");
+        if (isNaN(order) || order <= 0) return alert("Thứ tự bài học không hợp lệ.");
 
-        if (editingLessonId) {
-            const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
-            const snap = await getDoc(lessonRef);
-            const oldData = snap.data();
+        const lessonData = {
+            title,
+            description,
+            order,
+            videoTheory: uploadedVideoTheoryLink || "",
+            videoExercise: uploadedVideoExerciseLink || "",
+            videoHomework: uploadedVideoHomeworkLink || "",
+            pdfTheory: uploadedPdfTheoryLink || "",
+            pdfExercise: uploadedPdfExerciseLink || "",
+            pdfHomework: uploadedPdfHomeworkLink || "",
+            video: uploadedVideoLink || "",
+            pdf: uploadedPdfLink || "",
+            updatedAt: serverTimestamp()
+        };
 
-            if (pdfFile.files.length) await uploadPdf();
-            if (videoFile.files.length) await uploadVideo();
+        try {
+            if (editingLessonId) {
+                const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
+                const snap = await getDoc(lessonRef);
+                const oldData = snap.exists() ? snap.data() : {};
 
-            await updateDoc(lessonRef, {
-                title,
-                description,
-                order,
-                video: uploadedVideoLink || oldData.video || "",
-                pdf: uploadedPdfLink || oldData.pdf || ""
-            });
-        } else {
-            const lessonId = "lesson_" + Date.now();
-            if (videoFile.files.length) await uploadVideo();
-            if (pdfFile.files.length) await uploadPdf();
+                // Giữ lại link cũ nếu không upload mới
+                lessonData.video = uploadedVideoLink || oldData.video || "";
+                lessonData.pdf = uploadedPdfLink || oldData.pdf || "";
+                lessonData.videoTheory = uploadedVideoTheoryLink || oldData.videoTheory || "";
+                lessonData.videoExercise = uploadedVideoExerciseLink || oldData.videoExercise || "";
+                lessonData.videoHomework = uploadedVideoHomeworkLink || oldData.videoHomework || "";
+                lessonData.pdfTheory = uploadedPdfTheoryLink || oldData.pdfTheory || "";
+                lessonData.pdfExercise = uploadedPdfExerciseLink || oldData.pdfExercise || "";
+                lessonData.pdfHomework = uploadedPdfHomeworkLink || oldData.pdfHomework || "";
 
-            await setDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId), {
-                title,
-                description,
-                order,
-                video: uploadedVideoLink,
-                pdf: uploadedPdfLink,
-                createdAt: serverTimestamp()
-            });
+                if (pdfFile && pdfFile.files.length) await uploadPdf();
+                if (videoFile && videoFile.files.length) await uploadVideo();
+
+                await updateDoc(lessonRef, lessonData);
+                alert("Đã cập nhật bài học thành công!");
+            } else {
+                if (videoFile && videoFile.files.length) await uploadVideo();
+                if (pdfFile && pdfFile.files.length) await uploadPdf();
+
+                lessonData.video = uploadedVideoLink;
+                lessonData.pdf = uploadedPdfLink;
+
+                const lessonId = "lesson_" + Date.now();
+                await setDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId), {
+                    ...lessonData,
+                    createdAt: serverTimestamp()
+                });
+                alert("Đã tạo bài học mới thành công!");
+            }
+
+            // Reset form & state
+            editingLessonId = "";
+            lessonTitle.value = "";
+            lessonDescription.value = "";
+            lessonOrder.value = "";
+            uploadedVideoTheoryLink = "";
+            uploadedVideoExerciseLink = "";
+            uploadedVideoHomeworkLink = "";
+            uploadedPdfTheoryLink = "";
+            uploadedPdfExerciseLink = "";
+            uploadedPdfHomeworkLink = "";
+            uploadedVideoLink = "";
+            uploadedPdfLink = "";
+            
+            if (videoTheoryResult) videoTheoryResult.innerHTML = "";
+            if (videoExerciseResult) videoExerciseResult.innerHTML = "";
+            if (videoHomeworkResult) videoHomeworkResult.innerHTML = "";
+            if (pdfTheoryResult) pdfTheoryResult.innerHTML = "";
+            if (pdfExerciseResult) pdfExerciseResult.innerHTML = "";
+            if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = "";
+            if (videoResult) videoResult.textContent = "";
+            if (pdfResult) pdfResult.textContent = "";
+
+            lessonModal.style.display = "none";
+            await loadLessons();
+        } catch (err) {
+            console.error("Lỗi lưu bài học:", err);
+            alert("Không thể lưu bài học: " + err.message);
         }
-
-        editingLessonId = "";
-        lessonTitle.value = "";
-        lessonDescription.value = "";
-        lessonOrder.value = "";
-        videoResult.textContent = "";
-        uploadedVideoLink = "";
-        videoFile.value = "";
-        pdfFile.value = "";
-        pdfResult.textContent = "";
-        uploadedPdfLink = "";
-
-        lessonModal.style.display = "none";
-        await loadLessons();
     });
 }
 
@@ -2055,9 +2237,21 @@ window.editLesson = async function (lessonId) {
 
     uploadedVideoLink = data.video || "";
     uploadedPdfLink = data.pdf || "";
+    uploadedVideoTheoryLink = data.videoTheory || "";
+    uploadedVideoExerciseLink = data.videoExercise || "";
+    uploadedVideoHomeworkLink = data.videoHomework || "";
+    uploadedPdfTheoryLink = data.pdfTheory || "";
+    uploadedPdfExerciseLink = data.pdfExercise || "";
+    uploadedPdfHomeworkLink = data.pdfHomework || "";
 
-    videoResult.innerHTML = data.video ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>` : "";
-    pdfResult.innerHTML = data.pdf ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>` : "";
+    if (videoResult) videoResult.innerHTML = data.video ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>` : "";
+    if (pdfResult) pdfResult.innerHTML = data.pdf ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>` : "";
+    if (videoTheoryResult) videoTheoryResult.innerHTML = data.videoTheory ? `<a href="${data.videoTheory}" target="_blank">🎥 Video LT hiện tại</a>` : "";
+    if (videoExerciseResult) videoExerciseResult.innerHTML = data.videoExercise ? `<a href="${data.videoExercise}" target="_blank">🎥 Video BT hiện tại</a>` : "";
+    if (videoHomeworkResult) videoHomeworkResult.innerHTML = data.videoHomework ? `<a href="${data.videoHomework}" target="_blank">🎥 Video BTVN hiện tại</a>` : "";
+    if (pdfTheoryResult) pdfTheoryResult.innerHTML = data.pdfTheory ? `<a href="${data.pdfTheory}" target="_blank">📄 PDF LT hiện tại</a>` : "";
+    if (pdfExerciseResult) pdfExerciseResult.innerHTML = data.pdfExercise ? `<a href="${data.pdfExercise}" target="_blank">📄 PDF BT hiện tại</a>` : "";
+    if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = data.pdfHomework ? `<a href="${data.pdfHomework}" target="_blank">📄 PDF BTVN hiện tại</a>` : "";
 };
 
 if (backToCoursesBtn) {
@@ -2194,7 +2388,7 @@ if (videoFile) {
 
 async function uploadPdf() {
     const file = pdfFile.files[0];
-    if (!file) return alert("Vui lòng chọn file PDF.");
+    if (!file) return;
 
     pdfResult.textContent = "Đang upload...";
     const formData = new FormData();
@@ -2219,7 +2413,7 @@ async function uploadPdf() {
 
 async function uploadVideo() {
     const file = videoFile.files[0];
-    if (!file) return alert("Vui lòng chọn video.");
+    if (!file) return;
 
     videoResult.textContent = "Đang upload...";
     const formData = new FormData();
@@ -2241,6 +2435,7 @@ async function uploadVideo() {
         alert("Có lỗi upload video.");
     }
 }
+
 // ====================================
 //        QUẢN LÝ KẾT QUẢ KIỂM TRA HỌC SINH
 // ====================================
@@ -2438,9 +2633,6 @@ async function openStudentSubmissionsList(courseId, testId, userId) {
     }
 }
 
-// ==========================================================
-// HÀM QUAN TRỌNG: HIỂN THỊ ĐẦY ĐỦ CÂU HỎI VÀ ĐÁP ÁN KHI ẤN XEM CHI TIẾT
-// ==========================================================
 async function openSingleResultDetailModal(resultId) {
     if (!studentSingleResultDetailModal || !singleResultDetailBody) return;
     singleResultDetailBody.innerHTML = `<div class="empty">Đang tải chi tiết bài làm...</div>`;
@@ -2511,40 +2703,15 @@ async function openSingleResultDetailModal(resultId) {
                 const correctAnsArr = q.answers || [];
                 const studentAnsArr = Array.isArray(studentAns) ? studentAns : [];
 
-                html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 6px;">`;
+                html += `<div style="margin-left: 10px; display: flex; flex-direction: column; gap: 4px;">`;
                 statements.forEach((st, stIdx) => {
-                    const stLetter = String.fromCharCode(97 + stIdx);
-                    const studentChoice = studentAnsArr[stIdx];
-                    const correctChoice = correctAnsArr[stIdx];
-
-                    let choiceText = studentChoice !== undefined ? (studentChoice ? "Đúng" : "Sai") : "Chưa chọn";
-                    let correctText = correctChoice ? "Đúng" : "Sai";
-                    let isMatch = studentChoice === correctChoice;
-
-                    let stStyle = "padding: 6px 8px; border-radius: 4px; border: 1px solid #ddd;";
-                    if (isMatch) {
-                        stStyle += " background-color: #d4edda; color: #155724;";
-                    } else {
-                        stStyle += " background-color: #f8d7da; color: #721c24;";
-                    }
-
-                    html += `<div style="${stStyle}">
-                        <b>${stLetter})</b> ${formatChemistryText(st)}<br>
-                        <small>Học sinh chọn: <b>${choiceText}</b> | Đáp án đúng: <b>${correctText}</b></small>
-                    </div>`;
+                    const sAns = studentAnsArr[stIdx];
+                    const cAns = correctAnsArr[stIdx];
+                    html += `<div><b>${String.fromCharCode(97 + stIdx)}.</b> ${formatChemistryText(st)} - Học sinh chọn: <b>${sAns ? "Đúng" : "Sai"}</b> (Đáp án: ${cAns ? "Đúng" : "Sai"})</div>`;
                 });
                 html += `</div>`;
             } else if (q.part === 3) {
-                const studentText = normalizeTextAnswer(studentAns);
-                const correctText = normalizeTextAnswer(q.answer);
-                const isMatch = studentText === correctText;
-
-                html += `
-                    <div style="margin-left: 10px; padding: 8px; border-radius: 4px; background: ${isMatch ? '#d4edda' : '#f8d7da'}; color: ${isMatch ? '#155724' : '#721c24'};">
-                        <span>Học sinh trả lời: <b>${escapeHtmlTeacher(String(studentAns || "Chưa nhập"))}</b></span><br>
-                        <span>Đáp án đúng: <b>${escapeHtmlTeacher(String(q.answer || ""))}</b></span>
-                    </div>
-                `;
+                html += `<div>Học sinh trả lời: <b>${escapeHtmlTeacher(studentAns || "(Không trả lời)")}</b> | Đáp án đúng: <b>${escapeHtmlTeacher(q.answer)}</b></div>`;
             }
 
             html += `</div>`;
@@ -2554,46 +2721,31 @@ async function openSingleResultDetailModal(resultId) {
         singleResultDetailBody.innerHTML = html;
 
     } catch (error) {
-        console.error("Lỗi khi tải chi tiết bài làm:", error);
+        console.error("Lỗi khi mở chi tiết bài làm:", error);
         singleResultDetailBody.innerHTML = `<div class="empty">Không thể tải chi tiết bài làm.</div>`;
     }
 }
 
-// Đóng modal chi tiết kết quả bài làm đơn lẻ
 if (closeSingleResultModal) {
     closeSingleResultModal.addEventListener("click", () => {
         if (studentSingleResultDetailModal) studentSingleResultDetailModal.style.display = "none";
     });
 }
 
-// Đóng modal danh sách kết quả tổng quan của học sinh
 if (closeStudentTestResultBtn) {
     closeStudentTestResultBtn.addEventListener("click", () => {
         if (studentTestResultModal) studentTestResultModal.style.display = "none";
     });
 }
 
-// Nút quay lại trong modal kết quả kiểm tra của học sinh
 if (backTestResultBtn) {
     backTestResultBtn.addEventListener("click", () => {
         if (testResultNavStep === 2) {
             openStudentTestChapters(currentStudentCourseId);
-            backTestResultBtn.style.display = "none";
         } else if (testResultNavStep === 3) {
             openStudentTestLessons(currentStudentCourseId, selectedChapterForTest.id);
-            testResultNavStep = 2;
         } else if (testResultNavStep === 4) {
             openStudentTestsList(currentStudentCourseId, selectedChapterForTest.id, selectedLessonForTest.id);
-            testResultNavStep = 3;
         }
     });
 }
-
-window.addEventListener("click", (event) => {
-    if (event.target === studentTestResultModal) {
-        studentTestResultModal.style.display = "none";
-    }
-    if (event.target === studentSingleResultDetailModal) {
-        studentSingleResultDetailModal.style.display = "none";
-    }
-});
