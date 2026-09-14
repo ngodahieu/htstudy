@@ -4277,3 +4277,87 @@ background:#cfcfcf;
         left: 90px;
     }
 }
+/* ==========================================================
+   NÂNG CẤP GIAO DIỆN NÚT HỦY & LƯU (TẠO CHƯƠNG / TẠO BÀI)
+   ========================================================== */
+
+/* Khung chứa các nút bấm hành động trong Modal */
+.modal-buttons, 
+.chapter-actions-modal, 
+.lesson-actions-modal {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eef2f7;
+}
+
+/* Kiểu chung cho nút LƯU (Save) */
+#saveChapter,
+#saveLesson,
+#confirmDelete,
+.btn-save {
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 28px !important;
+    border-radius: 14px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#saveChapter:hover,
+#saveLesson:hover,
+.btn-save:hover {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.35) !important;
+}
+
+#saveChapter:active,
+#saveLesson:active,
+.btn-save:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+/* Kiểu chung cho nút HỦY (Cancel) */
+#cancelChapter,
+#cancelLesson,
+#cancelDelete,
+.btn-cancel {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 12px 24px !important;
+    border-radius: 14px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#cancelChapter:hover,
+#cancelLesson:hover,
+.btn-cancel:hover {
+    background: #e2e8f0 !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-2px) !important;
+}
+
+#cancelChapter:active,
+#cancelLesson:active,
+.btn-cancel:active {
+    transform: translateY(0) scale(0.97) !important;
+}
