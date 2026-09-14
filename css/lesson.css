@@ -1,0 +1,285 @@
+/*==================================================
+            H&T STUDY - LESSON.CSS
+        Theme : Futuristic Space Dark
+==================================================*/
+
+/*==========================================
+        LAYOUT BÀI HỌC (2 CỘT)
+==========================================*/
+.lesson-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: start;
+}
+
+/*==========================================
+        CHAPTER MENU (ASIDE)
+==========================================*/
+.chapter-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chapter-folder {
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(
+        145deg,
+        rgba(16, 32, 64, 0.92),
+        rgba(8, 16, 34, 0.92)
+    );
+    border: 1px solid rgba(120, 190, 255, 0.15);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.folder-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(
+        90deg,
+        rgba(20, 80, 170, 0.95),
+        rgba(38, 180, 255, 0.92)
+    );
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.folder-title i {
+    font-size: 18px;
+}
+
+/* Danh sách bài học trong menu */
+.lesson-list {
+    padding: 8px 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.lesson-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.lesson-list::-webkit-scrollbar-thumb {
+    background: #38c8ff;
+    border-radius: 999px;
+}
+
+.lesson-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #cbdcf8;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    position: relative;
+}
+
+.lesson-menu-item:last-child {
+    border-bottom: none;
+}
+
+.lesson-menu-item i {
+    color: #5ed5ff;
+    font-size: 15px;
+}
+
+.lesson-menu-item:hover {
+    background: rgba(0, 170, 255, 0.08);
+    color: #fff;
+    padding-left: 24px;
+}
+
+.lesson-menu-item.active {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 170, 255, 0.18),
+        rgba(80, 210, 255, 0.08)
+    );
+    color: #6ee1ff;
+    font-weight: 600;
+}
+
+/* Thanh sáng chỉ báo bài học đang chọn */
+.lesson-menu-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: #3acfff;
+    box-shadow: 0 0 10px #3acfff;
+}
+
+/*==========================================
+        LESSON VIEW (NỘI DUNG CHÍNH)
+==========================================*/
+.lesson-view {
+    border-radius: 24px;
+    padding: 35px;
+    background: linear-gradient(
+        145deg,
+        rgba(16, 32, 64, 0.92),
+        rgba(8, 16, 34, 0.92)
+    );
+    border: 1px solid rgba(120, 190, 255, 0.15);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+.lesson-view h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 12px;
+    text-shadow: 0 0 15px rgba(0, 180, 255, 0.2);
+}
+
+.lesson-view > p {
+    color: #9fb6d8;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+}
+
+/* Tabs chuyển đổi Video / PDF */
+.lesson-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 26px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.05);
+    color: #d8e9ff;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid rgba(120, 190, 255, 0.12);
+    transition: 0.35s;
+}
+
+.tab-btn:hover {
+    background: rgba(0, 170, 255, 0.15);
+    border-color: #4ac7ff;
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #0f67df, #39d2ff);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(0, 170, 255, 0.35);
+}
+
+/* Khung hiển thị nội dung (Video / PDF iframe) */
+.lesson-content {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(2, 8, 23, 0.6);
+    border: 1px solid rgba(120, 190, 255, 0.1);
+}
+
+.lesson-content iframe {
+    width: 100%;
+    height: 600px;
+    border: none;
+    display: block;
+}
+
+/*==========================================
+        NÚT QUAY LẠI & TIÊU ĐỀ TRANG
+==========================================*/
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    margin-bottom: 20px;
+    background: rgba(20, 45, 90, 0.75);
+    border: 1px solid rgba(90, 190, 255, 0.25);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+    transition: 0.35s;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.back-button i {
+    transition: 0.35s;
+}
+
+.back-button:hover {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #0d72ff, #39d3ff);
+    box-shadow: 0 0 25px rgba(70, 210, 255, 0.45);
+}
+
+.back-button:hover i {
+    transform: translateX(-5px);
+}
+
+.real-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+#courseDescription {
+    color: #9fb6d8;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+/*==========================================
+        RESPONSIVE CHO TRANG LESSON
+==========================================*/
+@media (max-width: 1024px) {
+    .lesson-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .chapter-menu {
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .lesson-view {
+        padding: 20px;
+    }
+
+    .lesson-view h2 {
+        font-size: 1.6rem;
+    }
+
+    .real-title {
+        font-size: 2rem;
+    }
+
+    .lesson-content iframe {
+        height: 380px;
+    }
+}
