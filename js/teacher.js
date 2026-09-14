@@ -1955,8 +1955,6 @@ if (saveLesson) {
         } else {
             const lessonId = "lesson_" + Date.now();
             if (videoFile.files.length) await uploadVideo();
-            if (!uploadedVideoLink) return alert("Chưa upload video.");
-
             if (pdfFile.files.length) await uploadPdf();
             if (!uploadedPdfLink) return alert("Chưa có file PDF.");
 
