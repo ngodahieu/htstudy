@@ -64,34 +64,36 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
         <!-- NỘI DUNG BÊN PHẢI -->
         <main class="lesson-view">
-            
-            <!-- CÁC TAB CHUYỂN ĐỔI: VIDEO VÀ 3 PHẦN PDF -->
-            <div class="lesson-tabs">
-                <button
-                    class="tab-btn active"
-                    data-tab="video">
-                    <i class="fa-solid fa-play"></i>
-                    Video bài giảng
-                </button>
-                <button
-                    class="tab-btn"
-                    data-tab="pdf-lythuyet">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    Lý thuyết
-                </button>
-                <button
-                    class="tab-btn"
-                    data-tab="pdf-baitap">
-                    <i class="fa-solid fa-file-lines"></i>
-                    Bài tập
-                </button>
-                <button
-                    class="tab-btn"
-                    data-tab="pdf-btvn">
-                    <i class="fa-solid fa-folder-open"></i>
-                    BTVN
-                </button>
-            </div>
+
+            <!-- ĐÃ CHUYỂN NÚT VIDEO / PDF LÊN PHÍA TRÊN NỘI DUNG -->
+<div class="lesson-tabs">
+    <button
+        class="tab-btn active"
+        data-tab="video">
+        <i class="fa-solid fa-play"></i>
+        Video bài giảng
+    </button>
+    <button
+        class="tab-btn"
+        data-tab="pdf-parent">
+        <i class="fa-solid fa-file-pdf"></i>
+        Tài liệu PDF
+        <i class="fa-solid fa-chevron-down pdf-toggle-arrow"></i>
+    </button>
+</div>
+
+<!-- KHU VỰC MENU CON HIỆN RA KHI BẤM VÀO TÀI LIỆU PDF -->
+<div id="pdfSubMenu" class="pdf-sub-menu" style="display: none;">
+    <button class="sub-tab-btn active" data-tab="pdf-lythuyet">
+        <i class="fa-solid fa-book-open"></i> Lý thuyết
+    </button>
+    <button class="sub-tab-btn" data-tab="pdf-baitap">
+        <i class="fa-solid fa-pen-clip"></i> Bài tập
+    </button>
+    <button class="sub-tab-btn" data-tab="pdf-btvn">
+        <i class="fa-solid fa-house-chimney"></i> BTVN
+    </button>
+</div>
 
             <h2 id="lessonTitle">
                 Chọn bài học
