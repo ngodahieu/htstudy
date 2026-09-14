@@ -22,7 +22,6 @@ const subTabButtons = document.querySelectorAll(".sub-tab-btn");
 const pdfSubMenu = document.getElementById("pdfSubMenu");
 const videoSubMenu = document.getElementById("videoSubMenu");
 const mainTabButtons = document.querySelectorAll(".tab-btn");
-const subTabButtons = document.querySelectorAll(".sub-tab-btn");
 
 let currentLesson = null;
 let currentTab = "video-lythuyet";
@@ -100,6 +99,7 @@ async function loadLessons(chapterId) {
         showLesson(firstLesson);
     }
 }
+
 function getEmbedUrl(rawUrl) {
     if (!rawUrl) return "";
     if (rawUrl.includes("youtu.be/")) {
@@ -110,6 +110,7 @@ function getEmbedUrl(rawUrl) {
     }
     return rawUrl;
 }
+
 function showLesson(lesson) {
     currentLesson = lesson;
     lessonTitle.textContent = lesson.title;
@@ -196,6 +197,7 @@ mainTabButtons.forEach(btn => {
         }
     });
 });
+
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
     if (!item) return;
@@ -233,7 +235,8 @@ tabButtons.forEach(btn => {
         }
     });
 });
-// Lắng nghe sự kiện click các nút tab con bên trong Tài liệu PDF (Lý thuyết, Bài tập, BTVN)
+
+// Lắng nghe sự kiện click các nút tab con bên trong (Lý thuyết, Bài tập, BTVN)
 subTabButtons.forEach(subBtn => {
     subBtn.addEventListener("click", () => {
         subTabButtons.forEach(sub => sub.classList.remove("active"));
@@ -245,6 +248,7 @@ subTabButtons.forEach(subBtn => {
         }
     });
 });
+
 loadCourse();
 
 window.toggleChapter = function(chapterId) {
