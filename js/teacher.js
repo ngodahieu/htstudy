@@ -2091,20 +2091,23 @@ if (saveLesson) {
                 await uploadPdf();
             }
 
-            const lessonData = {
-                title,
-                description,
-                order,
-                videoTheory: uploadedVideoTheoryLink || "",
-                videoExercise: uploadedVideoExerciseLink || "",
-                videoHomework: uploadedVideoHomeworkLink || "",
-                pdfTheory: uploadedPdfTheoryLink || "",
-                pdfExercise: uploadedPdfExerciseLink || "",
-                pdfHomework: uploadedPdfHomeworkLink || "",
-                video: uploadedVideoLink || "",
-                pdf: uploadedPdfLink || "",
-                updatedAt: serverTimestamp()
-            };
+// Thay thế đoạn xây dựng lessonData cũ bằng đoạn này trong sự kiện click của saveLesson
+const lessonData = {
+    title,
+    description,
+    order,
+    // Các tài nguyên mới bổ sung
+    videoTheory: uploadedVideoTheoryLink || "",
+    videoExercise: uploadedVideoExerciseLink || "",
+    videoHomework: uploadedVideoHomeworkLink || "",
+    pdfTheory: uploadedPdfTheoryLink || "",
+    pdfExercise: uploadedPdfExerciseLink || "",
+    pdfHomework: uploadedPdfHomeworkLink || "",
+    // Các tài nguyên cũ (nếu có)
+    video: uploadedVideoLink || "",
+    pdf: uploadedPdfLink || "",
+    updatedAt: serverTimestamp()
+};
 
             if (editingLessonId) {
                 const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
@@ -2235,6 +2238,7 @@ window.editLesson = async function (lessonId) {
     lessonOrder.value = data.order;
     lessonModal.style.display = "flex";
 
+    // Gán lại các link hiện có vào biến global states
     uploadedVideoLink = data.video || "";
     uploadedPdfLink = data.pdf || "";
     uploadedVideoTheoryLink = data.videoTheory || "";
@@ -2244,11 +2248,14 @@ window.editLesson = async function (lessonId) {
     uploadedPdfExerciseLink = data.pdfExercise || "";
     uploadedPdfHomeworkLink = data.pdfHomework || "";
 
+    // Hiển thị trực quan ra giao diện kết quả các file đã tải lên trước đó
     if (videoResult) videoResult.innerHTML = data.video ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>` : "";
     if (pdfResult) pdfResult.innerHTML = data.pdf ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>` : "";
+    
     if (videoTheoryResult) videoTheoryResult.innerHTML = data.videoTheory ? `<a href="${data.videoTheory}" target="_blank">🎥 Video LT hiện tại</a>` : "";
     if (videoExerciseResult) videoExerciseResult.innerHTML = data.videoExercise ? `<a href="${data.videoExercise}" target="_blank">🎥 Video BT hiện tại</a>` : "";
     if (videoHomeworkResult) videoHomeworkResult.innerHTML = data.videoHomework ? `<a href="${data.videoHomework}" target="_blank">🎥 Video BTVN hiện tại</a>` : "";
+    
     if (pdfTheoryResult) pdfTheoryResult.innerHTML = data.pdfTheory ? `<a href="${data.pdfTheory}" target="_blank">📄 PDF LT hiện tại</a>` : "";
     if (pdfExerciseResult) pdfExerciseResult.innerHTML = data.pdfExercise ? `<a href="${data.pdfExercise}" target="_blank">📄 PDF BT hiện tại</a>` : "";
     if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = data.pdfHomework ? `<a href="${data.pdfHomework}" target="_blank">📄 PDF BTVN hiện tại</a>` : "";
