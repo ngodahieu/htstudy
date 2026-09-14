@@ -31,12 +31,20 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 
 <section class="container">
 
-    <button
-        id="backLesson"
-        class="back-button">
-        <i class="fa-solid fa-arrow-left"></i>
-        Quay lại
-    </button>
+    <!-- CỤM NÚT ĐIỀU HƯỚNG -->
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <button
+            id="backLesson"
+            class="back-button"
+            onclick="history.back()">
+            <i class="fa-solid fa-arrow-left"></i>
+            Quay lại
+        </button>
+        <a href="index.html" class="back-button" style="text-decoration: none;">
+            <i class="fa-solid fa-house"></i>
+            Trang chủ
+        </a>
+    </div>
 
     <h1
         id="courseTitle"
@@ -57,7 +65,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         <!-- NỘI DUNG BÊN PHẢI -->
         <main class="lesson-view">
             
-            <!-- ĐÃ CHUYỂN NÚT VIDEO / PDF LÊN PHÍA TRÊN NỘI DUNG -->
+            <!-- CÁC TAB CHUYỂN ĐỔI: VIDEO VÀ 3 PHẦN PDF -->
             <div class="lesson-tabs">
                 <button
                     class="tab-btn active"
@@ -67,9 +75,21 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
                 </button>
                 <button
                     class="tab-btn"
-                    data-tab="pdf">
+                    data-tab="pdf-lythuyet">
                     <i class="fa-solid fa-file-pdf"></i>
-                    Tài liệu PDF
+                    Lý thuyết
+                </button>
+                <button
+                    class="tab-btn"
+                    data-tab="pdf-baitap">
+                    <i class="fa-solid fa-file-lines"></i>
+                    Bài tập
+                </button>
+                <button
+                    class="tab-btn"
+                    data-tab="pdf-btvn">
+                    <i class="fa-solid fa-folder-open"></i>
+                    BTVN
                 </button>
             </div>
 
