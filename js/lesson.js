@@ -84,26 +84,18 @@ for (const chapterDoc of chapterSnapshot.docs) {
 
     const chapter = chapterDoc.data();
 
-    chapterMenu.innerHTML += `
-
-<div class="chapter-folder">
-
-    <div class="folder-title">
-
-        <i class="fa-solid fa-folder-open"></i>
-
-        ${chapter.title}
-
+chapterMenu.innerHTML += `
+<div class="chapter-folder" id="folder-${chapterDoc.id}">
+    <div class="folder-title" onclick="toggleChapter('${chapterDoc.id}')">
+        <div class="folder-title-left">
+            <i class="fa-solid fa-folder-open"></i>
+            <span>${chapter.title}</span>
+        </div>
+        <i class="fa-solid fa-chevron-down toggle-arrow"></i>
     </div>
-
-    <div
-        id="chapter-${chapterDoc.id}"
-        class="lesson-list">
-
+    <div id="chapter-${chapterDoc.id}" class="lesson-list">
     </div>
-
 </div>
-
 `;
 
     await loadLessons(chapterDoc.id);
@@ -295,3 +287,7 @@ tabButtons.forEach(btn=>{
 
 });
 loadCourse();
+window.toggleChapter = function(chapterId) {
+    const folder = document.getElementById(`folder-${chapterId}`);
+    folder.classList.toggle("collapsed");
+};
