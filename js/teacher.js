@@ -1956,7 +1956,6 @@ if (saveLesson) {
             const lessonId = "lesson_" + Date.now();
             if (videoFile.files.length) await uploadVideo();
             if (pdfFile.files.length) await uploadPdf();
-            if (!uploadedPdfLink) return alert("Chưa có file PDF.");
 
             await setDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId), {
                 title,
