@@ -2082,28 +2082,36 @@ if (saveLesson) {
         if (!title) return alert("Vui lòng nhập tên bài học.");
         if (isNaN(order) || order <= 0) return alert("Thứ tự bài học không hợp lệ.");
 
-        const lessonData = {
-            title,
-            description,
-            order,
-            videoTheory: uploadedVideoTheoryLink || "",
-            videoExercise: uploadedVideoExerciseLink || "",
-            videoHomework: uploadedVideoHomeworkLink || "",
-            pdfTheory: uploadedPdfTheoryLink || "",
-            pdfExercise: uploadedPdfExerciseLink || "",
-            pdfHomework: uploadedPdfHomeworkLink || "",
-            video: uploadedVideoLink || "",
-            pdf: uploadedPdfLink || "",
-            updatedAt: serverTimestamp()
-        };
-
         try {
+            // Thực hiện upload file video và PDF chính nếu người dùng đã chọn file trước khi lưu
+            if (videoFile && videoFile.files.length) {
+                await uploadVideo();
+            }
+            if (pdfFile && pdfFile.files.length) {
+                await uploadPdf();
+            }
+
+            const lessonData = {
+                title,
+                description,
+                order,
+                videoTheory: uploadedVideoTheoryLink || "",
+                videoExercise: uploadedVideoExerciseLink || "",
+                videoHomework: uploadedVideoHomeworkLink || "",
+                pdfTheory: uploadedPdfTheoryLink || "",
+                pdfExercise: uploadedPdfExerciseLink || "",
+                pdfHomework: uploadedPdfHomeworkLink || "",
+                video: uploadedVideoLink || "",
+                pdf: uploadedPdfLink || "",
+                updatedAt: serverTimestamp()
+            };
+
             if (editingLessonId) {
                 const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
                 const snap = await getDoc(lessonRef);
                 const oldData = snap.exists() ? snap.data() : {};
 
-                // Giữ lại link cũ nếu không upload mới
+                // Giữ lại link cũ nếu không chọn file mới thay thế
                 lessonData.video = uploadedVideoLink || oldData.video || "";
                 lessonData.pdf = uploadedPdfLink || oldData.pdf || "";
                 lessonData.videoTheory = uploadedVideoTheoryLink || oldData.videoTheory || "";
@@ -2113,18 +2121,9 @@ if (saveLesson) {
                 lessonData.pdfExercise = uploadedPdfExerciseLink || oldData.pdfExercise || "";
                 lessonData.pdfHomework = uploadedPdfHomeworkLink || oldData.pdfHomework || "";
 
-                if (pdfFile && pdfFile.files.length) await uploadPdf();
-                if (videoFile && videoFile.files.length) await uploadVideo();
-
                 await updateDoc(lessonRef, lessonData);
                 alert("Đã cập nhật bài học thành công!");
             } else {
-                if (videoFile && videoFile.files.length) await uploadVideo();
-                if (pdfFile && pdfFile.files.length) await uploadPdf();
-
-                lessonData.video = uploadedVideoLink;
-                lessonData.pdf = uploadedPdfLink;
-
                 const lessonId = "lesson_" + Date.now();
                 await setDoc(doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", lessonId), {
                     ...lessonData,
@@ -2133,7 +2132,7 @@ if (saveLesson) {
                 alert("Đã tạo bài học mới thành công!");
             }
 
-            // Reset form & state
+            // Reset form & state sau khi lưu thành công
             editingLessonId = "";
             lessonTitle.value = "";
             lessonDescription.value = "";
@@ -2155,6 +2154,8 @@ if (saveLesson) {
             if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = "";
             if (videoResult) videoResult.textContent = "";
             if (pdfResult) pdfResult.textContent = "";
+            if (videoFile) videoFile.value = "";
+            if (pdfFile) pdfFile.value = "";
 
             lessonModal.style.display = "none";
             await loadLessons();
@@ -2164,7 +2165,6 @@ if (saveLesson) {
         }
     });
 }
-
 async function loadLessons() {
     if (!lessonList) return;
     lessonList.innerHTML = "Đang tải...";
