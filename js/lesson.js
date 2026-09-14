@@ -18,6 +18,8 @@ const lessonTitle = document.getElementById("lessonTitle");
 const lessonDescription = document.getElementById("lessonDescription");
 const lessonContent = document.getElementById("lessonContent");
 const tabButtons = document.querySelectorAll(".tab-btn");
+const subTabButtons = document.querySelectorAll(".sub-tab-btn");
+const pdfSubMenu = document.getElementById("pdfSubMenu");
 
 let currentLesson = null;
 let currentTab = "video";
@@ -122,7 +124,7 @@ function showLesson(lesson) {
             allowfullscreen>
         </iframe>`;
     } else {
-        // Xử lý hiển thị tương ứng cho 3 mục PDF
+        // Xử lý hiển thị tương ứng cho 3 mục PDF con
         let pdfUrl = "";
         if (currentTab === "pdf-lythuyet") pdfUrl = lesson.pdfLyThuyet || lesson.pdf || "";
         if (currentTab === "pdf-baitap") pdfUrl = lesson.pdfBaiTap || "";
@@ -144,7 +146,6 @@ function showLesson(lesson) {
         }
     }
 }
-
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
     if (!item) return;
@@ -160,18 +161,40 @@ document.addEventListener("click", (e) => {
 
 tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-        tabButtons.forEach(tab => {
-            tab.classList.remove("active");
-        });
+        tabButtons.forEach(tab => tab.classList.remove("active"));
         btn.classList.add("active");
-        currentTab = btn.dataset.tab;
+        
+        const tabType = btn.dataset.tab;
+
+        if (tabType === "video") {
+            pdfSubMenu.style.display = "none"; // Ẩn menu con PDF đi
+            currentTab = "video";
+        } else if (tabType === "pdf-parent") {
+            pdfSubMenu.style.display = "flex"; // Hiện menu con PDF ra
+            // Mặc định chọn mục "Lý thuyết" khi bấm vào Tài liệu PDF lần đầu
+            subTabButtons.forEach(sub => sub.classList.remove("active"));
+            const defaultSub = document.querySelector('[data-tab="pdf-lythuyet"]');
+            if(defaultSub) defaultSub.classList.add("active");
+            currentTab = "pdf-lythuyet";
+        }
 
         if (currentLesson) {
             showLesson(currentLesson);
         }
     });
 });
+// Lắng nghe sự kiện click các nút tab con bên trong Tài liệu PDF (Lý thuyết, Bài tập, BTVN)
+subTabButtons.forEach(subBtn => {
+    subBtn.addEventListener("click", () => {
+        subTabButtons.forEach(sub => sub.classList.remove("active"));
+        subBtn.classList.add("active");
+        currentTab = subBtn.dataset.tab; // Nhận giá trị: pdf-lythuyet, pdf-baitap, hoặc pdf-btvn
 
+        if (currentLesson) {
+            showLesson(currentLesson);
+        }
+    });
+});
 loadCourse();
 
 window.toggleChapter = function(chapterId) {
