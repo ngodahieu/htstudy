@@ -1,0 +1,204 @@
+/*==================================================
+            H&T STUDY - COURSES.CSS
+        Giao diện riêng cho trang Khóa học
+==================================================*/
+
+/*--- Hero Section của trang Khóa học ---*/
+.course-hero {
+    padding: 130px 0 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.course-hero::before {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    left: -180px;
+    top: -200px;
+    background: radial-gradient(circle, rgba(0,180,255,.18), transparent 70%);
+    pointer-events: none;
+}
+
+.course-hero::after {
+    content: "";
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    right: -150px;
+    bottom: -180px;
+    background: radial-gradient(circle, rgba(70,120,255,.15), transparent 70%);
+    pointer-events: none;
+}
+
+.course-hero h1 {
+    font-size: 3.6rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 0 0 25px rgba(80,220,255,.45), 0 0 60px rgba(0,160,255,.25);
+}
+
+.course-hero p {
+    margin-top: 18px;
+    font-size: 1.15rem;
+    color: #a9c7ea;
+}
+
+/*--- Bộ lọc khóa học & Thanh tìm kiếm ---*/
+.course-filter {
+    padding: 20px 0 70px;
+}
+
+.filter-box {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 12px 30px;
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    color: white;
+    font-size: 15px;
+    transition: .35s;
+    border: 1px solid rgba(120,190,255,.15);
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: linear-gradient(135deg, #1185ff, #42d2ff);
+    box-shadow: 0 0 20px rgba(0,180,255,.3);
+}
+
+.search-course {
+    width: 500px;
+    max-width: 95%;
+    margin: auto;
+    position: relative;
+}
+
+.search-course input {
+    width: 100%;
+    height: 58px;
+    padding-left: 22px;
+    padding-right: 55px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(120,190,255,.15);
+    color: white;
+    outline: none;
+    transition: .35s;
+}
+
+.search-course input:focus {
+    border-color: #48c7ff;
+    box-shadow: 0 0 20px rgba(0,180,255,.25);
+}
+
+.search-course i {
+    position: absolute;
+    right: 22px;
+    top: 20px;
+    color: #5fd8ff;
+    font-size: 18px;
+}
+
+/*--- Thẻ tag trạng thái khóa học ---*/
+.owned-tag {
+    background: rgba(40, 200, 100, 0.15);
+    border: 1px solid rgba(40, 200, 100, 0.3);
+    color: #5eff99;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+.lock-tag {
+    background: rgba(255, 80, 80, 0.15);
+    border: 1px solid rgba(255, 80, 80, 0.3);
+    color: #ff7575;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+}
+
+.course-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+/*--- Nút quay lại (Back Button) ---*/
+.back-button {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    background: rgba(20,45,90,.75);
+    border: 1px solid rgba(90,190,255,.25);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+    transition: .35s;
+    margin: 20px auto 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+}
+
+.back-button:hover {
+    transform: translateY(-4px);
+    background: linear-gradient(135deg,#0d72ff,#39d3ff);
+    box-shadow: 0 0 30px rgba(70,210,255,.45);
+}
+
+/*--- Ẩn/hiện khi lọc khóa học ---*/
+.course-card.hide {
+    opacity: 0;
+    transform: scale(.8);
+    pointer-events: none;
+    position: absolute;
+    display: none;
+}
+
+/*--- Tối ưu hóa giao diện di động (Màn hình dọc - Portrait) giống trang chủ ---*/
+@media (max-width: 768px) {
+    .course-hero {
+        padding: 90px 0 50px;
+    }
+
+    .course-hero h1 {
+        font-size: 2.2rem;
+    }
+
+    .course-hero p {
+        font-size: 0.95rem;
+    }
+
+    .filter-box {
+        gap: 10px;
+    }
+
+    .filter-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+    }
+
+    .search-course {
+        width: 100%;
+    }
+
+    .course-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+}
