@@ -25,7 +25,41 @@ function updateChemistryPreview(input, preview) {
     if (!input || !preview) return;
     preview.innerHTML = formatChemistryText(input.value);
 }
+// Hàm helper hiển thị trạng thái tài nguyên sau khi tải lên, có kèm nút Thay thế & Xóa
+function updateResourceDisplay(resultElement, fileLink, typeText, onReplaceCallback, onDeleteCallback) {
+    if (!resultElement) return;
+    if (fileLink && fileLink.trim() !== "") {
+        resultElement.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #e9ecef; padding: 8px 12px; border-radius: 6px; margin-top: 6px;">
+                <a href="${fileLink}" target="_blank" style="color: #007bff; text-decoration: none; font-weight: 500;">
+                    <i class="fa-solid fa-file-arrow-down"></i> Xem ${typeText} hiện tại
+                </a>
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="replace-btn" id="${resultElement.id}_replace">
+                        <i class="fa-solid fa-rotate"></i> Thay thế
+                    </button>
+                    <button type="button" class="remove-resource-btn" id="${resultElement.id}_remove">
+                        <i class="fa-solid fa-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        `;
 
+        // Gắn sự kiện nút Thay thế
+        const replaceBtn = document.getElementById(`${resultElement.id}_replace`);
+        if (replaceBtn && onReplaceCallback) {
+            replaceBtn.addEventListener("click", onReplaceCallback);
+        }
+
+        // Gắn sự kiện nút Xóa
+        const removeBtn = document.getElementById(`${resultElement.id}_remove`);
+        if (removeBtn && onDeleteCallback) {
+            removeBtn.addEventListener("click", onDeleteCallback);
+        }
+    } else {
+        resultElement.innerHTML = `<span style="color: #6c757d; font-size: 0.85rem; font-style: italic;">Chưa có ${typeText}</span>`;
+    }
+}
 // ====================================
 //        LẤY CÁC THÀNH PHẦN HTML
 // ====================================
@@ -1978,80 +2012,101 @@ if (cancelLesson) {
         if (lessonModal) lessonModal.style.display = "none";
     });
 }
-
-// --- Gán sự kiện click & chọn file cho các nút tài nguyên mới ---[cite: 31]
+// --- 1. Video Lý Thuyết ---
 if (uploadVideoTheoryBtn && videoTheoryFile) {
     uploadVideoTheoryBtn.addEventListener("click", () => videoTheoryFile.click());
     videoTheoryFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            videoTheoryResult.textContent = "Đang tải lên video lý thuyết...";
+            videoTheoryResult.innerHTML = "Đang tải lên video lý thuyết...";
             uploadedVideoTheoryLink = await uploadResourceToCloudinary(file, "video");
-            videoTheoryResult.innerHTML = uploadedVideoTheoryLink ? `<a href="${uploadedVideoTheoryLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(videoTheoryResult, uploadedVideoTheoryLink, "Video Lý Thuyết", 
+                () => videoTheoryFile.click(), 
+                () => { uploadedVideoTheoryLink = ""; updateResourceDisplay(videoTheoryResult, "", "Video Lý Thuyết", () => videoTheoryFile.click(), null); }
+            );
         }
     });
 }
 
+// --- 2. Video Bài Tập ---
 if (uploadVideoExerciseBtn && videoExerciseFile) {
     uploadVideoExerciseBtn.addEventListener("click", () => videoExerciseFile.click());
     videoExerciseFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            videoExerciseResult.textContent = "Đang tải lên video bài tập...";
+            videoExerciseResult.innerHTML = "Đang tải lên video bài tập...";
             uploadedVideoExerciseLink = await uploadResourceToCloudinary(file, "video");
-            videoExerciseResult.innerHTML = uploadedVideoExerciseLink ? `<a href="${uploadedVideoExerciseLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(videoExerciseResult, uploadedVideoExerciseLink, "Video Bài Tập", 
+                () => videoExerciseFile.click(), 
+                () => { uploadedVideoExerciseLink = ""; updateResourceDisplay(videoExerciseResult, "", "Video Bài Tập", () => videoExerciseFile.click(), null); }
+            );
         }
     });
 }
 
+// --- 3. Video Bài Về Nhà ---
 if (uploadVideoHomeworkBtn && videoHomeworkFile) {
     uploadVideoHomeworkBtn.addEventListener("click", () => videoHomeworkFile.click());
     videoHomeworkFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            videoHomeworkResult.textContent = "Đang tải lên video BTVN...";
+            videoHomeworkResult.innerHTML = "Đang tải lên video bài về nhà...";
             uploadedVideoHomeworkLink = await uploadResourceToCloudinary(file, "video");
-            videoHomeworkResult.innerHTML = uploadedVideoHomeworkLink ? `<a href="${uploadedVideoHomeworkLink}" target="_blank">🎥 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(videoHomeworkResult, uploadedVideoHomeworkLink, "Video Bài Về Nhà", 
+                () => videoHomeworkFile.click(), 
+                () => { uploadedVideoHomeworkLink = ""; updateResourceDisplay(videoHomeworkResult, "", "Video Bài Về Nhà", () => videoHomeworkFile.click(), null); }
+            );
         }
     });
 }
 
+// --- 4. PDF Lý Thuyết ---
 if (uploadPdfTheoryBtn && pdfTheoryFile) {
     uploadPdfTheoryBtn.addEventListener("click", () => pdfTheoryFile.click());
     pdfTheoryFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            pdfTheoryResult.textContent = "Đang tải lên PDF lý thuyết...";
+            pdfTheoryResult.innerHTML = "Đang tải lên PDF lý thuyết...";
             uploadedPdfTheoryLink = await uploadResourceToCloudinary(file, "raw");
-            pdfTheoryResult.innerHTML = uploadedPdfTheoryLink ? `<a href="${uploadedPdfTheoryLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(pdfTheoryResult, uploadedPdfTheoryLink, "PDF Lý Thuyết", 
+                () => pdfTheoryFile.click(), 
+                () => { uploadedPdfTheoryLink = ""; updateResourceDisplay(pdfTheoryResult, "", "PDF Lý Thuyết", () => pdfTheoryFile.click(), null); }
+            );
         }
     });
 }
 
+// --- 5. PDF Bài Tập ---
 if (uploadPdfExerciseBtn && pdfExerciseFile) {
     uploadPdfExerciseBtn.addEventListener("click", () => pdfExerciseFile.click());
     pdfExerciseFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            pdfExerciseResult.textContent = "Đang tải lên PDF bài tập...";
+            pdfExerciseResult.innerHTML = "Đang tải lên PDF bài tập...";
             uploadedPdfExerciseLink = await uploadResourceToCloudinary(file, "raw");
-            pdfExerciseResult.innerHTML = uploadedPdfExerciseLink ? `<a href="${uploadedPdfExerciseLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(pdfExerciseResult, uploadedPdfExerciseLink, "PDF Bài Tập", 
+                () => pdfExerciseFile.click(), 
+                () => { uploadedPdfExerciseLink = ""; updateResourceDisplay(pdfExerciseResult, "", "PDF Bài Tập", () => pdfExerciseFile.click(), null); }
+            );
         }
     });
 }
 
+// --- 6. PDF Bài Về Nhà ---
 if (uploadPdfHomeworkBtn && pdfHomeworkFile) {
     uploadPdfHomeworkBtn.addEventListener("click", () => pdfHomeworkFile.click());
     pdfHomeworkFile.addEventListener("change", async (e) => {
         const file = e.target.files[0];
         if (file) {
-            pdfHomeworkResult.textContent = "Đang tải lên PDF BTVN...";
+            pdfHomeworkResult.innerHTML = "Đang tải lên PDF bài về nhà...";
             uploadedPdfHomeworkLink = await uploadResourceToCloudinary(file, "raw");
-            pdfHomeworkResult.innerHTML = uploadedPdfHomeworkLink ? `<a href="${uploadedPdfHomeworkLink}" target="_blank">📄 Đã tải lên thành công</a>` : "Tải lên thất bại.";
+            updateResourceDisplay(pdfHomeworkResult, uploadedPdfHomeworkLink, "PDF Bài Về Nhà", 
+                () => pdfHomeworkFile.click(), 
+                () => { uploadedPdfHomeworkLink = ""; updateResourceDisplay(pdfHomeworkResult, "", "PDF Bài Về Nhà", () => pdfHomeworkFile.click(), null); }
+            );
         }
     });
 }
-
 // Hàm hỗ trợ upload chung lên Cloudinary[cite: 31]
 async function uploadResourceToCloudinary(file, resourceType = "auto") {
     const formData = new FormData();
