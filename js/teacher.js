@@ -2304,19 +2304,66 @@ window.editLesson = async function (lessonId) {
     uploadedPdfExerciseLink = data.pdfExercise || "";
     uploadedPdfHomeworkLink = data.pdfHomework || "";
 
-    // Hiển thị trực quan ra giao diện kết quả các file đã tải lên trước đó
+    // --- HIỂN THỊ TRỰC QUAN KÈM NÚT THAY THẾ & XÓA CHO CÁC TÀI NGUYÊN MỚI ---
+
+    // 1. Video Lý Thuyết
+    updateResourceDisplay(videoTheoryResult, uploadedVideoTheoryLink, "Video Lý Thuyết", 
+        () => videoTheoryFile.click(), 
+        () => { 
+            uploadedVideoTheoryLink = ""; 
+            updateResourceDisplay(videoTheoryResult, "", "Video Lý Thuyết", () => videoTheoryFile.click(), null); 
+        }
+    );
+
+    // 2. Video Bài Tập
+    updateResourceDisplay(videoExerciseResult, uploadedVideoExerciseLink, "Video Bài Tập", 
+        () => videoExerciseFile.click(), 
+        () => { 
+            uploadedVideoExerciseLink = ""; 
+            updateResourceDisplay(videoExerciseResult, "", "Video Bài Tập", () => videoExerciseFile.click(), null); 
+        }
+    );
+
+    // 3. Video Bài Về Nhà
+    updateResourceDisplay(videoHomeworkResult, uploadedVideoHomeworkLink, "Video Bài Về Nhà", 
+        () => videoHomeworkFile.click(), 
+        () => { 
+            uploadedVideoHomeworkLink = ""; 
+            updateResourceDisplay(videoHomeworkResult, "", "Video Bài Về Nhà", () => videoHomeworkFile.click(), null); 
+        }
+    );
+
+    // 4. PDF Lý Thuyết
+    updateResourceDisplay(pdfTheoryResult, uploadedPdfTheoryLink, "PDF Lý Thuyết", 
+        () => pdfTheoryFile.click(), 
+        () => { 
+            uploadedPdfTheoryLink = ""; 
+            updateResourceDisplay(pdfTheoryResult, "", "PDF Lý Thuyết", () => pdfTheoryFile.click(), null); 
+        }
+    );
+
+    // 5. PDF Bài Tập
+    updateResourceDisplay(pdfExerciseResult, uploadedPdfExerciseLink, "PDF Bài Tập", 
+        () => pdfExerciseFile.click(), 
+        () => { 
+            uploadedPdfExerciseLink = ""; 
+            updateResourceDisplay(pdfExerciseResult, "", "PDF Bài Tập", () => pdfExerciseFile.click(), null); 
+        }
+    );
+
+    // 6. PDF Bài Về Nhà
+    updateResourceDisplay(pdfHomeworkResult, uploadedPdfHomeworkLink, "PDF Bài Về Nhà", 
+        () => pdfHomeworkFile.click(), 
+        () => { 
+            uploadedPdfHomeworkLink = ""; 
+            updateResourceDisplay(pdfHomeworkResult, "", "PDF Bài Về Nhà", () => pdfHomeworkFile.click(), null); 
+        }
+    );
+
+    // Hiển thị các file cũ (nếu có)
     if (videoResult) videoResult.innerHTML = data.video ? `<a href="${data.video}" target="_blank">🎥 Video hiện tại</a>` : "";
     if (pdfResult) pdfResult.innerHTML = data.pdf ? `<a href="${data.pdf}" target="_blank">📄 PDF hiện tại</a>` : "";
-    
-    if (videoTheoryResult) videoTheoryResult.innerHTML = data.videoTheory ? `<a href="${data.videoTheory}" target="_blank">🎥 Video LT hiện tại</a>` : "";
-    if (videoExerciseResult) videoExerciseResult.innerHTML = data.videoExercise ? `<a href="${data.videoExercise}" target="_blank">🎥 Video BT hiện tại</a>` : "";
-    if (videoHomeworkResult) videoHomeworkResult.innerHTML = data.videoHomework ? `<a href="${data.videoHomework}" target="_blank">🎥 Video BTVN hiện tại</a>` : "";
-    
-    if (pdfTheoryResult) pdfTheoryResult.innerHTML = data.pdfTheory ? `<a href="${data.pdfTheory}" target="_blank">📄 PDF LT hiện tại</a>` : "";
-    if (pdfExerciseResult) pdfExerciseResult.innerHTML = data.pdfExercise ? `<a href="${data.pdfExercise}" target="_blank">📄 PDF BT hiện tại</a>` : "";
-    if (pdfHomeworkResult) pdfHomeworkResult.innerHTML = data.pdfHomework ? `<a href="${data.pdfHomework}" target="_blank">📄 PDF BTVN hiện tại</a>` : "";
 };
-
 if (backToCoursesBtn) {
     backToCoursesBtn.addEventListener("click", async () => {
         hideAllPages();
