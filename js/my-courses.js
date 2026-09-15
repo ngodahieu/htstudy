@@ -58,114 +58,96 @@ function createCard(course, locked = false) {
         </div>
     `;
 }
-function buildMenu(courses, container){
+function buildMenu(courses, container, isLockedGroup = false){
 
     container.innerHTML = "";
+
+    if (courses.length === 0) {
+        container.innerHTML = `<p style="font-size: 0.85rem; color: #8da5d8; padding: 10px;">Không có khóa học nào.</p>`;
+        return;
+    }
 
     const tree = {};
 
     courses.forEach(course=>{
-
         if(!tree[course.grade]){
-
             tree[course.grade] = {};
-
         }
-
         if(!tree[course.grade][course.subject]){
-
             tree[course.grade][course.subject] = [];
-
         }
-
         tree[course.grade][course.subject].push(course);
-
     });
 
     for(const grade in tree){
 
         const gradeDiv = document.createElement("div");
-
         gradeDiv.className = "menu-grade";
-
         gradeDiv.innerHTML = `
-<h4 class="grade-title">
+            <div class="grade-title">
+                <span class="arrow">▶</span>
+                <span>Lớp ${grade}</span>
+            </div>
+        `;
 
-<span class="arrow">
+        const gradeContent = document.createElement("div");
+        gradeContent.className = "grade-content";
 
-▶
-
-</span>
-
-Lớp ${grade}
-
-</h4>
-`;
-const gradeContent = document.createElement("div");
-
-gradeContent.className = "grade-content";
         for(const subject in tree[grade]){
 
             const subjectDiv = document.createElement("div");
-const subjectTitle =
-document.createElement("h5");
-const courseContainer =
-document.createElement("div");
-
-courseContainer.className =
-"course-links";
-subjectTitle.className =
-"subject-title";
-
-subjectTitle.innerHTML = `
-
-<span class="arrow">
-
-▶
-
-</span>
-
-${subject}
-
-`;
-
-subjectDiv.appendChild(subjectTitle);
             subjectDiv.className = "menu-subject";
 
+            const subjectTitle = document.createElement("div");
+            subjectTitle.className = "subject-title";
+            subjectTitle.innerHTML = `
+                <span class="arrow">▶</span>
+                <span>${subject}</span>
+            `;
+
+            const courseContainer = document.createElement("div");
+            courseContainer.className = "course-links";
 
             tree[grade][subject].forEach(course => {
-    const a = document.createElement("a");
-    a.href = `lesson.html?id=${course.id}`; // <-- Đã đổi thành lesson.html
-    a.innerHTML = `📘 ${course.name}`;
-    courseContainer.appendChild(a);
-});
-subjectDiv.appendChild(courseContainer);
+                const a = document.createElement("a");
+                
+                if (isLockedGroup) {
+                    // Khóa học tham khảo -> Chưa được cấp, bấm vào sẽ báo thông báo
+                    a.href = "#";
+                    a.className = "locked-link";
+                    a.innerHTML = `🔒 ${course.name} <span style="font-size: 0.7rem; margin-left: auto; color: #f59e0b;">Chưa cấp</span>`;
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        alert("Bạn chưa được cấp khóa học này! Vui lòng liên hệ quản trị viên để mở khóa.");
+                    };
+                } else {
+                    // Khóa học của tôi -> Cho phép vào học
+                    a.href = `lesson.html?id=${course.id}`;
+                    a.innerHTML = `📘 ${course.name}`;
+                }
+
+                courseContainer.appendChild(a);
+            });
+
+            subjectDiv.appendChild(subjectTitle);
+            subjectDiv.appendChild(courseContainer);
             gradeContent.appendChild(subjectDiv);
-subjectTitle.onclick = (e)=>{
 
-    e.stopPropagation();
-
-    subjectDiv.classList.toggle("open");
-
-};
-
+            subjectTitle.onclick = (e)=>{
+                e.stopPropagation();
+                subjectDiv.classList.toggle("open");
+            };
         }
 
-const gradeTitle =
-gradeDiv.querySelector(".grade-title");
+        const gradeTitle = gradeDiv.querySelector(".grade-title");
+        gradeTitle.onclick = (e)=>{
+            e.stopPropagation();
+            gradeDiv.classList.toggle("open");
+        };
 
-gradeTitle.onclick = (e)=>{
-
-    e.stopPropagation();
-
-    gradeDiv.classList.toggle("open");
-
-};
         gradeDiv.appendChild(gradeContent);
         container.appendChild(gradeDiv);
-
     }
-
 }
 onAuthStateChanged(auth, async(user)=>{
 
@@ -306,15 +288,17 @@ else{
 }
 
 });
-        buildMenu(
-    myCourses,
-    myCourseMenu
-);
+buildMenu(
+            myCourses,
+            myCourseMenu,
+            false
+        );
 
 buildMenu(
-    referenceCourses,
-    referenceMenu
-);
+            referenceCourses,
+            referenceMenu,
+            true
+        );
 allMyCourses = myCourses;
 allReferenceCourses = referenceCourses;
     }
