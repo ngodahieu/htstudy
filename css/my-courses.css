@@ -1603,3 +1603,191 @@ transition-delay:.2s;
 transition-delay:.25s;
 
 }
+/*======================================
+            SIDEBAR & TREE MENU (Nâng cấp giao diện)
+======================================*/
+
+.sidebar {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    padding: 24px 20px;
+    border-radius: 24px;
+    background: rgba(13, 27, 48, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(116, 185, 255, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sidebar h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(78, 162, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.sidebar h3 i {
+    color: #4ea2ff;
+    font-size: 1.1rem;
+}
+
+.sidebar hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(116, 185, 255, 0.3), transparent);
+    margin: 25px 0;
+}
+
+/* Tree Menu Container */
+.menu-group {
+    margin-bottom: 15px;
+}
+
+.menu-grade {
+    margin-bottom: 8px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.menu-grade.open {
+    background: rgba(78, 162, 255, 0.04);
+    border-color: rgba(78, 162, 255, 0.2);
+}
+
+.grade-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #e2ecff;
+    user-select: none;
+}
+
+.grade-title:hover {
+    background: rgba(78, 162, 255, 0.1);
+    color: #fff;
+}
+
+.grade-title .arrow {
+    font-size: 0.75rem;
+    color: #4ea2ff;
+    transition: transform 0.3s ease;
+}
+
+.menu-grade.open > .grade-title .arrow {
+    transform: rotate(90deg);
+}
+
+.grade-content {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    padding-left: 12px;
+}
+
+.menu-grade.open > .grade-content {
+    max-height: 1200px;
+    opacity: 1;
+    padding-bottom: 10px;
+}
+
+/* Subject Level */
+.menu-subject {
+    margin: 6px 0;
+    border-radius: 10px;
+}
+
+.subject-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    border-radius: 8px;
+    user-select: none;
+}
+
+.subject-title:hover {
+    background: rgba(78, 162, 255, 0.12);
+    color: #fff;
+}
+
+.subject-title .arrow {
+    font-size: 0.65rem;
+    color: #74b8ff;
+    transition: transform 0.3s ease;
+}
+
+.menu-subject.open > .subject-title .arrow {
+    transform: rotate(90deg);
+}
+
+/* Course Links Inside Sidebar */
+.course-links {
+    margin-left: 18px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    border-left: 1px dashed rgba(78, 162, 255, 0.2);
+    padding-left: 8px;
+}
+
+.menu-subject.open > .course-links {
+    max-height: 800px;
+    opacity: 1;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.course-links a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+    margin: 3px 0;
+}
+
+.course-links a:hover {
+    background: rgba(78, 162, 255, 0.15);
+    color: #ffffff;
+    transform: translateX(4px);
+    box-shadow: 0 0 12px rgba(78, 162, 255, 0.15);
+}
+
+/* Trạng thái khóa học bị khóa trong Sidebar */
+.course-links a.locked-link {
+    color: #64748b;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.course-links a.locked-link:hover {
+    background: rgba(255, 255, 255, 0.02);
+    transform: none;
+    box-shadow: none;
+    color: #64748b;
+}
