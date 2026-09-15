@@ -2126,8 +2126,7 @@ async function uploadResourceToCloudinary(file, resourceType = "auto") {
         return "";
     }
 }
-
-// Cập nhật sự kiện Lưu bài học (`saveLesson`)[cite: 31]
+// Cập nhật sự kiện Lưu bài học (`saveLesson`)
 if (saveLesson) {
     saveLesson.addEventListener("click", async () => {
         const title = lessonTitle.value.trim();
@@ -2138,7 +2137,6 @@ if (saveLesson) {
         if (isNaN(order) || order <= 0) return alert("Thứ tự bài học không hợp lệ.");
 
         try {
-            // Hiển thị trạng thái đang tải lên nếu cần
             saveLesson.disabled = true;
             saveLesson.textContent = "Đang tải lên tài nguyên...";
 
@@ -2175,32 +2173,19 @@ if (saveLesson) {
                 title,
                 description,
                 order,
-                videoTheory: uploadedVideoTheoryLink || "",
-                videoExercise: uploadedVideoExerciseLink || "",
-                videoHomework: uploadedVideoHomeworkLink || "",
-                pdfTheory: uploadedPdfTheoryLink || "",
-                pdfExercise: uploadedPdfExerciseLink || "",
-                pdfHomework: uploadedPdfHomeworkLink || "",
-                video: uploadedVideoLink || "",
-                pdf: uploadedPdfLink || "",
+                videoTheory: uploadedVideoTheoryLink,
+                videoExercise: uploadedVideoExerciseLink,
+                videoHomework: uploadedVideoHomeworkLink,
+                pdfTheory: uploadedPdfTheoryLink,
+                pdfExercise: uploadedPdfExerciseLink,
+                pdfHomework: uploadedPdfHomeworkLink,
+                video: uploadedVideoLink,
+                pdf: uploadedPdfLink,
                 updatedAt: serverTimestamp()
             };
 
             if (editingLessonId) {
                 const lessonRef = doc(db, "courses", currentCourseId, "chapters", currentChapterId, "lessons", editingLessonId);
-                const snap = await getDoc(lessonRef);
-                const oldData = snap.exists() ? snap.data() : {};
-
-                // Giữ lại link cũ nếu không chọn file mới thay thế
-                lessonData.video = uploadedVideoLink || oldData.video || "";
-                lessonData.pdf = uploadedPdfLink || oldData.pdf || "";
-                lessonData.videoTheory = uploadedVideoTheoryLink || oldData.videoTheory || "";
-                lessonData.videoExercise = uploadedVideoExerciseLink || oldData.videoExercise || "";
-                lessonData.videoHomework = uploadedVideoHomeworkLink || oldData.videoHomework || "";
-                lessonData.pdfTheory = uploadedPdfTheoryLink || oldData.pdfTheory || "";
-                lessonData.pdfExercise = uploadedPdfExerciseLink || oldData.pdfExercise || "";
-                lessonData.pdfHomework = uploadedPdfHomeworkLink || oldData.pdfHomework || "";
-
                 await updateDoc(lessonRef, lessonData);
                 alert("Đã cập nhật bài học thành công!");
             } else {
@@ -2212,8 +2197,9 @@ if (saveLesson) {
                 alert("Đã tạo bài học mới thành công!");
             }
 
-            // Reset form...
-            // (Giữ nguyên các lệnh reset state và đóng modal của bạn ở đây)
+            // Đóng modal và reset
+            if (lessonModal) lessonModal.style.display = "none";
+            await loadLessons();
 
         } catch (err) {
             console.error("Lỗi lưu bài học:", err);
