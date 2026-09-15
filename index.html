@@ -24,14 +24,13 @@
 
     <div class="space-bg"></div>
     <div class="overlay"></div>
-
-    <!-- ========================= -->
+<!-- ========================= -->
 <!-- Header -->
 <!-- ========================= -->
 <header class="header">
     <div class="container">
 
-        <!-- Nhóm bên trái: Nút 3 gạch + Logo -->
+        <!-- Nhóm bên trái: Nút 3 gạch (mobile) + Logo -->
         <div class="header-left-group">
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
                 <i class="fa-solid fa-bars"></i>
@@ -46,8 +45,16 @@
             </a>
         </div>
 
-        <!-- Nhóm bên phải: Thông báo & Avatar (luôn nằm cùng hàng trên mobile) -->
-        <div class="header-right-group">
+        <!-- Nhóm bên phải: Menu chính (Desktop) + Thông báo & Avatar -->
+        <div class="header-actions">
+            <!-- Thanh menu hiển thị trên máy tính (Desktop) -->
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active">Trang chủ</a></li>
+                <li><a href="courses.html" id="coursesLink">Khóa học</a></li>
+                <li><a href="exam.html" id="examLink">Thi thử</a></li>
+                <li><a href="result.html" id="resultLink">Kết quả</a></li>
+            </ul>
+
             <div class="header-right">
                 <button class="notification-btn" id="notificationBtn">
                     <i class="fa-regular fa-bell"></i>
@@ -103,7 +110,8 @@
 
     </div>
 </header>
-    <!-- Sidebar Menu và Overlay đặt bên ngoài Header để tránh lỗi định vị layout trên mobile -->
+
+<!-- Sidebar Menu dùng riêng cho phiên bản Mobile -->
 <nav class="nav-sidebar" id="navSidebar">
     <div class="sidebar-header">
         <h3>Menu</h3>
@@ -113,9 +121,9 @@
     </div>
     <ul class="nav-menu">
         <li><a href="index.html" class="active">Trang chủ</a></li>
-        <li><a href="courses.html" id="coursesLink">Khóa học</a></li>
-        <li><a href="exam.html" id="examLink">Thi thử</a></li>
-        <li><a href="result.html" id="resultLink">Kết quả</a></li>
+        <li><a href="courses.html">Khóa học</a></li>
+        <li><a href="exam.html">Thi thử</a></li>
+        <li><a href="result.html">Kết quả</a></li>
     </ul>
 </nav>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
