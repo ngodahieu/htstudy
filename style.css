@@ -5400,3 +5400,17 @@ transparent 70%);
         display: none !important;
     }
 }
+/* --- Sửa lỗi menu ngang hiển thị nhầm trên điện thoại --- */
+@media (max-width: 900px) {
+    /* Ẩn hoàn toàn thanh menu ngang dạng desktop trên thiết bị di động */
+    .header-actions > .nav-menu {
+        display: none !important;
+    }
+    
+    /* Đảm bảo nút 3 gạch mở sidebar luôn hiện đúng vị trí trên mobile */
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+}
