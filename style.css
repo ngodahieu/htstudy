@@ -5305,3 +5305,98 @@ transparent 70%);
         display: none; 
     }
 }
+/* --- Cấu hình Sidebar Mobile (Ẩn trên Desktop, hoạt động trên Mobile) --- */
+.nav-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Mặc định ẩn ngoài màn hình bên trái */
+    width: 280px;
+    height: 100vh;
+    height: 100dvh;
+    background: linear-gradient(145deg, #0f1c3f, #070e1d);
+    border-right: 1px solid rgba(120, 190, 255, 0.15);
+    z-index: 10000;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+.nav-sidebar.active {
+    transform: translateX(280px); /* Trượt hiện ra khi bấm nút 3 gạch */
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 12px;
+}
+
+.sidebar-header h3 {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.close-sidebar {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+/* Định dạng danh sách menu nằm dọc bên trong sidebar mobile */
+.nav-sidebar .nav-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.nav-sidebar .nav-menu a {
+    display: block;
+    padding: 14px 20px;
+    border-radius: 12px;
+}
+
+/* Lớp phủ mờ phía sau khi bật sidebar */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.35s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Kích hoạt nút 3 gạch và bố cục header trên màn hình điện thoại (Dọc & Ngang) */
+@media(max-width: 900px) {
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Ẩn menu ngang cũ của desktop trên giao diện di động */
+    .header-actions > .nav-menu {
+        display: none !important;
+    }
+}
