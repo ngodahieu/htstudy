@@ -57,305 +57,110 @@
 <!-- ==================================================
                     HEADER
 ================================================== -->
-
 <header class="header">
-
     <div class="container">
 
+        <!-- Nhóm bên trái: Nút 3 gạch (mobile) + Logo -->
+        <div class="header-left-group">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-        <!-- ==========================
-                LOGO
-        =========================== -->
+            <a class="logo" href="index.html">
+                <img src="assets/images/logo.png" alt="H&T STUDY">
+                <div class="logo-text">
+                    <h2>H&T STUDY</h2>
+                    <span>Chinh phục tri thức</span>
+                </div>
+            </a>
+        </div>
 
-        <a
-            class="logo"
-            href="index.html"
-        >
-
-            <img
-                src="assets/images/logo.png"
-                alt="H&T STUDY"
-            >
-
-            <div class="logo-text">
-
-                <h2>H&T STUDY</h2>
-
-                <span>
-                    Chinh phục tri thức
-                </span>
-
-            </div>
-
-        </a>
-
-
-        <!-- ==========================
-                HEADER ACTIONS
-        =========================== -->
-
+        <!-- Nhóm bên phải: Menu Desktop + Thông báo & Avatar -->
         <div class="header-actions">
-
-
-            <!-- ==========================
-                    NAVIGATION
-            =========================== -->
-
-            <nav>
-
-                <ul class="nav-menu">
-
-                    <li>
-
-                        <a href="index.html">
-                            Trang chủ
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a href="courses.html">
-                            Khóa học
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a
-                            class="active"
-                            href="exam.html"
-                        >
-                            Thi thử
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a href="result.html">
-                            Kết quả
-                        </a>
-
-                    </li>
-
-                </ul>
-
-            </nav>
-
-
-            <!-- ==========================
-                    HEADER RIGHT
-            =========================== -->
+            <!-- Thanh menu hiển thị trên máy tính (Desktop) -->
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="courses.html">Khóa học</a></li>
+                <li><a class="active" href="exam.html">Thi thử</a></li>
+                <li><a href="result.html">Kết quả</a></li>
+            </ul>
 
             <div class="header-right">
-
-
-                <!-- ==========================
-                        NOTIFICATION
-                =========================== -->
-
-                <button
-                    class="notification-btn"
-                    id="notificationBtn"
-                >
-
+                <!-- Thông báo -->
+                <button class="notification-btn" id="notificationBtn">
                     <i class="fa-regular fa-bell"></i>
-
-                    <span
-                        class="badge"
-                        id="notificationBadge"
-                        style="display:none;"
-                    >
-                        0
-                    </span>
-
+                    <span class="badge" id="notificationBadge" style="display:none;">0</span>
                 </button>
 
-
-                <!-- ==========================
-                        NOTIFICATION PANEL
-                =========================== -->
-
-                <div
-                    class="notification-panel"
-                    id="notificationPanel"
-                >
-
+                <div class="notification-panel" id="notificationPanel">
                     <div class="notification-header">
-
-                        <h3>
-                            Thông báo
-                        </h3>
-
-                        <button
-                            id="closeNotification"
-                        >
-
+                        <h3>Thông báo</h3>
+                        <button id="closeNotification">
                             <i class="fa-solid fa-xmark"></i>
-
                         </button>
-
                     </div>
-
-
-                    <div
-                        class="notification-list"
-                        id="notificationList"
-                    >
-
+                    <div class="notification-list" id="notificationList">
                         <div class="notification-empty">
-
                             <i class="fa-regular fa-bell-slash"></i>
-
-                            <p>
-                                Chưa có thông báo nào.
-                            </p>
-
+                            <p>Chưa có thông báo nào.</p>
                         </div>
-
                     </div>
-
                 </div>
 
-
-                <!-- ==========================
-                        AVATAR
-                =========================== -->
-
+                <!-- Avatar -->
                 <div class="avatar">
-
-                    <img
-                        src="assets/avatars/default.jpg"
-                        alt="Avatar"
-                    >
-
+                    <img src="assets/avatars/default.jpg" alt="Avatar">
                 </div>
 
-
-                <!-- ==========================
-                        USER MENU
-                =========================== -->
-
-                <div
-                    class="user-menu"
-                    id="userMenu"
-                >
-
-
-                    <!-- USER INFO -->
-
-                    <div
-                        class="user-box"
-                        id="userBox"
-                        style="display:none;"
-                    >
-
+                <div class="user-menu" id="userMenu">
+                    <div class="user-box" id="userBox" style="display:none;">
                         <div class="user-profile">
-
-                            <img
-                                id="userAvatar"
-                                src="assets/avatars/default.jpg"
-                                alt="Avatar"
-                            >
-
+                            <img id="userAvatar" src="assets/avatars/default.jpg" alt="Avatar">
                             <div class="user-info">
-
                                 <h3 id="userName"></h3>
-
-                                <p>
-
-                                    Mã học sinh:
-
-                                    <span id="userStudentId"></span>
-
-                                </p>
-
-                                <p>
-
-                                    Vai trò:
-
-                                    <span id="userRole"></span>
-
-                                </p>
-
+                                <p>Mã học sinh: <span id="userStudentId"></span></p>
+                                <p>Vai trò: <span id="userRole"></span></p>
                             </div>
-
                         </div>
-
                     </div>
 
-
-                    <!-- MENU -->
-
-                    <div
-                        class="user-menu-list"
-                        id="userMenuList"
-                        style="display:none;"
-                    >
-
-
-                        <!-- KHÓA HỌC -->
-
+                    <div class="user-menu-list" id="userMenuList" style="display:none;">
                         <button id="myCoursesBtn">
-
-                            <i class="fa-solid fa-book-open"></i>
-
-                            Khóa học của tôi
-
+                            <i class="fa-solid fa-book-open"></i> Khóa học của tôi
                         </button>
-
-
-                        <!-- QUẢN LÍ -->
-
-                        <button
-                            id="manageBtn"
-                            style="display:none;"
-                        >
-
-                            <i class="fa-solid fa-screwdriver-wrench"></i>
-
-                            Quản lí
-
+                        <button id="manageBtn" style="display:none;">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Quản lí
                         </button>
-
-
-                        <!-- HƯỚNG DẪN -->
-
                         <button id="userGuide">
-
-                            <i class="fa-regular fa-circle-question"></i>
-
-                            Hướng dẫn
-
+                            <i class="fa-regular fa-circle-question"></i> Hướng dẫn
                         </button>
-
-
-                        <!-- ĐĂNG XUẤT -->
-
                         <button id="logoutBtn">
-
-                            <i class="fa-solid fa-right-from-bracket"></i>
-
-                            Đăng xuất
-
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
                         </button>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
 
     </div>
-
 </header>
+
+<!-- Sidebar Menu dùng riêng cho phiên bản Mobile (Màn hình dọc & ngang) -->
+<nav class="nav-sidebar" id="navSidebar">
+    <div class="sidebar-header">
+        <h3>Menu</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <ul class="nav-menu">
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="courses.html">Khóa học</a></li>
+        <li><a class="active" href="exam.html">Thi thử</a></li>
+        <li><a href="result.html">Kết quả</a></li>
+    </ul>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- ==================================================
                     EXAM CONTENT
 ================================================== -->
