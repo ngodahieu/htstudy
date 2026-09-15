@@ -28,12 +28,11 @@
     <!-- ========================= -->
 <!-- Header -->
 <!-- ========================= -->
-
 <header class="header">
     <div class="container">
 
         <!-- Nhóm bên trái: Nút 3 gạch + Logo -->
-        <div class="header-left-group" style="display: flex; align-items: center; gap: 15px;">
+        <div class="header-left-group">
             <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
@@ -47,27 +46,8 @@
             </a>
         </div>
 
-        <!-- Sidebar Menu cho Mobile & Desktop Navigation -->
-        <div class="header-actions">
-            <nav class="nav-sidebar" id="navSidebar">
-                <div class="sidebar-header">
-                    <h3>Menu</h3>
-                    <button class="close-sidebar" id="closeSidebar">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Trang chủ</a></li>
-                    <li><a href="courses.html" id="coursesLink">Khóa học</a></li>
-                    <li><a href="exam.html" id="examLink">Thi thử</a></li>
-                    <li><a href="result.html" id="resultLink">Kết quả</a></li>
-                </ul>
-            </nav>
-
-            <!-- Overlay mờ khi mở sidebar trên điện thoại -->
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-            <!-- Nhóm bên phải: Thông báo & Avatar luôn được giữ nguyên ở đây -->
+        <!-- Nhóm bên phải: Thông báo & Avatar (luôn nằm cùng hàng trên mobile) -->
+        <div class="header-right-group">
             <div class="header-right">
                 <button class="notification-btn" id="notificationBtn">
                     <i class="fa-regular fa-bell"></i>
@@ -92,7 +72,6 @@
                 </div>
 
                 <div class="user-menu" id="userMenu">
-                    <!-- Giữ nguyên nội dung userMenu hiện tại của bạn -->
                     <div class="guest-box" id="guestBox">
                         <div class="guest-avatar"><i class="fa-regular fa-user"></i></div>
                         <h3>Bạn chưa đăng nhập</h3>
@@ -124,6 +103,22 @@
 
     </div>
 </header>
+    <!-- Sidebar Menu và Overlay đặt bên ngoài Header để tránh lỗi định vị layout trên mobile -->
+<nav class="nav-sidebar" id="navSidebar">
+    <div class="sidebar-header">
+        <h3>Menu</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <ul class="nav-menu">
+        <li><a href="index.html" class="active">Trang chủ</a></li>
+        <li><a href="courses.html" id="coursesLink">Khóa học</a></li>
+        <li><a href="exam.html" id="examLink">Thi thử</a></li>
+        <li><a href="result.html" id="resultLink">Kết quả</a></li>
+    </ul>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- ========================= -->
     <!-- Countdown -->
     <!-- ========================= -->
