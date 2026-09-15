@@ -28,46 +28,55 @@
 <!-- HEADER -->
 <header class="header">
     <div class="container">
-        <a class="logo" href="index.html">
-            <img src="assets/images/logo.png" alt="H&T STUDY">
-            <div class="logo-text">
-                <h2>H&T STUDY</h2>
-                <span>Chinh phục tri thức</span>
-            </div>
-        </a>
 
+        <!-- Nhóm bên trái: Nút 3 gạch (mobile) + Logo -->
+        <div class="header-left-group">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <a class="logo" href="index.html">
+                <img src="assets/images/logo.png" alt="H&T STUDY">
+                <div class="logo-text">
+                    <h2>H&T STUDY</h2>
+                    <span>Chinh phục tri thức</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Nhóm bên phải: Menu Desktop + Thông báo & Avatar -->
         <div class="header-actions">
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="index.html">Trang chủ</a></li>
-                    <li><a href="courses.html">Khóa học</a></li>
-                    <li><a href="exam.html">Thi thử</a></li>
-                    <li><a class="active" href="result.html">Kết quả</a></li>
-                </ul>
-            </nav>
+            <!-- Thanh menu hiển thị trên máy tính (Desktop) -->
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang chủ</a></li>
+                <li><a href="courses.html">Khóa học</a></li>
+                <li><a href="exam.html">Thi thử</a></li>
+                <li><a class="active" href="result.html">Kết quả</a></li>
+            </ul>
 
             <div class="header-right">
+                <!-- Thông báo -->
                 <button class="notification-btn" id="notificationBtn">
                     <i class="fa-regular fa-bell"></i>
                     <span class="badge" id="notificationBadge" style="display:none;">0</span>
                 </button>
 
-            <!-- Cấu trúc lấy từ exam.html -->
-<div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-        <h3>Thông báo</h3>
-        <button id="closeNotification">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-    </div>
-    <div class="notification-list" id="notificationList">
-        <div class="notification-empty">
-            <i class="fa-regular fa-bell-slash"></i>
-            <p>Chưa có thông báo nào.</p>
-        </div>
-    </div>
-</div>
+                <div class="notification-panel" id="notificationPanel">
+                    <div class="notification-header">
+                        <h3>Thông báo</h3>
+                        <button id="closeNotification">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        <div class="notification-empty">
+                            <i class="fa-regular fa-bell-slash"></i>
+                            <p>Chưa có thông báo nào.</p>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Avatar -->
                 <div class="avatar">
                     <img src="assets/avatars/default.jpg" alt="Avatar">
                 </div>
@@ -83,20 +92,44 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="user-menu-list" id="userMenuList" style="display:none;">
-                        <button id="myCoursesBtn"><i class="fa-solid fa-book-open"></i> Khóa học của tôi</button>
-                        <button id="manageBtn" style="display:none;"><i class="fa-solid fa-screwdriver-wrench"></i> Quản lí</button>
+                        <button id="myCoursesBtn">
+                            <i class="fa-solid fa-book-open"></i> Khóa học của tôi
+                        </button>
+                        <button id="manageBtn" style="display:none;">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Quản lí
+                        </button>
                         <button id="userGuide">
-        <i class="fa-regular fa-circle-question"></i> Hướng dẫn
-    </button>
-                        <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</button>
+                            <i class="fa-regular fa-circle-question"></i> Hướng dẫn
+                        </button>
+                        <button id="logoutBtn">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </header>
 
+<!-- Sidebar Menu dùng riêng cho phiên bản Mobile (Màn hình dọc & ngang) -->
+<nav class="nav-sidebar" id="navSidebar">
+    <div class="sidebar-header">
+        <h3>Menu</h3>
+        <button class="close-sidebar" id="closeSidebar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <ul class="nav-menu">
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="courses.html">Khóa học</a></li>
+        <li><a href="exam.html">Thi thử</a></li>
+        <li><a class="active" href="result.html">Kết quả</a></li>
+    </ul>
+</nav>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <!-- MAIN RESULT CONTENT -->
 <main class="exam-page">
     <div class="exam-container">
