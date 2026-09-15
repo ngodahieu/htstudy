@@ -201,3 +201,48 @@
         grid-template-columns: 1fr;
     }
 }
+/*==================================================
+    TỐI ƯU HÓA MOBILE (MÀN HÌNH DỌC) CHO TRANG KẾT QUẢ
+==================================================*/
+@media(max-width: 768px) {
+    .header .container {
+        height: 70px !important;
+        padding: 0 12px !important;
+        flex-direction: row !important;
+    }
+
+    .header-left-group {
+        gap: 10px !important;
+    }
+
+    .mobile-menu-btn {
+        display: flex !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 16px !important;
+    }
+
+    .header-actions > .nav-menu {
+        display: none !important;
+    }
+
+    .logo {
+        gap: 10px !important;
+    }
+
+    .logo img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .logo-text h2 {
+        font-size: 1.05rem !important;
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+    }
+
+    .logo-text span {
+        font-size: 0.7rem !important;
+        display: block;
+    }
+}
