@@ -5175,3 +5175,133 @@ transparent 70%);
         text-align: left;
     }
 }
+/* Thiết lập mặc định cho các nhóm trong header */
+.header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-right-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Nút mở menu mobile (3 gạch) mặc định ẩn trên desktop */
+.mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+/* Cấu hình Sidebar cho Mobile */
+.nav-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    height: 100dvh; /* Hỗ trợ chuẩn khung nhìn di động tránh bị tuột */
+    background: linear-gradient(145deg, #0f1c3f, #070e1d);
+    border-right: 1px solid rgba(120, 190, 255, 0.15);
+    z-index: 10000;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+}
+
+.nav-sidebar.active {
+    transform: translateX(280px);
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 15px;
+}
+
+.sidebar-header h3 {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.close-sidebar {
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+/* Biến đổi .nav-menu khi nằm trong sidebar mobile */
+.nav-sidebar .nav-menu {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    overflow-y: auto; /* Cho phép cuộn dọc khi danh sách menu dài */
+    max-height: calc(100vh - 100px);
+}
+
+.nav-sidebar .nav-menu a {
+    display: block;
+    padding: 14px 20px;
+    border-radius: 12px;
+}
+
+/* Overlay mờ phía sau sidebar */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.35s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Xử lý riêng cho màn hình điện thoại (< 768px) */
+@media(max-width: 768px) {
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .header .container {
+        flex-direction: row !important; /* Luôn nằm trên một hàng ngang */
+        justify-content: space-between !important;
+        height: 75px !important;
+        padding: 0 15px !important;
+    }
+
+    .header-actions {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    /* Ẩn thanh menu desktop cũ nếu còn sót lại */
+    .header-actions > .nav-sidebar {
+        display: none; 
+    }
+}
