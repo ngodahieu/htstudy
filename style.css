@@ -1380,3 +1380,58 @@ RESPONSIVE MEDIA QUERIES
         font-size: 2rem;
     }
 }
+/* --- Tối ưu hóa kích thước Logo & Tên web trên điện thoại (Màn hình dọc) --- */
+@media(max-width: 768px) {
+    .header .container {
+        height: 70px !important; /* Cố định chiều cao header gọn gàng */
+        padding: 0 12px !important;
+    }
+
+    .logo {
+        gap: 10px !important; /* Thu nhỏ khoảng cách giữa ảnh và chữ */
+    }
+
+    .logo img {
+        width: 40px !important;   /* Thu nhỏ kích thước ảnh logo */
+        height: 40px !important;
+    }
+
+    .logo-text h2 {
+        font-size: 1.05rem !important; /* Thu nhỏ chữ H&T STUDY vừa vặn */
+        letter-spacing: 0.5px;
+        line-height: 1.2;
+    }
+
+    .logo-text span {
+        font-size: 0.7rem !important;  /* Thu nhỏ slogan để không bị tràn dòng */
+        color: #99b7de;
+        display: block;
+    }
+
+    /* Thu nhỏ các nút hành động bên phải (thông báo, avatar, nút 3 gạch) cho cân đối */
+    .mobile-menu-btn {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 16px !important;
+    }
+
+    .notification-btn {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .avatar {
+        width: 40px !important;
+        height: 40px !important;
+    }
+}
+
+/* Riêng cho các dòng máy màn hình dọc siêu nhỏ (dưới 380px) */
+@media(max-width: 380px) {
+    .logo-text h2 {
+        font-size: 0.95rem !important;
+    }
+    .logo-text span {
+        font-size: 0.65rem !important;
+    }
+}
