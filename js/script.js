@@ -228,15 +228,13 @@ const myCoursesBtn = document.getElementById("myCoursesBtn");
 const manageBtn = document.getElementById("manageBtn");
 let currentRole = "";
 logoutBtn.addEventListener("click", async () => {
-
     await signOut(auth);
-loginForm.reset();
+    if (loginForm) {
+        loginForm.reset();
+    }
     currentUser = null;
-
     currentRole = "";
-
     userMenu.classList.remove("active");
-
 });
 
 /* Mở / Đóng User Menu */
@@ -721,3 +719,25 @@ showNotificationBadge(0);
 }
 
 });
+/*==========================================
+        MOBILE SIDEBAR MENU
+==========================================*/
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const navSidebar = document.getElementById("navSidebar");
+const closeSidebar = document.getElementById("closeSidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+if (mobileMenuBtn && navSidebar) {
+    mobileMenuBtn.addEventListener("click", () => {
+        navSidebar.classList.add("active");
+        if (sidebarOverlay) sidebarOverlay.classList.add("active");
+    });
+
+    const closeNavSidebar = () => {
+        navSidebar.classList.remove("active");
+        if (sidebarOverlay) sidebarOverlay.classList.remove("active");
+    };
+
+    if (closeSidebar) closeSidebar.addEventListener("click", closeNavSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeNavSidebar);
+}
