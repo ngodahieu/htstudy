@@ -176,24 +176,22 @@ mainTabButtons.forEach(btn => {
             pdfSubMenu.style.display = "none";
             
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-sub-tab="videoTheory"], [data-tab="videoTheory"]');
+            // Chọn mặc định tab đầu tiên của video (Lý thuyết)
+            const defaultSub = videoSubMenu.querySelector('.sub-tab-btn');
             if (defaultSub) {
                 defaultSub.classList.add("active");
-                currentTab = defaultSub.dataset.subTab || defaultSub.dataset.tab;
-            } else {
-                currentTab = "videoTheory";
+                currentTab = "videoTheory"; // Gán chính xác với Firestore
             }
         } else if (parentType === "pdf-parent") {
             videoSubMenu.style.display = "none";
             pdfSubMenu.style.display = "flex";
             
             subTabButtons.forEach(sub => sub.classList.remove("active"));
-            const defaultSub = document.querySelector('[data-sub-tab="pdfTheory"], [data-tab="pdfTheory"]');
+            // Chọn mặc định tab đầu tiên của PDF (Lý thuyết)
+            const defaultSub = pdfSubMenu.querySelector('.sub-tab-btn');
             if (defaultSub) {
                 defaultSub.classList.add("active");
-                currentTab = defaultSub.dataset.subTab || defaultSub.dataset.tab;
-            } else {
-                currentTab = "pdfTheory";
+                currentTab = "pdfTheory"; // Gán chính xác với Firestore
             }
         }
 
@@ -202,7 +200,6 @@ mainTabButtons.forEach(btn => {
         }
     });
 });
-
 // 2. Xử lý click chọn bài học trong danh sách
 document.addEventListener("click", (e) => {
     const item = e.target.closest(".lesson-menu-item");
@@ -222,14 +219,22 @@ subTabButtons.forEach(subBtn => {
     subBtn.addEventListener("click", () => {
         subTabButtons.forEach(sub => sub.classList.remove("active"));
         subBtn.classList.add("active");
-        currentTab = subBtn.dataset.subTab || subBtn.dataset.tab;
+        
+        const tabType = subBtn.dataset.tab;
+        
+        // Ánh xạ từ data-tab sang tên field tương ứng trong Firestore
+        if (tabType === "video-lythuyet") currentTab = "videoTheory";
+        else if (tabType === "video-baitap") currentTab = "videoExercise";
+        else if (tabType === "video-btvn") currentTab = "videoHomework";
+        else if (tabType === "pdf-lythuyet") currentTab = "pdfTheory";
+        else if (tabType === "pdf-baitap") currentTab = "pdfExercise";
+        else if (tabType === "pdf-btvn") currentTab = "pdfHomework";
 
         if (currentLesson) {
             showLesson(currentLesson);
         }
     });
 });
-
 loadCourse();
 
 window.toggleChapter = function(chapterId) {
